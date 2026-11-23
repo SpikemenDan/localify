@@ -5,11 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Localify — Offline MP3 Player</title>
   <script>
-    // Apply the saved theme before first paint to avoid a flash of the default theme
-    try {
-      const t = JSON.parse(localStorage.getItem('localify_theme_v1'));
-      if (typeof t === 'string' && t !== 'emerald') document.documentElement.dataset.theme = t;
-    } catch (e) { /* no storage */ }
+    // [Settings] Apply the saved mode/accent/density before first paint (no flash).
+    // Keep the legacy map in sync with LEGACY_THEME_MAP in the app script.
+    (function () {
+      var root = document.documentElement, mode = 'dark', accent = 'green', density = 'comfortable';
+      try {
+        var s = JSON.parse(localStorage.getItem('localify_appearance_v1'));
+        if (s && typeof s === 'object') {
+          mode = s.mode || mode; accent = s.accent || accent; density = s.density || density;
+        } else {
+          var legacy = { emerald: ['dark', 'green'], light: ['light', 'green'], ocean: ['dark', 'blue'],
+            sunset: ['dark', 'orange'], violet: ['dark', 'purple'], rose: ['dark', 'pink'] }[JSON.parse(localStorage.getItem('localify_theme_v1'))];
+          if (legacy) { mode = legacy[0]; accent = legacy[1]; }
+        }
+      } catch (e) { /* no storage */ }
+      if (mode === 'system') mode = window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      root.dataset.mode = mode === 'light' ? 'light' : 'dark';
+      root.dataset.accent = accent;
+      if (density === 'compact') root.dataset.density = 'compact';
+    })();
   </script>
   <style>
     /* ==========================================================================
@@ -47,79 +61,18 @@
     }
 
     /* ==========================================================================
-       Themes (set via <html data-theme="...">; default "emerald" = :root)
+       [Settings] Appearance: Mode × Accent
+       <html data-mode="dark|light" data-accent="green|blue|purple|pink|orange|teal">
+       :root above is the dark base (with green as a no-JS fallback). Accent
+       blocks are plain [data-accent] selectors so a swatch element can carry
+       its own data-accent and preview that accent in the current mode.
        ========================================================================== */
-    :root[data-theme="ocean"] {
-      --bg-base: #05080f;
-      --bg-surface: #0d1320;
-      --bg-elevated: #131b2b;
-      --bg-highlight: #1e2a40;
-      --bg-press: #28364f;
-      --accent: #4aa8ff;
-      --accent-hover: #6cb9ff;
-      --accent-deep: #0f3a6b;
-      --accent-rgb: 74, 168, 255;
-      --text-secondary: #a9b4c7;
-      --text-muted: #6b778c;
-      --surface-rgb: 13, 19, 32;
-    }
-
-    :root[data-theme="sunset"] {
-      --bg-base: #0c0705;
-      --bg-surface: #17100c;
-      --bg-elevated: #1e1510;
-      --bg-highlight: #31221a;
-      --bg-press: #3d2b21;
-      --accent: #ff8a4c;
-      --accent-hover: #ffa06b;
-      --accent-deep: #7a2e10;
-      --accent-rgb: 255, 138, 76;
-      --text-secondary: #c4b3a8;
-      --text-muted: #85746a;
-      --surface-rgb: 23, 16, 12;
-    }
-
-    :root[data-theme="violet"] {
-      --bg-base: #08060d;
-      --bg-surface: #120f1b;
-      --bg-elevated: #191424;
-      --bg-highlight: #2a2239;
-      --bg-press: #352b47;
-      --accent: #b18cff;
-      --accent-hover: #c3a6ff;
-      --accent-deep: #45238f;
-      --accent-rgb: 177, 140, 255;
-      --text-secondary: #b7afc8;
-      --text-muted: #776f88;
-      --surface-rgb: 18, 15, 27;
-    }
-
-    :root[data-theme="rose"] {
-      --bg-base: #0c0507;
-      --bg-surface: #170c10;
-      --bg-elevated: #1f1116;
-      --bg-highlight: #331c24;
-      --bg-press: #40242e;
-      --accent: #ff5c7a;
-      --accent-hover: #ff7d95;
-      --accent-deep: #7a1028;
-      --accent-rgb: 255, 92, 122;
-      --text-secondary: #c7adb5;
-      --text-muted: #886c75;
-      --surface-rgb: 23, 12, 16;
-    }
-
-    :root[data-theme="light"] {
+    :root[data-mode="light"] {
       --bg-base: #f2f2f4;
       --bg-surface: #ffffff;
       --bg-elevated: #ffffff;
       --bg-highlight: #e8e8ec;
       --bg-press: #dcdce2;
-      --accent: #15803d;
-      --accent-hover: #16a34a;
-      --accent-deep: #0b4d24;
-      --accent-rgb: 21, 128, 61;
-      --on-accent: #ffffff;
       --text-primary: #111114;
       --text-secondary: #4a4a52;
       --text-muted: #80808a;
@@ -128,49 +81,37 @@
       color-scheme: light;
     }
 
-    /* Theme picker (sidebar footer) */
-    .theme-picker {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      padding: 2px 2px;
+    /* Dark-mode accents: bright, black text on top */
+    [data-accent="green"]  { --accent: #1DB954; --accent-hover: #1ed760; --accent-deep: #0b5c28; --accent-rgb: 29, 185, 84;   --on-accent: #000000; }
+    [data-accent="blue"]   { --accent: #4aa8ff; --accent-hover: #6cb9ff; --accent-deep: #0f3a6b; --accent-rgb: 74, 168, 255;  --on-accent: #000000; }
+    [data-accent="purple"] { --accent: #b18cff; --accent-hover: #c3a6ff; --accent-deep: #45238f; --accent-rgb: 177, 140, 255; --on-accent: #000000; }
+    [data-accent="pink"]   { --accent: #ff5c8a; --accent-hover: #ff7da1; --accent-deep: #7a1035; --accent-rgb: 255, 92, 138;  --on-accent: #000000; }
+    [data-accent="orange"] { --accent: #ff8a4c; --accent-hover: #ffa06b; --accent-deep: #7a2e10; --accent-rgb: 255, 138, 76;  --on-accent: #000000; }
+    [data-accent="teal"]   { --accent: #2dd4bf; --accent-hover: #5eead4; --accent-deep: #0f5c55; --accent-rgb: 45, 212, 191;  --on-accent: #000000; }
+
+    /* Light-mode accents: darker for contrast on white (all >= 4.5:1), white text on top */
+    [data-mode="light"][data-accent="green"],  [data-mode="light"] [data-accent="green"]  { --accent: #15803d; --accent-hover: #166534; --accent-deep: #0b4d24; --accent-rgb: 21, 128, 61;  --on-accent: #ffffff; }
+    [data-mode="light"][data-accent="blue"],   [data-mode="light"] [data-accent="blue"]   { --accent: #2563eb; --accent-hover: #1d4ed8; --accent-deep: #1e3a8a; --accent-rgb: 37, 99, 235;  --on-accent: #ffffff; }
+    [data-mode="light"][data-accent="purple"], [data-mode="light"] [data-accent="purple"] { --accent: #7c3aed; --accent-hover: #6d28d9; --accent-deep: #4c1d95; --accent-rgb: 124, 58, 237; --on-accent: #ffffff; }
+    [data-mode="light"][data-accent="pink"],   [data-mode="light"] [data-accent="pink"]   { --accent: #db2777; --accent-hover: #be185d; --accent-deep: #831843; --accent-rgb: 219, 39, 119; --on-accent: #ffffff; }
+    [data-mode="light"][data-accent="orange"], [data-mode="light"] [data-accent="orange"] { --accent: #c2410c; --accent-hover: #9a3412; --accent-deep: #7c2d12; --accent-rgb: 194, 65, 12;  --on-accent: #ffffff; }
+    [data-mode="light"][data-accent="teal"],   [data-mode="light"] [data-accent="teal"]   { --accent: #0f766e; --accent-hover: #115e59; --accent-deep: #134e4a; --accent-rgb: 15, 118, 110; --on-accent: #ffffff; }
+
+    /* --accent-dim is derived, so re-derive it wherever the accent changes */
+    [data-accent] { --accent-dim: rgba(var(--accent-rgb), 0.16); }
+
+    /* [Settings] Compact rows (ROW_HEIGHT in JS follows this) */
+    :root[data-density="compact"] #tracklistBody .track-row {
+      height: 44px;
+      padding-top: 4px;
+      padding-bottom: 4px;
     }
 
-    .theme-picker-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
+    :root[data-density="compact"] #tracklistBody .track-thumb {
+      width: 32px;
+      height: 32px;
     }
-
-    .theme-swatches {
-      display: flex;
-      gap: 6px;
-    }
-
-    .theme-swatch {
-      width: 18px;
-      height: 18px;
-      border-radius: var(--radius-full);
-      background: linear-gradient(135deg, var(--sw-accent) 0 50%, var(--sw-bg) 50% 100%);
-      box-shadow: 0 0 0 1px rgba(var(--fg-rgb), 0.25);
-      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-    }
-
-    .theme-swatch:hover {
-      transform: scale(1.12);
-    }
-
-    .theme-swatch[aria-checked="true"] {
-      box-shadow: 0 0 0 2px var(--bg-surface), 0 0 0 4px var(--text-primary);
-    }
-
-    .theme-swatch:focus-visible {
-      outline: 2px solid var(--accent);
-      outline-offset: 3px;
-    }
+    /* [/Settings] Appearance */
 
     *, *::before, *::after {
       box-sizing: border-box;
@@ -1989,6 +1930,406 @@
     }
 
     /* ==========================================================================
+       [Settings] Gear button, sleep indicator and Settings panel
+       ========================================================================== */
+    .drop-box svg {
+      color: var(--accent);
+    }
+
+    .settings-btn {
+      width: 38px;
+      height: 38px;
+      flex-shrink: 0;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .settings-btn svg {
+      transition: transform var(--transition-med);
+    }
+
+    .settings-btn:hover,
+    .settings-btn[aria-expanded="true"] {
+      color: var(--text-primary);
+      background: var(--bg-highlight);
+      border-color: rgba(var(--fg-rgb), 0.25);
+    }
+
+    .settings-btn:hover svg,
+    .settings-btn[aria-expanded="true"] svg {
+      transform: rotate(45deg);
+    }
+
+    .sleep-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+      height: 30px;
+      padding: 0 12px;
+      border-radius: var(--radius-full);
+      background: var(--accent-dim);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      transition: background var(--transition-fast);
+    }
+
+    .sleep-indicator[hidden] {
+      display: none;
+    }
+
+    .sleep-indicator:hover {
+      background: rgba(var(--accent-rgb), 0.26);
+    }
+
+    .settings-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      background: rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity var(--transition-med), visibility var(--transition-med);
+    }
+
+    .settings-panel {
+      position: fixed;
+      top: 8px;
+      right: 8px;
+      bottom: 8px;
+      z-index: 85;
+      width: 400px;
+      max-width: calc(100vw - 16px);
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+      transform: translateX(calc(100% + 16px));
+      visibility: hidden;
+      transition: transform var(--transition-med), visibility var(--transition-med);
+    }
+
+    .settings-open .settings-backdrop {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .settings-open .settings-panel {
+      transform: none;
+      visibility: visible;
+      /* become visible at once on open (so focus can move in); stay visible while closing */
+      transition: transform var(--transition-med), visibility 0s;
+    }
+
+    .settings-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 16px 12px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+    }
+
+    .settings-header h2 {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .settings-close {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      transition: color var(--transition-fast), background var(--transition-fast);
+    }
+
+    .settings-close:hover {
+      color: var(--text-primary);
+      background: rgba(var(--fg-rgb), 0.1);
+    }
+
+    .settings-body {
+      flex: 1;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding: 8px 20px 24px;
+    }
+
+    .settings-section {
+      padding: 14px 0 6px;
+    }
+
+    .settings-section + .settings-section {
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .settings-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 10px 0;
+    }
+
+    .settings-row.stacked {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+    }
+
+    .settings-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .settings-hint {
+      display: block;
+      margin-top: 2px;
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    .settings-value {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .settings-row-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    /* Segmented control (radiogroup) */
+    .segmented {
+      display: flex;
+      gap: 2px;
+      padding: 3px;
+      border-radius: var(--radius-full);
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .segmented.wrap {
+      flex-wrap: wrap;
+      border-radius: var(--radius-md);
+    }
+
+    .segmented button {
+      flex: 1;
+      min-width: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 7px 10px;
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      transition: color var(--transition-fast), background var(--transition-fast);
+    }
+
+    .segmented button:hover {
+      color: var(--text-primary);
+    }
+
+    /* "Custom" only shows up once the sliders no longer match a preset */
+    .segmented button:disabled:not([aria-checked="true"]) {
+      display: none;
+    }
+
+    .segmented button:disabled {
+      cursor: default;
+    }
+
+    .segmented button[aria-checked="true"] {
+      background: var(--bg-highlight);
+      color: var(--text-primary);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Accent swatches (each carries its own data-accent, so it previews in the current mode) */
+    .accent-swatches {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .accent-swatch {
+      position: relative;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--on-accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 0 2px var(--bg-surface), 0 0 0 3px transparent;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .accent-swatch:hover {
+      transform: scale(1.08);
+    }
+
+    .accent-swatch svg {
+      opacity: 0;
+      transform: scale(0.6);
+      transition: opacity var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .accent-swatch[aria-checked="true"] {
+      box-shadow: 0 0 0 2px var(--bg-surface), 0 0 0 4px var(--accent);
+    }
+
+    .accent-swatch[aria-checked="true"] svg {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* Toggle switch: <button role="switch" aria-checked> */
+    .switch {
+      position: relative;
+      flex-shrink: 0;
+      width: 40px;
+      height: 22px;
+      border-radius: var(--radius-full);
+      background: rgba(var(--fg-rgb), 0.22);
+      transition: background var(--transition-fast);
+    }
+
+    .switch::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+      transition: transform var(--transition-fast);
+    }
+
+    .switch[aria-checked="true"] {
+      background: var(--accent);
+    }
+
+    .switch[aria-checked="true"]::after {
+      transform: translateX(18px);
+    }
+
+    /* EQ sliders */
+    .eq-bands {
+      display: grid;
+      gap: 10px;
+      padding: 4px 0 2px;
+    }
+
+    .eq-band {
+      display: grid;
+      grid-template-columns: 52px 1fr 58px;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .eq-band .settings-value {
+      text-align: right;
+    }
+
+    .settings-danger {
+      color: #ff6b6b;
+      border-color: rgba(255, 107, 107, 0.4);
+    }
+
+    [data-mode="light"] .settings-danger {
+      color: #c62828;
+      border-color: rgba(198, 40, 40, 0.35);
+    }
+
+    .settings-footer-note {
+      margin-top: 18px;
+      font-size: 12px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      .sleep-indicator,
+      .settings-btn {
+        margin-left: auto;
+      }
+
+      .sleep-indicator:not([hidden]) + .settings-btn {
+        margin-left: 0;
+      }
+
+      /* Full-height sheet that slides up */
+      .settings-panel {
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: auto;
+        max-width: none;
+        border: none;
+        border-radius: 0;
+        transform: translateY(100%);
+      }
+
+      .settings-header {
+        padding-top: max(14px, env(safe-area-inset-top));
+      }
+
+      .settings-body {
+        padding-bottom: max(24px, env(safe-area-inset-bottom));
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .settings-panel,
+      .settings-backdrop,
+      .settings-btn svg {
+        transition: none;
+      }
+    }
+    /* [/Settings] panel */
+
+    /* ==========================================================================
        Responsive Breakpoints (Tablet & Mobile)
        ========================================================================== */
     @media (max-width: 960px) {
@@ -2132,7 +2473,7 @@
   <!-- Fullscreen Drag & Drop Overlay -->
   <div id="dropOverlay" class="drop-overlay" aria-hidden="true">
     <div class="drop-box">
-      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#1DB954" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
         <polyline points="17 8 12 3 7 8"></polyline>
         <line x1="12" y1="3" x2="12" y2="15"></line>
@@ -2228,10 +2569,6 @@
 
         <!-- Cleaned Up Sidebar Footer & Folder Stats -->
         <div class="sidebar-footer">
-          <div class="theme-picker">
-            <span class="theme-picker-label" id="themePickerLabel">Theme</span>
-            <div class="theme-swatches" id="themeSwatches" role="radiogroup" aria-labelledby="themePickerLabel"></div>
-          </div>
           <div class="stats-row">
             <div class="stat-item">
               <span class="stat-dot"></span>
@@ -2308,6 +2645,10 @@
                 <div class="shortcut-keys"><span class="kbd">/</span></div>
               </div>
               <div class="shortcut-row">
+                <span>Settings</span>
+                <div class="shortcut-keys"><span class="kbd">,</span></div>
+              </div>
+              <div class="shortcut-row">
                 <span>Move in list / play</span>
                 <div class="shortcut-keys"><span class="kbd">↑</span><span class="kbd">↓</span><span class="kbd">Enter</span></div>
               </div>
@@ -2352,6 +2693,19 @@
           <option value="track">Sort: Track #</option>
           <option value="duration">Sort: Duration</option>
         </select>
+
+        <!-- [Settings] Sleep-timer indicator + gear button -->
+        <button type="button" class="sleep-indicator" id="sleepIndicator" hidden title="Sleep timer active (click to change)" aria-label="Sleep timer active">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          <span id="sleepIndicatorText">30:00</span>
+        </button>
+        <button type="button" class="settings-btn" id="btnSettings" title="Settings ( , )" aria-label="Open settings" aria-haspopup="dialog" aria-expanded="false" aria-controls="settingsPanel">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+        <!-- [/Settings] -->
       </header>
 
       <!-- Scrollable View Container -->
@@ -2658,6 +3012,132 @@
     </footer>
   </div>
 
+  <!-- ======================================================================
+       [Settings] Settings panel (drawer on desktop, full-height sheet on mobile)
+       ====================================================================== -->
+  <div id="settingsBackdrop" class="settings-backdrop"></div>
+  <aside id="settingsPanel" class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" inert>
+    <div class="settings-header">
+      <h2 id="settingsTitle">Settings</h2>
+      <button type="button" class="settings-close" id="btnSettingsClose" title="Close (Esc)" aria-label="Close settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+
+    <div class="settings-body">
+      <!-- Appearance -->
+      <section class="settings-section" aria-labelledby="setAppearanceTitle">
+        <h3 class="settings-section-title" id="setAppearanceTitle">Appearance</h3>
+
+        <div class="settings-row stacked">
+          <span class="settings-label" id="setModeLabel">Mode</span>
+          <div class="segmented" id="setMode" role="radiogroup" aria-labelledby="setModeLabel">
+            <button type="button" role="radio" data-value="dark">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+              Dark
+            </button>
+            <button type="button" role="radio" data-value="light">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>
+              Light
+            </button>
+            <button type="button" role="radio" data-value="system">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+              System
+            </button>
+          </div>
+        </div>
+
+        <div class="settings-row stacked">
+          <span class="settings-label" id="setAccentLabel">Accent color</span>
+          <div class="accent-swatches" id="setAccent" role="radiogroup" aria-labelledby="setAccentLabel"></div>
+        </div>
+
+        <div class="settings-row">
+          <span class="settings-label" id="setCompactLabel">Compact rows<span class="settings-hint">Fit more songs on screen</span></span>
+          <button type="button" class="switch" id="setCompact" role="switch" aria-checked="false" aria-labelledby="setCompactLabel"></button>
+        </div>
+      </section>
+
+      <!-- Audio -->
+      <section class="settings-section" aria-labelledby="setAudioTitle">
+        <h3 class="settings-section-title" id="setAudioTitle">Audio</h3>
+
+        <div class="settings-row stacked">
+          <span class="settings-label" id="setEqLabel">Equalizer</span>
+          <div class="segmented wrap" id="setEqPreset" role="radiogroup" aria-labelledby="setEqLabel">
+            <button type="button" role="radio" data-value="flat">Flat</button>
+            <button type="button" role="radio" data-value="bass">Bass boost</button>
+            <button type="button" role="radio" data-value="vocal">Vocal</button>
+            <button type="button" role="radio" data-value="treble">Treble boost</button>
+            <button type="button" role="radio" data-value="loudness">Loudness</button>
+            <button type="button" role="radio" data-value="custom" disabled>Custom</button>
+          </div>
+          <div class="eq-bands" id="setEqBands">
+            <label class="eq-band"><span>Bass</span><input type="range" class="speed-range-slider" data-band="0" min="-12" max="12" step="0.5" value="0" aria-label="Bass gain (dB)"><span class="settings-value">0 dB</span></label>
+            <label class="eq-band"><span>Mid</span><input type="range" class="speed-range-slider" data-band="1" min="-12" max="12" step="0.5" value="0" aria-label="Mid gain (dB)"><span class="settings-value">0 dB</span></label>
+            <label class="eq-band"><span>Treble</span><input type="range" class="speed-range-slider" data-band="2" min="-12" max="12" step="0.5" value="0" aria-label="Treble gain (dB)"><span class="settings-value">0 dB</span></label>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <span class="settings-label" id="setLevelingLabel">Volume leveling<span class="settings-hint">Evens out loud and quiet songs. Squashes dynamics a little, so quiet passages get louder.</span></span>
+          <button type="button" class="switch" id="setLeveling" role="switch" aria-checked="false" aria-labelledby="setLevelingLabel"></button>
+        </div>
+
+        <div class="settings-row stacked">
+          <div class="settings-row-head">
+            <label class="settings-label" for="setCrossfade">Crossfade</label>
+            <span class="settings-value" id="setCrossfadeValue">Off</span>
+          </div>
+          <input type="range" class="speed-range-slider" id="setCrossfade" min="0" max="12" step="1" value="0">
+        </div>
+
+        <div class="settings-row stacked">
+          <span class="settings-label" id="setSleepLabel">Sleep timer<span class="settings-hint" id="setSleepHint">Fades out over the last 10 seconds.</span></span>
+          <div class="segmented wrap" id="setSleep" role="radiogroup" aria-labelledby="setSleepLabel">
+            <button type="button" role="radio" data-value="off">Off</button>
+            <button type="button" role="radio" data-value="15">15 min</button>
+            <button type="button" role="radio" data-value="30">30 min</button>
+            <button type="button" role="radio" data-value="45">45 min</button>
+            <button type="button" role="radio" data-value="60">60 min</button>
+            <button type="button" role="radio" data-value="track">End of track</button>
+          </div>
+        </div>
+
+        <div class="settings-row stacked">
+          <div class="settings-row-head">
+            <label class="settings-label" for="setSpeed">Default playback speed</label>
+            <span class="settings-value" id="setSpeedValue">1x</span>
+          </div>
+          <input type="range" class="speed-range-slider" id="setSpeed" min="0.25" max="3" step="0.05" value="1">
+        </div>
+      </section>
+
+      <!-- General -->
+      <section class="settings-section" aria-labelledby="setGeneralTitle">
+        <h3 class="settings-section-title" id="setGeneralTitle">General</h3>
+
+        <div class="settings-row">
+          <span class="settings-label" id="setResumeLabel">Resume last track on startup<span class="settings-hint">Cue the song you were playing, at the same spot.</span></span>
+          <button type="button" class="switch" id="setResume" role="switch" aria-checked="true" aria-labelledby="setResumeLabel"></button>
+        </div>
+
+        <div class="settings-row">
+          <span class="settings-label" id="setConfirmClearLabel">Confirm before clearing folder history</span>
+          <button type="button" class="switch" id="setConfirmClear" role="switch" aria-checked="true" aria-labelledby="setConfirmClearLabel"></button>
+        </div>
+
+        <div class="settings-row">
+          <span class="settings-label">Reset all settings<span class="settings-hint">Your library and liked songs are kept.</span></span>
+          <button type="button" class="btn-secondary settings-danger" id="btnResetSettings">Reset</button>
+        </div>
+      </section>
+
+      <p class="settings-footer-note">Settings are saved on this device.</p>
+    </div>
+  </aside>
+  <!-- [/Settings] panel -->
+
   <script>
     /**
      * Localify — 100% Offline Spotify-Inspired MP3 Player
@@ -2682,22 +3162,16 @@
         SORT: 'localify_sort_v1',
         SESSION_FOLDERS: 'localify_session_folders_v1', // folders in the library last time (for reconnect)
         LAST_TRACK: 'localify_last_track_v1',           // { key, time } to resume where you left off
-        THEME: 'localify_theme_v1'
+        THEME: 'localify_theme_v1',                     // legacy (pre-Settings), migrated then removed
+        // [Settings]
+        APPEARANCE: 'localify_appearance_v1',           // { mode, accent, density }
+        AUDIO_FX: 'localify_audio_fx_v1',               // { eqPreset, eq:[low,mid,high], leveling, crossfade }
+        PREFS: 'localify_prefs_v1'                      // { resumeOnStartup, confirmClearHistory }
       };
-
-      // Swatch colors only; the full palettes live in the CSS [data-theme] blocks
-      const THEMES = [
-        { id: 'emerald', name: 'Emerald', accent: '#1DB954', bg: '#121212' },
-        { id: 'ocean', name: 'Ocean', accent: '#4aa8ff', bg: '#0d1320' },
-        { id: 'sunset', name: 'Sunset', accent: '#ff8a4c', bg: '#17100c' },
-        { id: 'violet', name: 'Violet', accent: '#b18cff', bg: '#120f1b' },
-        { id: 'rose', name: 'Rose', accent: '#ff5c7a', bg: '#170c10' },
-        { id: 'light', name: 'Light', accent: '#15803d', bg: '#f2f2f4' }
-      ];
 
       const AUDIO_EXTENSIONS = new Set(['mp3', 'wav', 'ogg', 'm4a', 'flac', 'aac', 'opus', 'webm']);
       const MAX_RECENT_FOLDERS = 20;
-      const ROW_HEIGHT = 58;          // must match .track-row height in CSS
+      let ROW_HEIGHT = 58;            // must match .track-row height in CSS ([Settings] compact rows: 44)
       const ROW_OVERSCAN = 8;         // extra rows rendered above/below the viewport
       const THUMB_SIZE = 96;          // px, list/queue thumbnails (2x of 42px for HiDPI)
       const ARTWORK_SIZE = 512;       // px, Media Session artwork
@@ -2889,7 +3363,6 @@
         countLiked: $('countLiked'),
         statTracks: $('statTracks'),
         statDuration: $('statDuration'),
-        themeSwatches: $('themeSwatches'),
 
         btnSelectFolderSide: $('btnSelectFolderSide'),
         btnAddFilesSide: $('btnAddFilesSide'),
@@ -2969,12 +3442,19 @@
       /* ========================================================================
          Audio Element
          ======================================================================== */
-      const audio = new Audio();
-      audio.preload = 'metadata';
-      audio.volume = state.muted ? 0 : state.volume;
-      audio.playbackRate = state.playbackRate;
-      if ('preservesPitch' in audio) audio.preservesPitch = true;
-      else if ('webkitPreservesPitch' in audio) audio.webkitPreservesPitch = true;
+      // [Settings] Two identical elements so crossfade can overlap tracks. `audio` is always
+      // the active one; with crossfade off only players[0] is ever used (same as before).
+      function createPlayer() {
+        const el = new Audio();
+        el.preload = 'metadata';
+        el.volume = state.muted ? 0 : state.volume;
+        el.playbackRate = state.playbackRate;
+        if ('preservesPitch' in el) el.preservesPitch = true;
+        else if ('webkitPreservesPitch' in el) el.webkitPreservesPitch = true;
+        return el;
+      }
+      const players = [createPlayer(), createPlayer()];
+      let audio = players[0];
 
       let currentAudioUrl = null;   // object URL of the file being played (only one alive at a time)
       let currentCoverUrl = null;   // full-size cover object URL for the current track only
@@ -3979,6 +4459,7 @@
       function setCurrentTrack(track) {
         const prevId = state.currentTrackId;
         state.currentTrackId = track.id;
+        settingsOnTrackChange();   // [Settings] cancel a crossfade/sleep fade that no longer applies
 
         if (currentAudioUrl) URL.revokeObjectURL(currentAudioUrl);
         currentAudioUrl = URL.createObjectURL(track.file);
@@ -4102,7 +4583,7 @@
         const clamped = Math.max(0, Math.min(1, val));
         state.volume = clamped;
         state.muted = clamped === 0;
-        audio.volume = state.muted ? 0 : state.volume;
+        players.forEach(p => { p.volume = state.muted ? 0 : state.volume; });
         saveJSON(STORAGE_KEYS.VOLUME, state.volume);
         saveJSON(STORAGE_KEYS.MUTED, state.muted);
         updateVolumeUI();
@@ -4111,7 +4592,7 @@
       function toggleMute() {
         state.muted = !state.muted;
         if (!state.muted && state.volume === 0) state.volume = 0.5;
-        audio.volume = state.muted ? 0 : state.volume;
+        players.forEach(p => { p.volume = state.muted ? 0 : state.volume; });
         saveJSON(STORAGE_KEYS.MUTED, state.muted);
         saveJSON(STORAGE_KEYS.VOLUME, state.volume);
         updateVolumeUI();
@@ -4121,8 +4602,8 @@
         const val = Math.round(Math.max(0.25, Math.min(3.0, Number(speed))) * 100) / 100;
         if (!Number.isFinite(val)) return;
         state.playbackRate = val;
-        audio.playbackRate = val;
-        saveJSON(STORAGE_KEYS.SPEED, val);
+        players.forEach(p => { p.playbackRate = val; });
+        // [Settings] The popover changes this session only; the saved default lives in Settings
         updateSpeedUI();
         if (showNotification) showToast(`Speed: ${val}x`);
       }
@@ -4152,6 +4633,7 @@
 
       function clearLibrary() {
         if (state.tracks.length === 0) return;
+        settingsOnTrackChange();   // [Settings] stop any crossfade/fade in progress
         audio.pause();
         audio.removeAttribute('src');
         audio.load();
@@ -4237,8 +4719,9 @@
           state.analyser = state.audioCtx.createAnalyser();
           state.analyser.fftSize = 256;
           state.analyser.smoothingTimeConstant = 0.82;
-          state.sourceNode = state.audioCtx.createMediaElementSource(audio);
-          state.sourceNode.connect(state.analyser);
+          // [Settings] players -> crossfade gains -> EQ -> leveling -> sleep fade -> analyser
+          buildAudioGraph(state.audioCtx, state.analyser);
+          state.sourceNode = state.fx.inputs[0].src;
           state.analyser.connect(state.audioCtx.destination);
         } catch (e) {
           state.audioCtx = null;
@@ -5199,7 +5682,7 @@
           handleRecentFolderClick(item.dataset.folderName);
         }
       });
-      dom.btnClearFolderHistory.addEventListener('click', clearFolderHistory);
+      dom.btnClearFolderHistory.addEventListener('click', clearFolderHistoryWithConfirm);   // [Settings]
 
       // Visualizer style
       dom.btnVisStyle.addEventListener('click', () => {
@@ -5284,12 +5767,17 @@
         }, { passive: false });
       }
 
-      // Audio element events are the single source of truth for play state
-      audio.addEventListener('timeupdate', () => {
+      // Audio element events are the single source of truth for play state.
+      // [Settings] Both players get the listeners; only the active one (`audio`) counts.
+      function onPlayers(type, fn) {
+        players.forEach(p => p.addEventListener(type, (e) => { if (e.currentTarget === audio) fn(e); }));
+      }
+      onPlayers('timeupdate', () => {
         updateSeekUI();
+        settingsOnTimeUpdate();   // [Settings] crossfade start / end-of-track sleep fade
         saveResumePoint(false);
       });
-      audio.addEventListener('loadedmetadata', () => {
+      onPlayers('loadedmetadata', () => {
         updateSeekUI();
         updateMediaSessionPlayback();
         const track = state.trackMap.get(state.currentTrackId);
@@ -5300,19 +5788,23 @@
           scheduleUI({ stats: true });
         }
       });
-      audio.addEventListener('ended', () => playNextTrack(true));
-      audio.addEventListener('play', () => {
+      onPlayers('ended', () => {
+        if (sleepStopsAtTrackEnd()) return;   // [Settings] sleep timer: "End of track"
+        playNextTrack(true);
+      });
+      onPlayers('play', () => {
         state.isPlaying = true;
         updatePlayStateUI();
       });
-      audio.addEventListener('pause', () => {
+      onPlayers('pause', () => {
+        settingsOnPause();   // [Settings] pausing mid-crossfade finishes it
         state.isPlaying = false;
         updatePlayStateUI();
         saveResumePoint(true);
       });
-      audio.addEventListener('ratechange', updateMediaSessionPlayback);
-      audio.addEventListener('seeked', updateMediaSessionPlayback);
-      audio.addEventListener('error', () => {
+      onPlayers('ratechange', updateMediaSessionPlayback);
+      onPlayers('seeked', updateMediaSessionPlayback);
+      onPlayers('error', () => {
         if (!audio.getAttribute('src')) return;
         const track = state.trackMap.get(state.currentTrackId);
         showToast(`Can't play “${track ? track.title : 'this file'}”. Skipping.`);
@@ -5332,6 +5824,7 @@
         if (e.key === 'Escape') {
           toggleSpeedPopover(false);
           closeMobileSidebar();
+          closeSettings();   // [Settings]
           return;
         }
         if (isTypingTarget(target)) return;
@@ -5370,6 +5863,7 @@
             break;
           case '[': e.preventDefault(); setPlaybackSpeed(state.playbackRate - 0.1, true); break;
           case ']': e.preventDefault(); setPlaybackSpeed(state.playbackRate + 0.1, true); break;
+          case ',': e.preventDefault(); openSettings(); break;   // [Settings]
           default: break;
         }
       });
@@ -5395,50 +5889,642 @@
       window.addEventListener('pagehide', () => saveResumePoint(true));
 
       /* ========================================================================
-         Theme
+         [Settings] Settings panel: Appearance, Audio (EQ, leveling, crossfade,
+         sleep timer, default speed) and General preferences.
+         Everything for the Settings feature lives in this block, plus small
+         hooks in the code above marked with "[Settings]".
          ======================================================================== */
-      function applyTheme(id) {
-        if (!THEMES.some(t => t.id === id)) id = 'emerald';
-        if (id === 'emerald') delete document.documentElement.dataset.theme;
-        else document.documentElement.dataset.theme = id;
-        saveJSON(STORAGE_KEYS.THEME, id);
+      const ACCENTS = [
+        { id: 'green', name: 'Green' },
+        { id: 'blue', name: 'Blue' },
+        { id: 'purple', name: 'Purple' },
+        { id: 'pink', name: 'Pink' },
+        { id: 'orange', name: 'Orange' },
+        { id: 'teal', name: 'Teal' }
+      ];
+      const MODES = ['dark', 'light', 'system'];
+      // Old single-choice themes -> [mode, accent]. Keep in sync with the <head> script.
+      const LEGACY_THEME_MAP = {
+        emerald: ['dark', 'green'], light: ['light', 'green'], ocean: ['dark', 'blue'],
+        sunset: ['dark', 'orange'], violet: ['dark', 'purple'], rose: ['dark', 'pink']
+      };
+      const EQ_PRESETS = {           // dB for [bass, mid, treble]
+        flat: [0, 0, 0],
+        bass: [6, 0, 0],
+        vocal: [-2, 4, 1],
+        treble: [0, 0, 6],
+        loudness: [5, -1, 4]
+      };
+      const EQ_BANDS = [               // [type, frequency Hz]
+        ['lowshelf', 120],
+        ['peaking', 1000],
+        ['highshelf', 8000]
+      ];
+      const LEVELING_MAKEUP_DB = 6;
+      const SLEEP_FADE_SECONDS = 10;
+
+      const DEFAULT_APPEARANCE = { mode: 'dark', accent: 'green', density: 'comfortable' };
+      const DEFAULT_FX = { eqPreset: 'flat', eq: [0, 0, 0], leveling: false, crossfade: 0 };
+      const DEFAULT_PREFS = { resumeOnStartup: true, confirmClearHistory: true };
+
+      function loadAppearance() {
+        let a = loadJSON(STORAGE_KEYS.APPEARANCE, null);
+        if (!a || typeof a !== 'object') {
+          const legacy = loadJSON(STORAGE_KEYS.THEME, null);
+          const m = LEGACY_THEME_MAP[legacy];
+          a = m ? { mode: m[0], accent: m[1], density: 'comfortable' } : {};
+          if (legacy !== null) {
+            saveJSON(STORAGE_KEYS.APPEARANCE, { ...DEFAULT_APPEARANCE, ...a });
+            try { localStorage.removeItem(STORAGE_KEYS.THEME); } catch (e) {}
+          }
+        }
+        return {
+          mode: MODES.includes(a.mode) ? a.mode : DEFAULT_APPEARANCE.mode,
+          accent: ACCENTS.some(x => x.id === a.accent) ? a.accent : DEFAULT_APPEARANCE.accent,
+          density: a.density === 'compact' ? 'compact' : 'comfortable'
+        };
+      }
+
+      function loadFx() {
+        const f = loadJSON(STORAGE_KEYS.AUDIO_FX, null) || {};
+        const eq = Array.isArray(f.eq) && f.eq.length === 3
+          ? f.eq.map(v => clampNum(v, -12, 12, 0)) : DEFAULT_FX.eq.slice();
+        return {
+          eqPreset: f.eqPreset === 'custom' || EQ_PRESETS[f.eqPreset] ? f.eqPreset : 'flat',
+          eq,
+          leveling: f.leveling === true,
+          crossfade: Math.round(clampNum(f.crossfade, 0, 12, 0))
+        };
+      }
+
+      function loadPrefs() {
+        const p = loadJSON(STORAGE_KEYS.PREFS, null) || {};
+        return {
+          resumeOnStartup: p.resumeOnStartup !== false,
+          confirmClearHistory: p.confirmClearHistory !== false
+        };
+      }
+
+      function clampNum(v, min, max, fallback) {
+        const n = Number(v);
+        return Number.isFinite(n) ? Math.max(min, Math.min(max, n)) : fallback;
+      }
+
+      const settings = {
+        appearance: loadAppearance(),
+        fx: loadFx(),
+        prefs: loadPrefs()
+      };
+
+      const setDom = {
+        btn: $('btnSettings'),
+        panel: $('settingsPanel'),
+        backdrop: $('settingsBackdrop'),
+        close: $('btnSettingsClose'),
+        mode: $('setMode'),
+        accent: $('setAccent'),
+        compact: $('setCompact'),
+        eqPreset: $('setEqPreset'),
+        eqBands: $('setEqBands'),
+        leveling: $('setLeveling'),
+        crossfade: $('setCrossfade'),
+        crossfadeValue: $('setCrossfadeValue'),
+        sleep: $('setSleep'),
+        sleepHint: $('setSleepHint'),
+        speed: $('setSpeed'),
+        speedValue: $('setSpeedValue'),
+        resume: $('setResume'),
+        confirmClear: $('setConfirmClear'),
+        reset: $('btnResetSettings'),
+        sleepIndicator: $('sleepIndicator'),
+        sleepIndicatorText: $('sleepIndicatorText'),
+        appShell: document.querySelector('.app-shell')
+      };
+
+      /* ---- Appearance ---- */
+      const systemLightQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: light)') : null;
+
+      function resolvedMode() {
+        const m = settings.appearance.mode;
+        if (m !== 'system') return m;
+        return systemLightQuery && systemLightQuery.matches ? 'light' : 'dark';
+      }
+
+      function applyAppearance() {
+        const root = document.documentElement;
+        const a = settings.appearance;
+        root.dataset.mode = resolvedMode();
+        root.dataset.accent = a.accent;
+        if (a.density === 'compact') root.dataset.density = 'compact';
+        else delete root.dataset.density;
         vis.gradient = null;   // canvas colors are read from the CSS tokens
         vis.lineColor = null;
-        dom.themeSwatches.querySelectorAll('.theme-swatch').forEach(btn => {
-          const on = btn.dataset.theme === id;
+        const rowHeight = a.density === 'compact' ? 44 : 58;
+        if (rowHeight !== ROW_HEIGHT) {
+          ROW_HEIGHT = rowHeight;
+          renderedRange = [0, -1];
+          renderTracklist();
+        }
+      }
+
+      function saveAppearance() {
+        saveJSON(STORAGE_KEYS.APPEARANCE, settings.appearance);
+        applyAppearance();
+        syncSettingsUI();
+      }
+
+      /* ---- Audio graph ---- */
+      // players[i] -> inputs[i].gain (crossfade) -> EQ x3 -> trim -> [compressor -> makeup] -> sleepGain -> analyser
+      function buildAudioGraph(ctx, output) {
+        const fx = {};
+        fx.inputs = players.map(p => {
+          const src = ctx.createMediaElementSource(p);
+          const gain = ctx.createGain();
+          src.connect(gain);
+          return { src, gain };
+        });
+        fx.eq = EQ_BANDS.map(([type, freq]) => {
+          const f = ctx.createBiquadFilter();
+          f.type = type;
+          f.frequency.value = freq;
+          if (type === 'peaking') f.Q.value = 0.8;
+          return f;
+        });
+        fx.trim = ctx.createGain();       // headroom so boosts don't clip
+        fx.comp = ctx.createDynamicsCompressor();
+        fx.comp.threshold.value = -24;
+        fx.comp.knee.value = 12;
+        fx.comp.ratio.value = 4;
+        fx.comp.attack.value = 0.006;
+        fx.comp.release.value = 0.25;
+        fx.makeup = ctx.createGain();
+        fx.makeup.gain.value = Math.pow(10, LEVELING_MAKEUP_DB / 20);
+        fx.sleep = ctx.createGain();
+        fx.output = output;
+
+        fx.inputs.forEach(i => i.gain.connect(fx.eq[0]));
+        fx.eq[0].connect(fx.eq[1]);
+        fx.eq[1].connect(fx.eq[2]);
+        fx.eq[2].connect(fx.trim);
+        fx.comp.connect(fx.makeup);
+        fx.sleep.connect(output);
+        state.fx = fx;
+        applyEq();
+        applyLevelingRoute();
+      }
+
+      function applyEq() {
+        const fx = state.fx;
+        if (!fx) return;
+        const t = state.audioCtx.currentTime;
+        const gains = settings.fx.eq;
+        fx.eq.forEach((f, i) => f.gain.setTargetAtTime(gains[i], t, 0.03));
+        // Pull the level down by half the biggest boost so presets don't clip
+        const headroomDb = -0.5 * Math.max(0, ...gains);
+        fx.trim.gain.setTargetAtTime(Math.pow(10, headroomDb / 20), t, 0.03);
+      }
+
+      function applyLevelingRoute() {
+        const fx = state.fx;
+        if (!fx) return;
+        fx.trim.disconnect();
+        fx.makeup.disconnect();
+        if (settings.fx.leveling) {
+          fx.trim.connect(fx.comp);
+          fx.makeup.connect(fx.sleep);
+        } else {
+          fx.trim.connect(fx.sleep);
+        }
+      }
+
+      function inputGainFor(el) {
+        const i = players.indexOf(el);
+        return state.fx && i >= 0 ? state.fx.inputs[i].gain.gain : null;
+      }
+
+      function resetParam(param, value) {
+        if (!param) return;
+        param.cancelScheduledValues(0);
+        param.value = value;
+      }
+
+      /* ---- Crossfade ---- */
+      const xf = { active: false, from: null, oldUrl: null, timer: 0, starting: false };
+
+      function equalPowerCurve(fadeIn) {
+        const n = 64;
+        const c = new Float32Array(n);
+        for (let i = 0; i < n; i++) {
+          const x = i / (n - 1);
+          c[i] = fadeIn ? Math.sin(x * Math.PI / 2) : Math.cos(x * Math.PI / 2);
+        }
+        return c;
+      }
+
+      /** Same rules as playNextTrack(true): which queue index plays next, or -1 for none. */
+      function autoNextIndex() {
+        if (state.repeatMode === 'one' || state.playQueue.length === 0) return -1;
+        if (state.queueIndex + 1 < state.playQueue.length) return state.queueIndex + 1;
+        return state.repeatMode === 'all' ? 0 : -1;
+      }
+
+      function maybeStartCrossfade() {
+        const secs = settings.fx.crossfade;
+        if (!secs || xf.active || !state.fx || audio.paused || audio.seeking) return;
+        if (sleep.mode === 'track' || state.audioCtx.state !== 'running') return;
+        const dur = audio.duration;
+        if (!Number.isFinite(dur) || dur < secs * 2 + 1) return;   // too short to overlap
+        const remaining = (dur - audio.currentTime) / (audio.playbackRate || 1);
+        if (remaining > secs || remaining < 0.5) return;
+        let next = autoNextIndex();
+        if (next < 0) return;
+        if (next === 0 && state.queueIndex + 1 >= state.playQueue.length && state.shuffle && state.baseQueue.length > 1) {
+          state.playQueue = fisherYatesShuffle(state.baseQueue);
+        }
+        startCrossfade(next, remaining);
+      }
+
+      function startCrossfade(nextIndex, fadeSecs) {
+        const ctx = state.audioCtx;
+        const now = ctx.currentTime;
+        const from = audio;
+        const to = players[0] === from ? players[1] : players[0];
+        const fromGain = inputGainFor(from);
+        const toGain = inputGainFor(to);
+
+        xf.active = true;
+        xf.from = from;
+        xf.oldUrl = currentAudioUrl;   // keep the outgoing file alive until it finishes
+        currentAudioUrl = null;
+
+        fromGain.cancelScheduledValues(now);
+        fromGain.setValueCurveAtTime(equalPowerCurve(false), now, fadeSecs);
+        toGain.cancelScheduledValues(now);
+        toGain.setValueCurveAtTime(equalPowerCurve(true), now, fadeSecs);
+
+        audio = to;
+        xf.starting = true;
+        try {
+          loadAndPlayQueueIndex(nextIndex);
+        } finally {
+          xf.starting = false;
+        }
+        updatePlayStateUI();
+        xf.timer = setTimeout(finishCrossfade, fadeSecs * 1000 + 150);
+      }
+
+      /** Stop the outgoing track. `cut` = the fade was interrupted: also snap the current one to full level. */
+      function finishCrossfade(cut) {
+        if (!xf.active) return;
+        clearTimeout(xf.timer);
+        const from = xf.from;
+        xf.active = false;
+        xf.from = null;
+        from.pause();
+        from.removeAttribute('src');
+        from.load();
+        if (xf.oldUrl) { URL.revokeObjectURL(xf.oldUrl); xf.oldUrl = null; }
+        resetParam(inputGainFor(from), 1);
+        if (cut === true) resetParam(inputGainFor(audio), 1);
+      }
+
+      /* ---- Sleep timer ---- */
+      const sleep = { mode: 'off', endAt: 0, interval: 0, fading: false };
+
+      function setSleepTimer(mode) {
+        clearInterval(sleep.interval);
+        cancelSleepFade();
+        sleep.mode = mode;
+        sleep.endAt = 0;
+        if (mode !== 'off' && mode !== 'track') {
+          sleep.endAt = Date.now() + Number(mode) * 60000;
+          sleep.interval = setInterval(sleepTick, 1000);
+        }
+        if (mode === 'track' && xf.active) finishCrossfade(true);
+        updateSleepUI();
+        syncSettingsUI();
+        if (mode === 'off') showToast('Sleep timer off');
+        else if (mode === 'track') showToast('Stopping at the end of this track');
+        else showToast(`Sleep timer: ${mode} min`);
+      }
+
+      function startSleepFade(seconds) {
+        if (sleep.fading) return;
+        sleep.fading = true;
+        if (!state.fx) return;   // no Web Audio: just stop at the end
+        const g = state.fx.sleep.gain;
+        const now = state.audioCtx.currentTime;
+        g.cancelScheduledValues(now);
+        g.setValueAtTime(g.value, now);
+        g.linearRampToValueAtTime(0.0001, now + Math.max(0.2, seconds));
+      }
+
+      function cancelSleepFade() {
+        sleep.fading = false;
+        if (state.fx) resetParam(state.fx.sleep.gain, 1);
+      }
+
+      function sleepTick() {
+        if (sleep.mode === 'off' || sleep.mode === 'track') return;
+        const left = (sleep.endAt - Date.now()) / 1000;
+        if (left <= 0) { stopForSleep(); return; }
+        if (left <= SLEEP_FADE_SECONDS && !audio.paused) startSleepFade(left);
+        updateSleepUI();
+      }
+
+      function stopForSleep() {
+        clearInterval(sleep.interval);
+        if (xf.active) finishCrossfade(true);
+        audio.pause();
+        sleep.mode = 'off';
+        // Restore the level after the pause has taken effect
+        setTimeout(cancelSleepFade, 100);
+        updateSleepUI();
+        syncSettingsUI();
+        showToast('Sleep timer: playback stopped');
+      }
+
+      /** Called from the 'ended' listener: true = the sleep timer handled it (don't advance). */
+      function sleepStopsAtTrackEnd() {
+        if (sleep.mode !== 'track') return false;
+        stopForSleep();
+        return true;
+      }
+
+      function formatClock(totalSeconds) {
+        const s = Math.max(0, Math.ceil(totalSeconds));
+        const m = Math.floor(s / 60);
+        return `${m}:${String(s % 60).padStart(2, '0')}`;
+      }
+
+      function updateSleepUI() {
+        const el = setDom.sleepIndicator;
+        if (sleep.mode === 'off') { el.hidden = true; return; }
+        el.hidden = false;
+        let text;
+        if (sleep.mode === 'track') {
+          const left = Number.isFinite(audio.duration) ? (audio.duration - audio.currentTime) / (audio.playbackRate || 1) : NaN;
+          text = Number.isFinite(left) ? formatClock(left) : 'End of track';
+          el.setAttribute('aria-label', 'Sleep timer: stops at the end of this track');
+        } else {
+          text = formatClock((sleep.endAt - Date.now()) / 1000);
+          el.setAttribute('aria-label', `Sleep timer: ${text} left`);
+        }
+        if (setDom.sleepIndicatorText.textContent !== text) setDom.sleepIndicatorText.textContent = text;
+      }
+
+      /* ---- Hooks called from the player code ---- */
+      function settingsOnTrackChange() {
+        if (xf.active && !xf.starting) finishCrossfade(true);
+        if (sleep.mode === 'track' && sleep.fading) cancelSleepFade();
+      }
+
+      function settingsOnTimeUpdate() {
+        maybeStartCrossfade();
+        if (sleep.mode === 'track') {
+          const left = (audio.duration - audio.currentTime) / (audio.playbackRate || 1);
+          if (left <= SLEEP_FADE_SECONDS && !audio.paused && !audio.seeking) startSleepFade(left);
+          else if (left > SLEEP_FADE_SECONDS && sleep.fading) cancelSleepFade();   // seeked back
+          updateSleepUI();
+        }
+      }
+
+      function settingsOnPause() {
+        if (xf.active) finishCrossfade(true);
+      }
+
+      /* ---- General ---- */
+      function clearFolderHistoryWithConfirm() {
+        if (settings.prefs.confirmClearHistory &&
+            !window.confirm('Clear your folder history? The folders themselves are not touched.')) return;
+        clearFolderHistory();
+      }
+
+      function setDefaultSpeed(val) {
+        const v = Math.round(clampNum(val, 0.25, 3, 1) * 100) / 100;
+        saveJSON(STORAGE_KEYS.SPEED, v);
+        setPlaybackSpeed(v);
+        syncSettingsUI();
+      }
+
+      function saveFx() {
+        saveJSON(STORAGE_KEYS.AUDIO_FX, settings.fx);
+        syncSettingsUI();
+      }
+
+      function savePrefs() {
+        saveJSON(STORAGE_KEYS.PREFS, settings.prefs);
+        syncSettingsUI();
+      }
+
+      function resetAllSettings() {
+        if (!window.confirm('Reset all settings to their defaults? Your library and liked songs are kept.')) return;
+        settings.appearance = { ...DEFAULT_APPEARANCE };
+        settings.fx = { ...DEFAULT_FX, eq: DEFAULT_FX.eq.slice() };
+        settings.prefs = { ...DEFAULT_PREFS };
+        [STORAGE_KEYS.APPEARANCE, STORAGE_KEYS.AUDIO_FX, STORAGE_KEYS.PREFS, STORAGE_KEYS.SPEED, STORAGE_KEYS.THEME]
+          .forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
+        applyAppearance();
+        applyEq();
+        applyLevelingRoute();
+        if (sleep.mode !== 'off') setSleepTimer('off');
+        setPlaybackSpeed(1);
+        syncSettingsUI();
+        showToast('Settings reset');
+      }
+
+      /* ---- Panel UI ---- */
+      const CHECK_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+
+      function setRadioGroup(group, value) {
+        group.querySelectorAll('[role="radio"]').forEach(btn => {
+          const on = btn.dataset.value === String(value);
           btn.setAttribute('aria-checked', String(on));
           btn.tabIndex = on ? 0 : -1;
         });
       }
 
-      function initThemePicker() {
-        dom.themeSwatches.innerHTML = THEMES.map(t =>
-          `<button type="button" class="theme-swatch" role="radio" data-theme="${t.id}" title="${t.name}" aria-label="${t.name} theme" style="--sw-accent:${t.accent};--sw-bg:${t.bg}"></button>`
-        ).join('');
-        dom.themeSwatches.addEventListener('click', (e) => {
-          const btn = e.target.closest('.theme-swatch');
-          if (btn) applyTheme(btn.dataset.theme);
+      function setSwitch(btn, on) {
+        btn.setAttribute('aria-checked', String(!!on));
+      }
+
+      function formatDb(v) {
+        return `${v > 0 ? '+' : ''}${+v.toFixed(1)} dB`;
+      }
+
+      function syncSettingsUI() {
+        const { appearance, fx, prefs } = settings;
+        setRadioGroup(setDom.mode, appearance.mode);
+        setRadioGroup(setDom.accent, appearance.accent);
+        setSwitch(setDom.compact, appearance.density === 'compact');
+        setRadioGroup(setDom.eqPreset, fx.eqPreset);
+        setDom.eqBands.querySelectorAll('input').forEach(input => {
+          const v = fx.eq[Number(input.dataset.band)];
+          input.value = v;
+          input.nextElementSibling.textContent = formatDb(v);
         });
-        // Arrow keys move between swatches (radiogroup pattern)
-        dom.themeSwatches.addEventListener('keydown', (e) => {
+        setSwitch(setDom.leveling, fx.leveling);
+        setDom.crossfade.value = fx.crossfade;
+        setDom.crossfadeValue.textContent = fx.crossfade ? `${fx.crossfade} s` : 'Off';
+        setRadioGroup(setDom.sleep, sleep.mode);
+        const def = loadJSON(STORAGE_KEYS.SPEED, 1);
+        setDom.speed.value = def;
+        setDom.speedValue.textContent = `${+Number(def).toFixed(2)}x`;
+        setSwitch(setDom.resume, prefs.resumeOnStartup);
+        setSwitch(setDom.confirmClear, prefs.confirmClearHistory);
+      }
+
+      /** Radiogroup behaviour: click picks, arrow keys move + pick. */
+      function wireRadioGroup(group, onPick) {
+        group.addEventListener('click', (e) => {
+          const btn = e.target.closest('[role="radio"]');
+          if (btn && !btn.disabled) onPick(btn.dataset.value);
+        });
+        group.addEventListener('keydown', (e) => {
           const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
           if (!step) return;
           e.preventDefault();
-          e.stopPropagation();
-          const btns = [...dom.themeSwatches.children];
+          const btns = [...group.querySelectorAll('[role="radio"]:not(:disabled)')];
           const i = btns.indexOf(document.activeElement);
           const next = btns[(i + step + btns.length) % btns.length];
-          applyTheme(next.dataset.theme);
+          onPick(next.dataset.value);
           next.focus();
         });
-        applyTheme(loadJSON(STORAGE_KEYS.THEME, 'emerald'));
       }
+
+      let settingsReturnFocus = null;
+
+      function isSettingsOpen() {
+        return document.body.classList.contains('settings-open');
+      }
+
+      function openSettings() {
+        if (isSettingsOpen()) return;
+        toggleSpeedPopover(false);
+        closeMobileSidebar();
+        settingsReturnFocus = document.activeElement;
+        syncSettingsUI();
+        updateSleepUI();
+        setDom.panel.inert = false;
+        if (setDom.appShell) setDom.appShell.inert = true;
+        document.body.classList.add('settings-open');
+        setDom.btn.setAttribute('aria-expanded', 'true');
+        setDom.close.focus();
+      }
+
+      function closeSettings() {
+        if (!isSettingsOpen()) return;
+        document.body.classList.remove('settings-open');
+        setDom.panel.inert = true;
+        if (setDom.appShell) setDom.appShell.inert = false;
+        setDom.btn.setAttribute('aria-expanded', 'false');
+        const r = settingsReturnFocus;
+        const back = r && r !== document.body && document.contains(r) ? r : setDom.btn;
+        settingsReturnFocus = null;
+        back.focus();
+      }
+
+      function focusableIn(el) {
+        return [...el.querySelectorAll('button, input, select, [tabindex]')]
+          .filter(n => !n.disabled && n.tabIndex >= 0 && n.offsetParent !== null);
+      }
+
+      function initSettings() {
+        if (!settings.prefs.resumeOnStartup) state.resume = null;
+
+        setDom.accent.innerHTML = ACCENTS.map(a =>
+          `<button type="button" class="accent-swatch" role="radio" data-accent="${a.id}" data-value="${a.id}" title="${a.name}" aria-label="${a.name}">${CHECK_SVG}</button>`
+        ).join('');
+
+        applyAppearance();
+        if (systemLightQuery) {
+          const onSystemChange = () => { if (settings.appearance.mode === 'system') applyAppearance(); };
+          if (systemLightQuery.addEventListener) systemLightQuery.addEventListener('change', onSystemChange);
+          else if (systemLightQuery.addListener) systemLightQuery.addListener(onSystemChange);
+        }
+
+        // Open / close
+        setDom.btn.addEventListener('click', () => (isSettingsOpen() ? closeSettings() : openSettings()));
+        setDom.close.addEventListener('click', closeSettings);
+        setDom.backdrop.addEventListener('click', closeSettings);
+        setDom.sleepIndicator.addEventListener('click', openSettings);
+        setDom.panel.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') {
+            e.preventDefault();
+            e.stopPropagation();
+            closeSettings();
+            return;
+          }
+          if (e.key === 'Tab') {   // focus trap
+            const items = focusableIn(setDom.panel);
+            if (items.length === 0) return;
+            const first = items[0];
+            const last = items[items.length - 1];
+            if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+            else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+          }
+          // Keep the player's global shortcuts (space, arrows, letters) out of the panel
+          e.stopPropagation();
+        });
+
+        // Appearance
+        wireRadioGroup(setDom.mode, (v) => { settings.appearance.mode = v; saveAppearance(); });
+        wireRadioGroup(setDom.accent, (v) => { settings.appearance.accent = v; saveAppearance(); });
+        setDom.compact.addEventListener('click', () => {
+          settings.appearance.density = settings.appearance.density === 'compact' ? 'comfortable' : 'compact';
+          saveAppearance();
+        });
+
+        // Audio
+        wireRadioGroup(setDom.eqPreset, (v) => {
+          if (!EQ_PRESETS[v]) return;
+          settings.fx.eqPreset = v;
+          settings.fx.eq = EQ_PRESETS[v].slice();
+          applyEq();
+          saveFx();
+        });
+        setDom.eqBands.addEventListener('input', (e) => {
+          const input = e.target.closest('input[data-band]');
+          if (!input) return;
+          settings.fx.eq[Number(input.dataset.band)] = parseFloat(input.value);
+          const match = Object.keys(EQ_PRESETS).find(k => EQ_PRESETS[k].every((v, i) => v === settings.fx.eq[i]));
+          settings.fx.eqPreset = match || 'custom';
+          applyEq();
+          saveFx();
+        });
+        setDom.leveling.addEventListener('click', () => {
+          settings.fx.leveling = !settings.fx.leveling;
+          applyLevelingRoute();
+          saveFx();
+        });
+        setDom.crossfade.addEventListener('input', () => {
+          settings.fx.crossfade = Math.round(clampNum(setDom.crossfade.value, 0, 12, 0));
+          if (!settings.fx.crossfade && xf.active) finishCrossfade(true);
+          saveFx();
+        });
+        wireRadioGroup(setDom.sleep, setSleepTimer);
+        setDom.speed.addEventListener('input', () => setDefaultSpeed(setDom.speed.value));
+
+        // General
+        setDom.resume.addEventListener('click', () => {
+          settings.prefs.resumeOnStartup = !settings.prefs.resumeOnStartup;
+          savePrefs();
+        });
+        setDom.confirmClear.addEventListener('click', () => {
+          settings.prefs.confirmClearHistory = !settings.prefs.confirmClearHistory;
+          savePrefs();
+        });
+        setDom.reset.addEventListener('click', resetAllSettings);
+
+        syncSettingsUI();
+      }
+      /* [/Settings] */
 
       /* ========================================================================
          Init
          ======================================================================== */
       ensureRoundRectPolyfill();
-      initThemePicker();
+      initSettings();   // [Settings]
       setupMediaSessionHandlers();
 
       dom.tracklistBody.setAttribute('role', 'listbox');
