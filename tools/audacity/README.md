@@ -16,8 +16,8 @@ The helper only ever starts Audacity. It refuses any path that:
    into the Explorer address bar).
 2. Copy `localify-audacity.ps1` into that folder.
 3. Open the copied file in Notepad and set `$MusicRoots` to your music
-   folder(s). When you first click **Open in Audacity**, Localify shows the
-   exact line to paste, for example:
+   folder(s). Localify shows the exact line to paste under
+   **Settings → Integrations → Audacity**, for example:
    ```powershell
    $MusicRoots = @('D:\Music', 'C:\Users\you\Music')
    ```
@@ -26,9 +26,10 @@ The helper only ever starts Audacity. It refuses any path that:
 4. Double-click `install-localify-audacity.reg` and confirm. This only writes
    under `HKEY_CURRENT_USER\Software\Classes\localify-audacity`.
 
-In Localify, the first click on **Open in Audacity** asks for the full path of
-the folder you loaded (for example `D:\Music`). To change it later,
-Shift+click the button.
+In Localify, the first click on **Open in Audacity** opens
+**Settings → Integrations → Audacity** and asks for the full path of the folder
+you loaded (for example `D:\Music`). Change or forget saved paths there at any
+time; Shift+click the button also jumps there.
 
 ## Try it without Localify
 

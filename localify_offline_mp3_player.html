@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><!-- [Looks] safe areas -->
   <title>Localify — Offline MP3 Player</title>
   <script>
     // [Settings] Apply the saved mode/accent/density before first paint (no flash).
@@ -2271,14 +2271,9 @@
       text-align: right;
     }
 
-    .settings-danger {
-      color: #ff6b6b;
-      border-color: rgba(255, 107, 107, 0.4);
-    }
-
-    [data-mode="light"] .settings-danger {
-      color: #c62828;
-      border-color: rgba(198, 40, 40, 0.35);
+    .settings-danger {   /* [Looks] token instead of hardcoded reds */
+      color: var(--danger);
+      border-color: rgba(var(--danger-rgb), 0.4);
     }
 
     .settings-footer-note {
@@ -2839,8 +2834,7 @@
       color: var(--text-secondary);
     }
 
-    .ed-dialog .toast-container,
-    .as-dialog .toast-container {
+    .ed-dialog .toast-container {
       bottom: 24px;
     }
 
@@ -2867,49 +2861,24 @@
     }
 
     /* ==========================================================================
-       [Audacity integration] Setup dialog — self-contained so it can move into
-       the Settings panel later. Uses the same tokens as the rest of the app.
+       [Audacity integration] [Looks] Settings → Integrations → Audacity
+       (was a separate setup dialog). Uses the same tokens as the rest of the app.
        ========================================================================== */
-    .as-dialog {
-      width: min(560px, calc(100vw - 32px));
-      max-width: none;
-      max-height: calc(100vh - 32px);
-      padding: 0;
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      background: var(--bg-elevated);
-      color: var(--text-primary);
-      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
-    }
-
-    .as-dialog::backdrop {
-      background: rgba(0, 0, 0, 0.62);
-    }
-
-    .as-form {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      padding: 18px 20px;
+    .as-block {
       font-size: 13px;
       color: var(--text-secondary);
       line-height: 1.5;
     }
 
-    .as-form h2 {
-      font-size: 18px;
-      color: var(--text-primary);
-    }
-
-    .as-form ol {
+    .as-steps {
       padding-left: 20px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 4px;
     }
 
-    .as-form code {
-      font-family: Consolas, "Cascadia Mono", monospace;
+    .as-block code {
+      font-family: "Cascadia Mono", Consolas, monospace;
       font-size: 12px;
       background: rgba(var(--fg-rgb), 0.08);
       color: var(--text-primary);
@@ -2918,20 +2887,80 @@
       word-break: break-all;
     }
 
+    .as-link {
+      align-self: flex-start;
+      color: var(--accent);
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+
+    .as-link:hover {
+      text-decoration: underline;
+    }
+
+    .as-link:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .as-roots {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .as-root {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      background: rgba(var(--fg-rgb), 0.04);
+      border: 1px solid var(--border-subtle);
+      transition: border-color var(--transition-med), background var(--transition-med);
+    }
+
+    .as-root.highlight {
+      border-color: rgba(var(--accent-rgb), 0.6);
+      background: var(--accent-dim);
+    }
+
     .as-label {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
       font-weight: 700;
       color: var(--text-primary);
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .as-state {
+      flex-shrink: 0;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .as-input-row {
+      display: flex;
+      gap: 6px;
     }
 
     .as-input {
-      width: 100%;
-      padding: 10px 12px;
+      flex: 1;
+      min-width: 0;
+      min-height: 38px;
+      padding: 8px 10px;
       border-radius: var(--radius-sm);
       border: 1px solid rgba(var(--fg-rgb), 0.2);
       background: var(--bg-base);
       color: var(--text-primary);
       font-size: 13px;
-      font-family: Consolas, "Cascadia Mono", monospace;
+      font-family: "Cascadia Mono", Consolas, monospace;
+      user-select: text;
     }
 
     .as-input:focus-visible {
@@ -2941,24 +2970,875 @@
 
     .as-error {
       color: var(--danger);
+      font-size: 12px;
       font-weight: 600;
-      min-height: 1em;
     }
 
-    .as-preview {
+    .as-error:empty {
+      display: none;
+    }
+
+    .as-empty {
       font-size: 12px;
       color: var(--text-muted);
-      word-break: break-all;
-      white-space: pre-line;
     }
 
-    .as-actions {
+    .as-helper {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .as-helper[hidden],
+    .as-pending[hidden] {
+      display: none;
+    }
+
+    .as-sub {
+      font-size: 13px;
+    }
+
+    .as-block .as-preview {
+      display: block;
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      white-space: pre-wrap;
+      user-select: all;
+    }
+
+    .as-copy,
+    .as-remove {
+      flex-shrink: 0;
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    .as-pending {
       display: flex;
       flex-wrap: wrap;
-      justify-content: flex-end;
-      gap: 8px;
+      align-items: center;
+      gap: 8px 12px;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      background: var(--accent-dim);
+      color: var(--text-primary);
+    }
+
+    .as-pending span {
+      flex: 1 1 180px;
+    }
+
+    .as-open-btn {
+      padding: 8px 16px;
+      font-size: 13px;
     }
     /* ---- end [Audacity integration] ---- */
+
+    /* ==========================================================================
+       [Looks] Polish pass — Settings drawer + audio editor
+       Everything for the look-and-feel pass lives in [Looks] blocks like this
+       one (CSS) and the [Looks] script block before Init. Colors are tokens.
+       ========================================================================== */
+    :root {
+      --danger-rgb: 233, 20, 41;
+      --tint-rgb: var(--accent-rgb);      /* album-art tint, set from JS; accent fallback */
+      --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+      --tap: 44px;
+    }
+
+    :root[data-mode="light"] {
+      --text-muted: #6b6b75;              /* 5:1 on white; small labels stay readable */
+      --danger: #c8102e;
+      --danger-rgb: 200, 16, 46;
+    }
+
+    /* Settings drawer (phones keep the full-width sheet) */
+    @media (min-width: 769px) {
+      .settings-panel {
+        width: 420px;
+      }
+    }
+
+    [data-mode="light"] .settings-panel {
+      box-shadow: 0 16px 48px rgba(var(--fg-rgb), 0.16);
+    }
+
+    .settings-header h2 {
+      font-size: 20px;
+      letter-spacing: -0.01em;
+    }
+
+    .settings-close,
+    .ed-icon-btn {
+      width: 40px;
+      height: 40px;
+    }
+
+    .settings-section {
+      padding: 18px 0 8px;
+      scroll-margin-top: 8px;
+      border-radius: var(--radius-md);
+    }
+
+    .settings-section-title {
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .settings-section.flash {
+      animation: looksFlash 1.6s var(--ease-out);
+    }
+
+    .settings-row.flash {
+      animation: looksFlash 1.6s var(--ease-out);
+      border-radius: var(--radius-md);
+    }
+
+    @keyframes looksFlash {
+      0%, 30% { box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.55); background: var(--accent-dim); }
+      100% { box-shadow: 0 0 0 2px transparent; background: transparent; }
+    }
+
+    .settings-row {
+      padding: 12px 0;
+    }
+
+    .settings-label {
+      line-height: 1.35;
+    }
+
+    [data-mode="light"] .segmented button[aria-checked="true"] {
+      background: var(--bg-surface);
+      box-shadow: 0 1px 3px rgba(var(--fg-rgb), 0.18);
+    }
+
+    .segmented button {
+      min-height: 34px;
+    }
+
+    .switch {
+      width: 44px;
+      height: 26px;
+    }
+
+    .switch::after {
+      width: 20px;
+      height: 20px;
+    }
+
+    .switch[aria-checked="true"]::after {
+      transform: translateX(18px);
+    }
+
+    .switch:focus-visible {
+      outline-offset: 3px;
+    }
+
+    .settings-footer-note {
+      margin-top: 22px;
+    }
+
+    /* Audio editor */
+    [data-mode="light"] .ed-dialog {
+      box-shadow: 0 24px 64px rgba(var(--fg-rgb), 0.22);
+    }
+
+    .ed-head {
+      padding: 14px 14px 14px 20px;
+    }
+
+    .ed-title {
+      font-size: 18px;
+      letter-spacing: -0.01em;
+    }
+
+    .ed-subtitle {
+      margin-top: 2px;
+      color: var(--text-muted);
+    }
+
+    .ed-body {
+      padding: 16px 20px;
+      gap: 14px;
+    }
+
+    .ed-foot {
+      padding: 12px 20px;
+      background: rgba(var(--fg-rgb), 0.02);
+    }
+
+    .ed-btn {
+      min-height: 34px;
+    }
+
+    .ed-group-title {
+      color: var(--text-primary);
+      opacity: 0.8;
+    }
+
+    .ed-overlay {
+      backdrop-filter: blur(2px);
+    }
+
+    @media (max-width: 768px) {
+      .ed-dialog {
+        max-width: 100vw;
+      }
+
+      .ed-head {
+        padding-top: max(12px, var(--safe-top));
+        padding-left: max(16px, var(--safe-left));
+        padding-right: max(10px, var(--safe-right));
+      }
+
+      .ed-foot {
+        padding-bottom: max(12px, var(--safe-bottom));
+      }
+
+      .ed-foot .btn-primary {
+        flex: 1 1 100%;
+      }
+
+      .settings-body {
+        padding-left: max(20px, var(--safe-left));
+        padding-right: max(20px, var(--safe-right));
+      }
+    }
+
+    /* Touch screens: every control at least 44px tall/wide */
+    @media (pointer: coarse) {
+      .settings-close,
+      .ed-icon-btn,
+      .accent-swatch {
+        width: var(--tap);
+        height: var(--tap);
+      }
+
+      .segmented button,
+      .ed-btn,
+      .btn-ghost,
+      .btn-secondary,
+      .as-input {
+        min-height: var(--tap);
+      }
+
+      .switch {
+        width: 52px;
+        height: 30px;
+      }
+
+      .switch::after {
+        width: 24px;
+        height: 24px;
+      }
+
+      .switch[aria-checked="true"]::after {
+        transform: translateX(22px);
+      }
+
+      /* bigger range thumbs (the 5px track stays; margin widens the hit area) */
+      .speed-range-slider {
+        margin: 10px 0;
+      }
+
+      .speed-range-slider::-webkit-slider-thumb {
+        width: 24px;
+        height: 24px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .settings-section.flash,
+      .settings-row.flash {
+        animation: none;
+        box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.55);
+      }
+    }
+    /* [/Looks] Settings + editor */
+
+    /* ==========================================================================
+       [Looks] Visual pass: tint, crossfade, skeletons, browse grids, empty
+       states, typography, mobile full-screen player, track menu, layouts.
+       ========================================================================== */
+    .looks-skeleton[hidden], .looks-grid-wrap[hidden], .looks-hero-back[hidden],
+    .fs-player[hidden], .looks-menu[hidden], .looks-menu-backdrop[hidden],
+    #looksEmptyCtaWrap[hidden] { display: none !important; }
+
+    /* --- Album-art tint (falls back to the accent through --tint-rgb) --- */
+    .hero-banner:not(.liked-theme) {
+      background: linear-gradient(180deg, rgba(var(--tint-rgb), 0.38) 0%, rgba(var(--surface-rgb), 0) 100%);
+      transition: background 600ms var(--ease-out, ease);
+    }
+    :root[data-mode="light"] .hero-banner:not(.liked-theme) {
+      background: linear-gradient(180deg, rgba(var(--tint-rgb), 0.22) 0%, rgba(var(--surface-rgb), 0) 100%);
+    }
+    .now-playing-view.active {
+      background: radial-gradient(120% 70% at 20% 0%, rgba(var(--tint-rgb), 0.28) 0%, rgba(var(--surface-rgb), 0) 70%);
+    }
+    :root[data-mode="light"] .now-playing-view.active {
+      background: radial-gradient(120% 70% at 20% 0%, rgba(var(--tint-rgb), 0.16) 0%, rgba(var(--surface-rgb), 0) 70%);
+    }
+
+    /* --- Artwork crossfade --- */
+    .player-art { position: relative; }
+    .player-art, .np-artwork, .fs-art { isolation: isolate; }
+    .looks-art-old {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      animation: looks-fade-out 420ms var(--ease-out, ease) forwards;
+    }
+    .looks-art-old > * { width: 100%; height: 100%; }
+    .looks-fade-in { animation: looks-fade-in 360ms var(--ease-out, ease); }
+    @keyframes looks-fade-out { to { opacity: 0; } }
+    @keyframes looks-fade-in { from { opacity: 0; } }
+
+    /* --- Loading skeleton --- */
+    .looks-skeleton { padding: 4px 24px 24px; }
+    .looks-sk-row {
+      display: grid;
+      grid-template-columns: 44px 40px 1fr 56px;
+      align-items: center;
+      gap: 12px;
+      height: 58px;
+      padding: 0 14px;
+      opacity: calc(1 - var(--i) * 0.09);
+    }
+    .looks-sk-num, .looks-sk-box, .looks-sk-line {
+      display: block;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(90deg, rgba(var(--fg-rgb), 0.06) 0%, rgba(var(--fg-rgb), 0.13) 40%, rgba(var(--fg-rgb), 0.06) 80%);
+      background-size: 300% 100%;
+      animation: looks-shimmer 1.4s linear infinite;
+      animation-delay: calc(var(--i) * 60ms);
+    }
+    .looks-sk-num { width: 16px; height: 12px; justify-self: center; }
+    .looks-sk-box { width: 40px; height: 40px; }
+    .looks-sk-lines { display: flex; flex-direction: column; gap: 8px; }
+    .looks-sk-line { height: 11px; width: 62%; }
+    .looks-sk-line.short { width: 36%; height: 9px; }
+    .looks-sk-line.dur { width: 36px; justify-self: end; }
+    @keyframes looks-shimmer { from { background-position: 100% 0; } to { background-position: -50% 0; } }
+
+    /* --- Albums & Artists card grid --- */
+    .looks-grid-wrap { padding: 4px 20px 32px; }
+    .looks-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+      gap: 8px;
+    }
+    .looks-card { position: relative; min-width: 0; }
+    .looks-card-main {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      width: 100%;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      text-align: left;
+      color: inherit;
+      background: transparent;
+      transition: background var(--transition-fast);
+    }
+    .looks-card-main:hover, .looks-card-main:focus-visible { background: rgba(var(--fg-rgb), 0.07); }
+    .looks-card-art {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 100%;
+      aspect-ratio: 1;
+      margin-bottom: 8px;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      background: var(--bg-elevated);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+    :root[data-mode="light"] .looks-card-art { box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14); }
+    .looks-card-art > * { grid-area: 1 / 1; width: 100%; height: 100%; }
+    .looks-card-art img { object-fit: cover; display: block; }
+    .looks-card-art .fallback-art { display: grid; place-items: center; }
+    .looks-card.is-artist .looks-card-art { border-radius: 50%; }
+    .looks-card.is-artist .looks-card-main { text-align: center; }
+    .looks-card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .looks-card-sub {
+      font-size: 13px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-variant-numeric: tabular-nums;
+    }
+    .looks-card-overlay {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      aspect-ratio: 1;
+      pointer-events: none;
+    }
+    .looks-card-play {
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--accent);
+      color: var(--on-accent);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity var(--transition-fast), transform var(--transition-fast);
+      pointer-events: auto;
+    }
+    .looks-card:hover .looks-card-play,
+    .looks-card:focus-within .looks-card-play { opacity: 1; transform: none; }
+    .looks-card-play:hover { background: var(--accent-deep); }
+    @media (hover: none) {
+      .looks-card-play { opacity: 1; transform: none; width: 44px; height: 44px; }
+    }
+
+    /* Browse hero */
+    .hero-banner.looks-browse .hero-cover { color: var(--on-accent); }
+    .hero-cover.looks-round { border-radius: 50%; }
+    .hero-cover > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .hero-banner { position: relative; }
+    .hero-banner:has(.looks-hero-back:not([hidden])) { padding-top: 60px; }
+    .looks-hero-back {
+      position: absolute;
+      top: 16px;
+      left: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      min-height: 32px;
+      padding: 4px 12px 4px 6px;
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      background: rgba(var(--fg-rgb), 0.1);
+      transition: background var(--transition-fast);
+    }
+    .looks-hero-back:hover { background: rgba(var(--fg-rgb), 0.18); }
+    .looks-strong { color: var(--text-primary); font-weight: 700; }
+
+    /* --- Empty states --- */
+    .empty-state .empty-icon-wrap:has(.looks-illus) {
+      width: 128px;
+      height: 128px;
+      background: none;
+      color: var(--accent);
+    }
+    .looks-illus { display: block; }
+    .looks-illus .li-halo { fill: rgba(var(--accent-rgb), 0.12); }
+    .looks-illus .li-card { fill: rgba(var(--fg-rgb), 0.1); }
+    .looks-illus .li-fg { stroke: var(--accent); }
+    .looks-illus .li-fg-fill { fill: var(--accent); }
+    .looks-illus .li-muted { stroke: rgba(var(--fg-rgb), 0.45); }
+    .looks-illus .li-spark { stroke: rgba(var(--accent-rgb), 0.7); }
+    #looksEmptyCtaWrap { margin-top: 4px; }
+
+    /* --- Typography & hierarchy --- */
+    .track-name { font-size: 15px; font-weight: 500; letter-spacing: -0.005em; }
+    .track-row.active .track-name { font-weight: 600; }
+    .track-artist { font-size: 13px; }
+    .row-index-num, .track-dur, .player-time, .hero-subtitle {
+      font-variant-numeric: tabular-nums;
+    }
+    .row-index-num, .track-dur { color: var(--text-muted); }
+    .track-row:hover .track-dur, .track-row.active .track-dur { color: var(--text-secondary); }
+    .hero-type { color: var(--text-secondary); letter-spacing: 0.1em; }
+    .hero-title { font-weight: 800; letter-spacing: -0.035em; padding-bottom: 2px; }
+    .player-title { font-size: 15px; font-weight: 600; }
+
+    /* --- Row actions: "⋯" menu button (touch) --- */
+    .row-action.row-more { display: none; }
+    @media (max-width: 768px), (hover: none) {
+      .row-action.row-edit, .row-action.row-audacity { display: none; }
+      .row-action.row-more { display: grid; opacity: 1; }
+      .row-actions .row-action.row-more, .row-actions .btn-like { width: 44px; height: 44px; }
+      .tracklist-header, .track-row { grid-template-columns: 32px minmax(0, 1fr) 92px 40px; }
+      .track-row { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+    }
+    @media (max-width: 768px) {
+      .tracklist-header, .track-row { grid-template-columns: 28px minmax(0, 1fr) 88px 40px; gap: 6px; }
+    }
+
+    /* --- Track actions menu (popover on desktop, bottom sheet on phones) --- */
+    .looks-menu-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 1190;
+      background: rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      transition: opacity 200ms ease;
+    }
+    .looks-menu-backdrop.open { opacity: 1; }
+    .looks-menu {
+      position: fixed;
+      z-index: 1200;
+      min-width: 220px;
+      max-width: calc(100vw - 16px);
+      padding: 6px;
+      border-radius: var(--radius-md);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+      color: var(--text-primary);
+      opacity: 0;
+      transform: scale(0.97);
+      transform-origin: top right;
+      transition: opacity 140ms ease, transform 140ms var(--ease-out, ease);
+    }
+    .looks-menu.open { opacity: 1; transform: none; }
+    .looks-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      min-height: 36px;
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      text-align: left;
+      color: var(--text-primary);
+    }
+    .looks-menu-item svg { flex-shrink: 0; color: var(--text-secondary); }
+    .looks-menu-item.is-on svg { color: var(--accent); fill: currentColor; }
+    .looks-menu-item span { flex: 1; }
+    .looks-menu-item kbd {
+      font: 600 11px/1 inherit;
+      font-family: inherit;
+      padding: 3px 6px;
+      border-radius: 4px;
+      color: var(--text-muted);
+      background: rgba(var(--fg-rgb), 0.08);
+    }
+    .looks-menu-item:hover, .looks-menu-item:focus-visible { background: rgba(var(--fg-rgb), 0.1); outline: none; }
+    .looks-menu-item[aria-disabled="true"] { opacity: 0.45; cursor: not-allowed; }
+    .looks-menu-sep { height: 1px; margin: 6px 4px; background: var(--border-subtle); }
+    .looks-menu.is-sheet {
+      left: 0 !important;
+      right: 0;
+      top: auto !important;
+      bottom: 0;
+      max-width: none;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      padding: 8px 8px calc(12px + var(--safe-bottom, 0px));
+      transform: translateY(100%);
+      transition: transform 260ms var(--ease-out, ease), opacity 200ms ease;
+    }
+    .looks-menu.is-sheet.open { transform: none; }
+    .looks-menu.is-sheet .looks-menu-item { min-height: var(--tap, 44px); font-size: 15px; padding: 10px 14px; }
+    .looks-menu-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 10px 12px;
+      margin-bottom: 4px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .looks-menu-art { width: 44px; height: 44px; border-radius: var(--radius-sm); overflow: hidden; flex-shrink: 0; }
+    .looks-menu-art > * { width: 100%; height: 100%; }
+    .looks-menu-text { min-width: 0; }
+    .looks-menu-title { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .looks-menu-sub { font-size: 13px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* --- Mobile full-screen Now Playing --- */
+    .fs-player {
+      position: fixed;
+      inset: 0;
+      z-index: 1100;
+      pointer-events: none;
+    }
+    .fs-player.open { pointer-events: auto; }
+    .fs-sheet {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: calc(10px + var(--safe-top, 0px)) calc(20px + var(--safe-right, 0px)) calc(20px + var(--safe-bottom, 0px)) calc(20px + var(--safe-left, 0px));
+      background:
+        linear-gradient(180deg, rgba(var(--tint-rgb), 0.55) 0%, rgba(var(--tint-rgb), 0.18) 45%, var(--bg-base) 85%),
+        var(--bg-base);
+      color: var(--text-primary);
+      transform: translateY(100%);
+      transition: transform 320ms var(--ease-out, cubic-bezier(.2, .8, .2, 1));
+      overflow: hidden;
+      touch-action: none;
+    }
+    :root[data-mode="light"] .fs-sheet {
+      background:
+        linear-gradient(180deg, rgba(var(--tint-rgb), 0.32) 0%, rgba(var(--tint-rgb), 0.1) 45%, var(--bg-base) 85%),
+        var(--bg-base);
+    }
+    .fs-player.open .fs-sheet { transform: none; }
+    .fs-player.dragging .fs-sheet, .fs-player.dragging .fs-art { transition: none; }
+    .fs-head { display: flex; align-items: center; gap: 8px; }
+    .fs-head-text { flex: 1; text-align: center; min-width: 0; display: flex; flex-direction: column; }
+    .fs-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-secondary); }
+    .fs-context { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fs-icon-btn, .fs-ctrl {
+      width: var(--tap, 44px);
+      height: var(--tap, 44px);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: var(--text-primary);
+      flex-shrink: 0;
+    }
+    .fs-icon-btn:active, .fs-ctrl:active { background: rgba(var(--fg-rgb), 0.1); }
+    .fs-art-wrap {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      touch-action: none;
+    }
+    .fs-art {
+      position: relative;
+      width: min(100%, 52vh, 420px);
+      aspect-ratio: 1;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: var(--bg-elevated);
+      color: var(--text-muted);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+      transition: transform 260ms var(--ease-out, ease);
+    }
+    .fs-art > :not(.looks-art-old) { width: 100%; height: 100%; }
+    .fs-art img { object-fit: cover; display: block; }
+    .fs-art.looks-swipe-l { animation: looks-swipe-l 320ms var(--ease-out, ease); }
+    .fs-art.looks-swipe-r { animation: looks-swipe-r 320ms var(--ease-out, ease); }
+    @keyframes looks-swipe-l { from { transform: translateX(40px); opacity: 0.4; } }
+    @keyframes looks-swipe-r { from { transform: translateX(-40px); opacity: 0.4; } }
+    .fs-bottom { display: flex; flex-direction: column; gap: 14px; }
+    .fs-info { display: flex; align-items: center; gap: 12px; }
+    .fs-text { flex: 1; min-width: 0; }
+    .fs-title { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fs-artist { font-size: 15px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+    .btn-like.fs-like { width: var(--tap, 44px); height: var(--tap, 44px); flex-shrink: 0; }
+    .fs-range {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 28px;
+      margin: 0;
+      background: transparent;
+      cursor: pointer;
+      --pct: 0%;
+    }
+    .fs-range::-webkit-slider-runnable-track {
+      height: 4px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--text-primary) var(--pct), rgba(var(--fg-rgb), 0.25) var(--pct));
+    }
+    .fs-range::-moz-range-track { height: 4px; border-radius: 2px; background: rgba(var(--fg-rgb), 0.25); }
+    .fs-range::-moz-range-progress { height: 4px; border-radius: 2px; background: var(--text-primary); }
+    .fs-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      margin-top: -5px;
+      border-radius: 50%;
+      background: var(--text-primary);
+      border: 0;
+    }
+    .fs-range::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--text-primary); border: 0; }
+    .fs-times {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-variant-numeric: tabular-nums;
+    }
+    .fs-controls { display: flex; align-items: center; justify-content: space-between; }
+    .fs-ctrl { position: relative; color: var(--text-primary); }
+    .fs-ctrl#fsShuffle, .fs-ctrl#fsRepeat { color: var(--text-secondary); }
+    .fs-ctrl.active { color: var(--accent) !important; }
+    .fs-ctrl.active::after {
+      content: '';
+      position: absolute;
+      bottom: 4px;
+      left: 50%;
+      width: 4px;
+      height: 4px;
+      margin-left: -2px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .fs-one {
+      position: absolute;
+      top: 8px;
+      right: 6px;
+      font-size: 9px;
+      font-weight: 800;
+      line-height: 1;
+      display: none;
+    }
+    .fs-ctrl.repeat-one .fs-one { display: block; }
+    .fs-play {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--text-primary);
+      color: var(--bg-base);
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+      transition: transform var(--transition-fast);
+    }
+    .fs-play:active { transform: scale(0.95); }
+    .fs-hint { margin: 0; text-align: center; font-size: 12px; color: var(--text-muted); }
+    :root.looks-fs-open .player-bar { visibility: hidden; }
+    @media (min-width: 769px) { .fs-player { display: none !important; } }
+    @media (max-width: 768px) {
+      .player-left { cursor: pointer; }
+    }
+
+    /* --- Thin progress line under the top bar (phones) --- */
+    .looks-top-progress { display: none; }
+    @media (max-width: 768px) {
+      .looks-top-progress {
+        display: block;
+        position: relative;
+        height: 2px;
+        margin-top: -2px;
+        z-index: 21;
+        background: transparent;
+        pointer-events: none;
+        flex-shrink: 0;
+      }
+      .looks-top-progress > span {
+        position: absolute;
+        inset: 0;
+        background: var(--accent);
+        transform: scaleX(0);
+        transform-origin: left center;
+        transition: transform 250ms linear;
+      }
+    }
+
+    /* --- Mobile: safe areas, momentum scrolling, touch targets --- */
+    .main-scroll { -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+    @media (max-width: 768px) {
+      .topbar { padding-top: calc(10px + var(--safe-top, 0px)); padding-left: calc(14px + var(--safe-left, 0px)); padding-right: calc(14px + var(--safe-right, 0px)); }
+      .player-bar {
+        height: auto;
+        min-height: var(--player-height);
+        padding-bottom: calc(10px + var(--safe-bottom, 0px));
+        padding-left: calc(14px + var(--safe-left, 0px));
+        padding-right: calc(14px + var(--safe-right, 0px));
+      }
+      .app-shell { grid-template-rows: minmax(0, 1fr) auto; }
+      .sidebar { padding-top: calc(8px + var(--safe-top, 0px)); padding-bottom: calc(8px + var(--safe-bottom, 0px)); padding-left: calc(8px + var(--safe-left, 0px)); }
+      .mobile-menu-btn { width: var(--tap, 44px); height: var(--tap, 44px); }
+      .looks-grid-wrap { padding: 4px 8px 24px; }
+      .looks-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0; }
+      .looks-card-main { padding: 8px; }
+      .looks-card-overlay { top: 8px; left: 8px; right: 8px; }
+      .looks-skeleton { padding: 4px 8px 24px; }
+      .looks-sk-row { grid-template-columns: 28px 40px 1fr 40px; padding: 0 10px; }
+      .hero-title { font-size: clamp(26px, 8vw, 36px); }
+    }
+
+    /* --- Landscape phones: give the content room --- */
+    @media (max-height: 500px) and (orientation: landscape) {
+      :root { --player-height: 72px; }
+      .hero-banner { padding-top: 12px; padding-bottom: 10px; }
+      .hero-cover { width: 64px; height: 64px; }
+      .hero-title { font-size: 26px; }
+      .empty-state .empty-icon-wrap:has(.looks-illus) { width: 88px; height: 88px; }
+      .looks-illus { width: 88px; height: 88px; }
+      .fs-sheet {
+        display: grid;
+        grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+        grid-template-rows: auto minmax(0, 1fr);
+        column-gap: 24px;
+        row-gap: 8px;
+      }
+      .fs-head { grid-column: 1 / -1; }
+      .fs-art-wrap { grid-row: 2; }
+      .fs-art { width: min(100%, calc(100dvh - 90px)); }
+      .fs-bottom { grid-row: 2; align-self: center; gap: 8px; }
+      .fs-hint { display: none; }
+    }
+    @media (min-width: 769px) and (max-width: 1024px) and (max-height: 500px) and (orientation: landscape) {
+      :root { --sidebar-width: 200px; }
+    }
+    @media (max-width: 768px) and (max-height: 500px) and (orientation: landscape) {
+      .player-bar { grid-template-columns: minmax(0, 1fr) auto; }
+    }
+
+    /* --- Wide screens --- */
+    @media (min-width: 1600px) {
+      :root { --sidebar-width: 300px; }
+      .hero-cover { width: 200px; height: 200px; }
+      .hero-banner { padding: 36px 36px 26px; }
+      .looks-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+      .looks-grid-wrap { padding: 4px 28px 40px; }
+      .np-grid { grid-template-columns: minmax(300px, 420px) 1fr; gap: 40px; }
+    }
+
+    /* --- Windows PC: crisp scaling, focus, scrollbars --- */
+    #tracklistBody .track-row { will-change: auto; }
+    a:focus-visible, summary:focus-visible, [role="button"]:focus-visible,
+    [role="menuitem"]:focus-visible, .queue-item:focus-visible,
+    .looks-card-main:focus-visible, .looks-card-play:focus-visible, .looks-hero-back:focus-visible,
+    .fs-player button:focus-visible, .fs-range:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    .looks-menu-item:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+    * { scrollbar-width: thin; scrollbar-color: rgba(var(--fg-rgb), 0.28) transparent; }
+    ::-webkit-scrollbar { width: 12px; height: 12px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(var(--fg-rgb), 0.22);
+      border-radius: 8px;
+      border: 3px solid transparent;
+      background-clip: padding-box;
+    }
+    ::-webkit-scrollbar-thumb:hover { background-color: rgba(var(--fg-rgb), 0.38); }
+    ::-webkit-scrollbar-corner { background: transparent; }
+
+    /* --- Reduced motion --- */
+    @media (prefers-reduced-motion: reduce) {
+      .looks-art-old, .looks-fade-in, .fs-art.looks-swipe-l, .fs-art.looks-swipe-r { animation: none; }
+      .looks-sk-num, .looks-sk-box, .looks-sk-line { animation: none; }
+      .fs-sheet, .fs-art, .looks-menu, .looks-menu.is-sheet, .looks-menu-backdrop,
+      .looks-card-play, .looks-top-progress > span, .hero-banner:not(.liked-theme) { transition: none; }
+    }
+    /* Empty-state explanation: at most two lines */
+    .empty-desc {
+      max-width: 420px;
+      margin-inline: auto;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      overflow: hidden;
+      overflow-wrap: anywhere;
+    }
+    /* [/Looks] visual pass */
   </style>
 </head>
 <body>
@@ -3096,30 +3976,6 @@
     </div>
   </dialog>
 
-  <!-- =====================================================================
-       [Audacity integration] Setup dialog — self-contained so it can move
-       into the Settings panel later.
-       ===================================================================== -->
-  <dialog id="audacityDialog" class="as-dialog" aria-labelledby="asTitle">
-    <form method="dialog" class="as-form" id="asForm" novalidate>
-      <h2 id="asTitle">Open in Audacity: one-time setup</h2>
-      <p>Browsers can't start programs on their own. A small helper in the <code>tools/audacity</code> folder next to this player adds a <code>localify-audacity:</code> link type. When you click "Open in Audacity", the helper checks that the file is an audio file inside your music folder and opens it in Audacity.</p>
-      <ol>
-        <li>Copy <code>localify-audacity.ps1</code> to <code>%LOCALAPPDATA%\Localify Audacity Helper\</code> and put your music folder in its <code>$MusicRoots</code> line (the line below shows the exact text).</li>
-        <li>Double-click <code>install-localify-audacity.reg</code>. It only changes your own user account and needs no admin rights.</li>
-        <li>Tell the player where the folder <strong id="asRootName"></strong> is on this PC.</li>
-      </ol>
-      <label class="as-label" for="asPath">Full path of the folder “<span id="asRootName2"></span>”</label>
-      <input class="as-input" id="asPath" type="text" placeholder="C:\Users\you\Music" spellcheck="false" autocomplete="off" aria-describedby="asPreview asError">
-      <div class="as-preview" id="asPreview"></div>
-      <div class="as-error" id="asError" role="alert"></div>
-      <div class="as-actions">
-        <button type="button" class="btn-ghost" id="asCancel">Cancel</button>
-        <button type="submit" class="btn-primary" id="asSave">Save and open</button>
-      </div>
-    </form>
-  </dialog>
-
   <!-- Mobile Sidebar Backdrop -->
   <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
 
@@ -3156,6 +4012,24 @@
             <span>Liked Songs</span>
             <span class="nav-count" id="countLiked">0</span>
           </button>
+
+          <!-- [Looks] Albums & Artists browse views -->
+          <button class="nav-item" data-view="albums" id="navAlbums">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="9"></circle>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <span>Albums</span>
+          </button>
+
+          <button class="nav-item" data-view="artists" id="navArtists">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="8" r="4"></circle>
+              <path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"></path>
+            </svg>
+            <span>Artists</span>
+          </button>
+          <!-- [/Looks] -->
 
           <button class="nav-item" data-view="visualizer" id="navVisualizer">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -3341,12 +4215,14 @@
         </button>
         <!-- [/Settings] -->
       </header>
+      <div class="looks-top-progress" id="looksTopProgress" aria-hidden="true"><span></span></div><!-- [Looks] mobile progress -->
 
       <!-- Scrollable View Container -->
       <div class="main-scroll" id="mainScroll">
         <!-- Library View (All Tracks / Liked Songs) -->
         <section id="libraryView">
           <div class="hero-banner" id="heroBanner">
+            <button type="button" class="looks-hero-back" id="looksHeroBack" hidden aria-label="Back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg><span id="looksHeroBackLabel">Albums</span></button><!-- [Looks] -->
             <div class="hero-cover" id="heroCover">
               <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M9 18V5l12-2v13"></path>
@@ -3401,9 +4277,9 @@
                 <circle cx="18" cy="16" r="3"></circle>
               </svg>
             </div>
-            <h2 class="empty-title" id="emptyTitle">Your offline music player is ready</h2>
+            <h2 class="empty-title" id="emptyTitle">Your Offline Music Player Is Ready</h2>
             <p class="empty-desc" id="emptyDesc">
-              Select a local folder containing your MP3s (including subfolders) or drag and drop audio files anywhere on this window. Everything stays 100% private and offline on your device.
+              Pick a folder or drop audio files. It all stays on your device.
             </p>
             <div class="empty-actions" id="emptyActions">
               <button class="btn-primary" id="btnReconnect" hidden>
@@ -3411,7 +4287,7 @@
                   <polyline points="23 4 23 10 17 10"></polyline>
                   <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
                 </svg>
-                <span id="reconnectLabel">Reconnect folder</span>
+                <span id="reconnectLabel">Reconnect Folder</span>
               </button>
               <button class="btn-primary" id="btnSelectFolderEmpty">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -3427,6 +4303,7 @@
                 <span>Add Audio Files</span>
               </button>
             </div>
+            <div class="empty-actions" id="looksEmptyCtaWrap" hidden><button type="button" class="btn-primary" id="looksEmptyCta"></button></div><!-- [Looks] -->
             <div class="empty-formats">
               <span>Supports</span>
               <span class="format-badge">MP3</span>
@@ -3437,6 +4314,13 @@
               <span class="format-badge">AAC</span>
             </div>
           </div>
+
+          <!-- [Looks] Loading skeleton + Albums/Artists card grid -->
+          <div class="looks-skeleton" id="looksSkeleton" hidden aria-hidden="true"></div>
+          <div class="looks-grid-wrap" id="looksGridWrap" hidden>
+            <div class="looks-grid" id="looksGrid" role="list"></div>
+          </div>
+          <!-- [/Looks] -->
 
           <!-- Tracklist Table -->
           <div class="tracklist-container" id="tracklistContainer" style="display: none;">
@@ -3655,6 +4539,56 @@
   </div>
 
   <!-- ======================================================================
+       [Looks] Mobile full-screen Now Playing + track actions menu
+       ====================================================================== -->
+  <div class="fs-player" id="fsPlayer" role="dialog" aria-modal="true" aria-label="Now playing" hidden>
+    <div class="fs-sheet" id="fsSheet">
+      <div class="fs-head">
+        <button type="button" class="fs-icon-btn" id="fsClose" aria-label="Close Now Playing">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="fs-head-text">
+          <span class="fs-eyebrow">Now playing</span>
+          <span class="fs-context" id="fsContext">Your library</span>
+        </div>
+        <button type="button" class="fs-icon-btn" id="fsMore" aria-label="More actions" aria-haspopup="menu">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle></svg>
+        </button>
+      </div>
+      <div class="fs-art-wrap" id="fsArtWrap">
+        <div class="fs-art" id="fsArt"></div>
+      </div>
+      <div class="fs-bottom">
+        <div class="fs-info">
+          <div class="fs-text">
+            <div class="fs-title" id="fsTitle">Not Playing</div>
+            <div class="fs-artist" id="fsArtist"></div>
+          </div>
+          <button type="button" class="btn-like fs-like" id="fsLike" aria-pressed="false" aria-label="Add to Liked Songs">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+          </button>
+        </div>
+        <div class="fs-seek">
+          <input type="range" class="fs-range" id="fsSeek" min="0" max="1000" step="1" value="0" aria-label="Seek">
+          <div class="fs-times"><span id="fsCur">0:00</span><span id="fsDur">0:00</span></div>
+        </div>
+        <div class="fs-controls">
+          <button type="button" class="fs-ctrl" id="fsShuffle" aria-label="Toggle shuffle"></button>
+          <button type="button" class="fs-ctrl" id="fsPrev" aria-label="Previous track"></button>
+          <button type="button" class="fs-play" id="fsPlay" aria-label="Play"></button>
+          <button type="button" class="fs-ctrl" id="fsNext" aria-label="Next track"></button>
+          <button type="button" class="fs-ctrl" id="fsRepeat" aria-label="Cycle repeat mode"></button>
+        </div>
+        <p class="fs-hint" aria-hidden="true">Swipe the cover to skip · swipe down to close</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="looks-menu-backdrop" id="looksMenuBackdrop" hidden></div>
+  <div class="looks-menu" id="looksMenu" role="menu" aria-label="Track actions" hidden></div>
+  <!-- [/Looks] -->
+
+  <!-- ======================================================================
        [Settings] Settings panel (drawer on desktop, full-height sheet on mobile)
        ====================================================================== -->
   <div id="settingsBackdrop" class="settings-backdrop"></div>
@@ -3690,12 +4624,12 @@
         </div>
 
         <div class="settings-row stacked">
-          <span class="settings-label" id="setAccentLabel">Accent color</span>
+          <span class="settings-label" id="setAccentLabel">Accent Color</span>
           <div class="accent-swatches" id="setAccent" role="radiogroup" aria-labelledby="setAccentLabel"></div>
         </div>
 
         <div class="settings-row">
-          <span class="settings-label" id="setCompactLabel">Compact rows<span class="settings-hint">Fit more songs on screen</span></span>
+          <span class="settings-label" id="setCompactLabel">Compact Rows<span class="settings-hint">Fit more songs.</span></span>
           <button type="button" class="switch" id="setCompact" role="switch" aria-checked="false" aria-labelledby="setCompactLabel"></button>
         </div>
       </section>
@@ -3708,9 +4642,9 @@
           <span class="settings-label" id="setEqLabel">Equalizer</span>
           <div class="segmented wrap" id="setEqPreset" role="radiogroup" aria-labelledby="setEqLabel">
             <button type="button" role="radio" data-value="flat">Flat</button>
-            <button type="button" role="radio" data-value="bass">Bass boost</button>
+            <button type="button" role="radio" data-value="bass">Bass Boost</button>
             <button type="button" role="radio" data-value="vocal">Vocal</button>
-            <button type="button" role="radio" data-value="treble">Treble boost</button>
+            <button type="button" role="radio" data-value="treble">Treble Boost</button>
             <button type="button" role="radio" data-value="loudness">Loudness</button>
             <button type="button" role="radio" data-value="custom" disabled>Custom</button>
           </div>
@@ -3722,7 +4656,7 @@
         </div>
 
         <div class="settings-row">
-          <span class="settings-label" id="setLevelingLabel">Volume leveling<span class="settings-hint">Evens out loud and quiet songs. Squashes dynamics a little, so quiet passages get louder.</span></span>
+          <span class="settings-label" id="setLevelingLabel">Volume Leveling<span class="settings-hint">Evens out loud and quiet songs.</span></span>
           <button type="button" class="switch" id="setLeveling" role="switch" aria-checked="false" aria-labelledby="setLevelingLabel"></button>
         </div>
 
@@ -3735,23 +4669,54 @@
         </div>
 
         <div class="settings-row stacked">
-          <span class="settings-label" id="setSleepLabel">Sleep timer<span class="settings-hint" id="setSleepHint">Fades out over the last 10 seconds.</span></span>
+          <span class="settings-label" id="setSleepLabel">Sleep Timer<span class="settings-hint" id="setSleepHint">Fades out at the end.</span></span>
           <div class="segmented wrap" id="setSleep" role="radiogroup" aria-labelledby="setSleepLabel">
             <button type="button" role="radio" data-value="off">Off</button>
             <button type="button" role="radio" data-value="15">15 min</button>
             <button type="button" role="radio" data-value="30">30 min</button>
             <button type="button" role="radio" data-value="45">45 min</button>
             <button type="button" role="radio" data-value="60">60 min</button>
-            <button type="button" role="radio" data-value="track">End of track</button>
+            <button type="button" role="radio" data-value="track">End of Track</button>
           </div>
         </div>
 
         <div class="settings-row stacked">
           <div class="settings-row-head">
-            <label class="settings-label" for="setSpeed">Default playback speed</label>
+            <label class="settings-label" for="setSpeed">Default Playback Speed</label>
             <span class="settings-value" id="setSpeedValue">1x</span>
           </div>
           <input type="range" class="speed-range-slider" id="setSpeed" min="0.25" max="3" step="0.05" value="1">
+        </div>
+      </section>
+
+      <!-- [Looks] Integrations → Audacity (was a separate setup dialog) -->
+      <section class="settings-section" id="setIntegrations" aria-labelledby="setIntegrationsTitle">
+        <h3 class="settings-section-title" id="setIntegrationsTitle">Integrations</h3>
+
+        <div class="settings-row stacked as-block" id="setAudacity" aria-labelledby="setAudacityLabel">
+          <span class="settings-label" id="setAudacityLabel">Open in Audacity<span class="settings-hint">Windows only. Needs the helper below.</span></span>
+
+          <div class="as-pending" id="asPending" hidden role="status">
+            <span>Enter where <strong id="asPendingRoot"></strong> is on this PC, then open <strong id="asPendingTitle"></strong>.</span>
+            <button type="button" class="btn-primary as-open-btn" id="asOpenPending">Save and Open</button>
+          </div>
+
+          <ol class="as-steps">
+            <li>Copy <code>localify-audacity.ps1</code> to <code>%LOCALAPPDATA%\Localify Audacity Helper\</code>.</li>
+            <li>Paste the <em>helper line</em> below into its <code>$MusicRoots</code> line.</li>
+            <li>Double-click <code>install-localify-audacity.reg</code>. Your account only, no admin needed.</li>
+          </ol>
+          <a class="as-link" href="tools/audacity/README.md" target="_blank" rel="noopener">Helper install steps (tools/audacity/README.md)</a>
+
+          <div class="as-roots" id="asRoots"></div>
+
+          <div class="as-helper" id="asHelper" hidden>
+            <div class="settings-row-head">
+              <span class="settings-label as-sub">Helper Line</span>
+              <button type="button" class="btn-ghost as-copy" id="asCopy">Copy</button>
+            </div>
+            <code class="as-preview" id="asPreview"></code>
+          </div>
         </div>
       </section>
 
@@ -3760,17 +4725,17 @@
         <h3 class="settings-section-title" id="setGeneralTitle">General</h3>
 
         <div class="settings-row">
-          <span class="settings-label" id="setResumeLabel">Resume last track on startup<span class="settings-hint">Cue the song you were playing, at the same spot.</span></span>
+          <span class="settings-label" id="setResumeLabel">Resume Last Track on Startup<span class="settings-hint">Pick up where you left off.</span></span>
           <button type="button" class="switch" id="setResume" role="switch" aria-checked="true" aria-labelledby="setResumeLabel"></button>
         </div>
 
         <div class="settings-row">
-          <span class="settings-label" id="setConfirmClearLabel">Confirm before clearing folder history</span>
+          <span class="settings-label" id="setConfirmClearLabel">Confirm Before Clearing Folder History</span>
           <button type="button" class="switch" id="setConfirmClear" role="switch" aria-checked="true" aria-labelledby="setConfirmClearLabel"></button>
         </div>
 
         <div class="settings-row">
-          <span class="settings-label">Reset all settings<span class="settings-hint">Your library and liked songs are kept.</span></span>
+          <span class="settings-label">Reset All Settings<span class="settings-hint">Keeps your library and likes.</span></span>
           <button type="button" class="btn-secondary settings-danger" id="btnResetSettings">Reset</button>
         </div>
       </section>
@@ -4579,6 +5544,7 @@
 
       /** Prepare full-size cover + Media Session artwork for the current track. */
       async function prepareCurrentArtwork(track) {
+        Tint.fromTrack(track);   // [Looks] album-art tint (accent when no cover)
         if (currentCoverUrl) { URL.revokeObjectURL(currentCoverUrl); currentCoverUrl = null; }
         currentArtworkDataUrl = null;
         if (!track || !track.cover) return;
@@ -4790,7 +5756,7 @@
         if (pending.length) {
           dom.reconnectLabel.textContent = pending.length === 1
             ? `Reconnect “${pending[0].name}”`
-            : `Reconnect ${pending.length} folders`;
+            : `Reconnect ${pending.length} Folders`;
         }
         if (state.tracks.length === 0) renderTracklist();
       }
@@ -4812,6 +5778,7 @@
       }
 
       function setLoadingState(loading) {
+        looksShowSkeleton(loading && state.tracks.length === 0);   // [Looks]
         dom.mainView.classList.toggle('loading', loading);
         dom.mainView.setAttribute('aria-busy', loading ? 'true' : 'false');
         document.body.style.cursor = loading ? 'progress' : '';
@@ -5012,7 +5979,9 @@
          ======================================================================== */
       function invalidateVisible() {
         state.visibleCache = null;
+        looksVisibleVersion++;   // [Looks] lets the browse grid know its groups are stale
       }
+      let looksVisibleVersion = 0;   // [Looks]
 
       const SORTERS = {
         title: (a, b) => collator.compare(a.title, b.title),
@@ -5032,6 +6001,7 @@
         if (state.activeView === 'liked') {
           list = list.filter(t => state.likedKeys.has(t.likeKey));
         }
+        if (Browse.selected()) list = Browse.filterSelected(list);   // [Looks] album/artist detail
         const q = state.searchQuery.trim().toLowerCase();
         if (q) {
           const terms = q.split(/\s+/);
@@ -5604,13 +6574,13 @@
          Views & rendering
          ======================================================================== */
       function switchView(view) {
-        if (view !== 'all' && view !== 'liked' && view !== 'visualizer') view = 'all';
+        if (view !== 'all' && view !== 'liked' && view !== 'visualizer' && !Browse.isBrowseView(view)) view = 'all';   // [Looks] + albums/artists
         const prev = state.activeView;
         state.activeView = view;
         saveJSON(STORAGE_KEYS.VIEW, view);
         closeMobileSidebar();
 
-        [dom.navAll, dom.navLiked, dom.navVisualizer].forEach(el => {
+        [dom.navAll, dom.navLiked, dom.navVisualizer, $('navAlbums'), $('navArtists')].forEach(el => {   // [Looks] + browse views
           const isActive = el.dataset.view === view;
           el.classList.toggle('active', isActive);
           if (isActive) el.setAttribute('aria-current', 'page'); else el.removeAttribute('aria-current');
@@ -5631,8 +6601,10 @@
           dom.nowPlayingView.classList.remove('active');
           dom.libraryView.style.display = 'block';
           if (prev !== view) { invalidateVisible(); state.focusIndex = -1; dom.mainScroll.scrollTop = 0; }
+          if (prev !== view) Browse.onViewChanged();   // [Looks]
           renderHeroHeader();
           renderTracklist();
+          updateStats();   // [Looks] subtitle differs per view
         }
       }
 
@@ -5661,11 +6633,12 @@
           let visSec = 0;
           for (const t of visible) visSec += t.duration || 0;
           const loading = enrichTotal > 0 ? `<span class="hero-dot">&bull;</span><span>Reading tags ${enrichDone}/${enrichTotal}</span>` : '';
-          dom.heroSubtitle.innerHTML = `<span>${visible.length} ${visible.length === 1 ? 'song' : 'songs'}</span><span class="hero-dot">&bull;</span><span>${formatTotalDuration(visSec)}</span>${loading}`;
+          dom.heroSubtitle.innerHTML = Browse.subtitlePrefix(visible) + `<span>${visible.length} ${visible.length === 1 ? 'song' : 'songs'}</span><span class="hero-dot">&bull;</span><span>${formatTotalDuration(visSec)}</span>${loading}`;
         }
       }
 
       function renderHeroHeader() {
+        if (Browse.renderHero()) return;   // [Looks] albums/artists hero
         const isLiked = state.activeView === 'liked';
         dom.heroBanner.classList.toggle('liked-theme', isLiked);
         dom.heroType.textContent = isLiked ? 'Favorites' : 'Local Music Library';
@@ -5688,6 +6661,7 @@
       }
 
       function renderTracklist() {
+        if (Browse.renderGrid()) return;   // [Looks] albums/artists card grid
         const visible = getVisibleTracks();
         const hasLibrary = state.tracks.length > 0;
 
@@ -5700,24 +6674,26 @@
 
           if (!hasLibrary) {
             const reconnect = state.pendingReconnect.length > 0;
-            dom.emptyTitle.textContent = reconnect ? 'Welcome back' : 'Your offline music player is ready';
+            dom.emptyTitle.textContent = reconnect ? 'Welcome Back' : 'Your Offline Music Player Is Ready';
             dom.emptyDesc.textContent = reconnect
-              ? 'Your browser needs your OK to read your music folder again. Click Reconnect, or pick a different folder.'
-              : 'Select a local folder containing your MP3s (including subfolders) or drag and drop audio files anywhere on this window. Everything stays 100% private and offline on your device.';
+              ? 'Reconnect your folder or pick another.'
+              : 'Pick a folder or drop audio files. It all stays on your device.';
             dom.emptyActions.style.display = 'flex';
           } else if (state.searchQuery.trim() !== '') {
-            dom.emptyTitle.textContent = 'No matching tracks';
-            dom.emptyDesc.textContent = `No songs found for "${state.searchQuery.trim()}". Try a title, artist, album, year or genre.`;
+            dom.emptyTitle.textContent = 'No Matching Tracks';
+            dom.emptyDesc.textContent = `Nothing found for "${state.searchQuery.trim()}".`;
             dom.emptyActions.style.display = 'none';
           } else if (state.activeView === 'liked') {
-            dom.emptyTitle.textContent = 'No liked songs yet';
-            dom.emptyDesc.textContent = 'Click the heart icon next to any song to save it to your Liked Songs collection.';
+            dom.emptyTitle.textContent = 'No Liked Songs Yet';
+            dom.emptyDesc.textContent = 'Tap the heart on a song to save it.';
             dom.emptyActions.style.display = 'none';
           }
+          looksDecorateEmpty();   // [Looks] illustration + call to action
           return;
         }
 
         dom.emptyState.style.display = 'none';
+        looksShowSkeleton(false);   // [Looks]
         dom.actionBar.style.display = 'flex';
         dom.tracklistContainer.style.display = 'block';
         dom.tracklistBody.style.height = `${visible.length * ROW_HEIGHT}px`;
@@ -5737,6 +6713,7 @@
 
       function updateVirtualRows() {
         if (state.activeView === 'visualizer') return;
+        if (Browse.isGrid()) return;   // [Looks] list is hidden behind the card grid
         const visible = getVisibleTracks();
         const n = visible.length;
         if (n === 0) return;
@@ -5802,6 +6779,7 @@
             <div class="row-actions">
               <button class="row-action row-edit" data-edit-id="${track.id}" tabindex="-1" aria-label="Edit audio" title="Edit audio (E)">${SVG.edit}</button>
               <button class="row-action row-audacity" data-audacity-id="${track.id}" tabindex="-1" aria-label="Open in Audacity"${Audacity.canOpen(track) ? ' title="Open in Audacity"' : ` aria-disabled="true" title="${escapeHtml(Audacity.UNKNOWN_LOCATION)}"`}>${SVG.audacity}</button>
+              <button class="row-action row-more" data-more-id="${track.id}" tabindex="-1" aria-label="More actions" aria-haspopup="menu" title="More actions">${LOOKS_SVG.more}</button>
               <button class="btn-like${isLiked ? ' liked' : ''}" data-like-id="${track.id}" tabindex="-1" aria-pressed="${isLiked}" aria-label="${isLiked ? 'Remove from' : 'Add to'} Liked Songs">${SVG.heart}</button>
             </div>
             <div class="track-dur">${track.duration ? formatTime(track.duration) : '--:--'}</div>`;
@@ -5811,6 +6789,7 @@
       function patchTrackEverywhere(track) {
         const el = rowEls.get(track.id);
         if (el) fillRow(el, track, +el.dataset.index);
+        Browse.trackChanged();   // [Looks] tags arrived: refresh the card grid
         if (state.activeView === 'visualizer' && dom.upNextList.querySelector(`[data-tid="${track.id}"]`)) {
           scheduleUI({ queue: true });
         }
@@ -5876,8 +6855,9 @@
       function updateCurrentTrackArt() {
         const track = state.trackMap.get(state.currentTrackId);
         if (!track) return;
-        dom.playerArt.innerHTML = artHTML(track, 24, true);
-        dom.npArtwork.innerHTML = artHTML(track, 76, true);
+        looksSetArt(dom.playerArt, artHTML(track, 24, true));   // [Looks] crossfade
+        looksSetArt(dom.npArtwork, artHTML(track, 76, true));   // [Looks] crossfade
+        FsPlayer.artChanged();   // [Looks]
       }
 
       function updateLikeCurrentUI() {
@@ -5900,7 +6880,7 @@
         if (!track) {
           dom.playerTitle.textContent = 'Not Playing';
           dom.playerSubtitle.textContent = 'Select a folder to begin';
-          dom.playerArt.innerHTML = SVG.note(24, '#727272');
+          looksSetArt(dom.playerArt, SVG.note(24, 'currentColor'));   // [Looks] crossfade; token color
           dom.btnLikeCurrent.style.display = 'none';
           dom.timeCurrent.textContent = '0:00';
           dom.timeTotal.textContent = '0:00';
@@ -5914,7 +6894,7 @@
         const sub = track.artist + (track.album && track.album !== track.artist ? ' • ' + track.album : '');
         dom.playerSubtitle.textContent = sub;
         dom.playerSubtitle.title = sub;
-        dom.playerArt.innerHTML = artHTML(track, 24, true);
+        looksSetArt(dom.playerArt, artHTML(track, 24, true));   // [Looks] crossfade
         dom.btnLikeCurrent.style.display = 'grid';
         updateLikeCurrentUI();
         updateDocumentTitle();
@@ -5995,14 +6975,14 @@
           dom.npTitle.textContent = 'No track playing';
           dom.npArtist.textContent = 'Select a track to start listening';
           dom.npAlbum.textContent = 'Local Library';
-          dom.npArtwork.innerHTML = buildFallbackArtHTML(['#282828', '#121212'], 64);
+          looksSetArt(dom.npArtwork, buildFallbackArtHTML(['#282828', '#121212'], 64));   // [Looks] keep crossfade key in sync
           return;
         }
         dom.npTitle.textContent = track.title;
         dom.npArtist.textContent = track.artist;
         const albumBits = [track.album, track.year, track.genre].filter(Boolean);
         dom.npAlbum.textContent = albumBits.join(' • ');
-        dom.npArtwork.innerHTML = artHTML(track, 76, true);
+        looksSetArt(dom.npArtwork, artHTML(track, 76, true));   // [Looks] crossfade
       }
 
       function renderUpNextQueue() {
@@ -6175,7 +7155,7 @@
       });
 
       // Navigation
-      [dom.navAll, dom.navLiked, dom.navVisualizer].forEach(btn => {
+      [dom.navAll, dom.navLiked, dom.navVisualizer, $('navAlbums'), $('navArtists')].forEach(btn => {   // [Looks] + browse views
         btn.addEventListener('click', () => switchView(btn.dataset.view));
       });
       dom.btnVisualizerToggle.addEventListener('click', () => {
@@ -6481,7 +7461,7 @@
 
       window.addEventListener('keydown', (e) => {
         // The editor and the Audacity setup dialog handle their own keys
-        if (Editor.isOpen() || Audacity.isOpen()) return;
+        if (Editor.isOpen()) return;   // [Looks] Audacity setup moved into Settings
         if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
         const target = e.target;
         if (e.key === 'Escape') {
@@ -7062,18 +8042,29 @@
         return document.body.classList.contains('settings-open');
       }
 
-      function openSettings() {
-        if (isSettingsOpen()) return;
-        toggleSpeedPopover(false);
-        closeMobileSidebar();
-        settingsReturnFocus = document.activeElement;
-        syncSettingsUI();
-        updateSleepUI();
-        setDom.panel.inert = false;
-        if (setDom.appShell) setDom.appShell.inert = true;
-        document.body.classList.add('settings-open');
-        setDom.btn.setAttribute('aria-expanded', 'true');
-        setDom.close.focus();
+      /** [Looks] opts (optional): { section: element id to scroll to, focus: selector to focus }. */
+      function openSettings(opts) {
+        const section = opts && opts.section ? document.getElementById(opts.section) : null;
+        if (!isSettingsOpen()) {
+          toggleSpeedPopover(false);
+          closeMobileSidebar();
+          settingsReturnFocus = document.activeElement;
+          syncSettingsUI();
+          updateSleepUI();
+          if (typeof Audacity !== 'undefined') Audacity.renderSettings();   // [Looks]
+          setDom.panel.inert = false;
+          if (setDom.appShell) setDom.appShell.inert = true;
+          document.body.classList.add('settings-open');
+          setDom.btn.setAttribute('aria-expanded', 'true');
+        }
+        const focusEl = opts && opts.focus ? setDom.panel.querySelector(opts.focus) : null;
+        (focusEl || setDom.close).focus({ preventScroll: !!section });
+        if (section) {   // [Looks] jump to a section and flash it
+          section.scrollIntoView({ block: 'start', behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+          section.classList.remove('flash');
+          void section.offsetWidth;
+          section.classList.add('flash');
+        }
       }
 
       function closeSettings() {
@@ -7082,6 +8073,7 @@
         setDom.panel.inert = true;
         if (setDom.appShell) setDom.appShell.inert = false;
         setDom.btn.setAttribute('aria-expanded', 'false');
+        if (typeof Audacity !== 'undefined') Audacity.onSettingsClosed();   // [Looks]
         const r = settingsReturnFocus;
         const back = r && r !== document.body && document.contains(r) ? r : setDom.btn;
         settingsReturnFocus = null;
@@ -8423,6 +9415,8 @@
         return {
           open,
           isOpen,
+          /** [Looks] Ask to close (confirms when there are unsaved edits). True if it closed. */
+          close() { if (isOpen()) requestClose(); return !isOpen(); },
           /** The main player started: never play both at once. */
           onMainPlay() { if (ed.playing) pausePreview(); },
           /** Theme changed: the waveform reads its colors from the CSS tokens. */
@@ -8432,9 +9426,10 @@
 
       /* ========================================================================
          [Audacity integration] — begin
-         Self-contained so it can move into the Settings panel later. It needs:
+         [Looks] The setup now lives in Settings → Integrations → Audacity.
+         It needs:
            • STORAGE_KEYS.AUDACITY_ROOTS  { "<picked folder name>": "C:\\abs\\path" }
-           • the #audacityDialog markup and the .as-* CSS block
+           • the #setAudacity markup in the Settings panel and the .as-* CSS block
            • the helper in tools/audacity, which registers the localify-audacity: link
              and only opens existing audio files inside its configured music folders
          ======================================================================== */
@@ -8443,12 +9438,11 @@
         const UNKNOWN_LOCATION = 'Location unknown. Load this track with Open Folder (or drop its folder) to open it in Audacity.';
 
         const el = {
-          dialog: $('audacityDialog'), form: $('asForm'),
-          rootName: $('asRootName'), rootName2: $('asRootName2'),
-          path: $('asPath'), preview: $('asPreview'), error: $('asError'),
-          cancel: $('asCancel')
+          roots: $('asRoots'), helper: $('asHelper'), preview: $('asPreview'), copy: $('asCopy'),
+          pending: $('asPending'), pendingRoot: $('asPendingRoot'), pendingTitle: $('asPendingTitle'),
+          openPending: $('asOpenPending')
         };
-        let pending = null;   // track waiting for the setup to finish
+        let pending = null;   // track waiting for its folder path
 
         function getRoots() {
           const r = loadJSON(STORAGE_KEYS.AUDACITY_ROOTS, {});
@@ -8457,7 +9451,7 @@
 
         function setRoot(name, absPath) {
           const r = getRoots();
-          r[name] = absPath;
+          if (absPath) r[name] = absPath; else delete r[name];
           saveJSON(STORAGE_KEYS.AUDACITY_ROOTS, r);
         }
 
@@ -8492,60 +9486,156 @@
           a.remove();
         }
 
+        /** Folder names to show: saved ones plus folders loaded this session. */
+        function knownRootNames() {
+          const names = new Set(Object.keys(getRoots()));
+          for (const t of state.tracks) if (canOpen(t)) names.add(t.rootName);
+          return [...names].sort((a, b) => collator.compare(a, b));
+        }
+
+        function rootId(name) { return 'asRoot_' + hashString(name).toString(36); }
+
+        /** Render the folder rows inside Settings. Keeps typed text for rows that stay. */
+        function renderSettings() {
+          const roots = getRoots();
+          const names = knownRootNames();
+          if (pending && !names.includes(pending.rootName)) names.unshift(pending.rootName);
+          if (names.length === 0) {
+            el.roots.innerHTML = '<p class="as-empty">Load a music folder with <strong>Open Folder</strong> (or drop a folder) and it shows up here.</p>';
+          } else {
+            el.roots.innerHTML = names.map(name => {
+              const id = rootId(name);
+              const saved = roots[name] || '';
+              return `<div class="as-root${pending && pending.rootName === name ? ' highlight' : ''}" data-root="${escapeHtml(name)}">
+                  <label class="as-label" for="${id}">Folder “${escapeHtml(name)}”<span class="as-state">${saved ? 'Saved' : 'Not set'}</span></label>
+                  <div class="as-input-row">
+                    <input class="as-input" id="${id}" type="text" value="${escapeHtml(saved)}" placeholder="C:\\Users\\you\\Music\\${escapeHtml(name)}" spellcheck="false" autocomplete="off" aria-describedby="${id}_err">
+                    ${saved ? `<button type="button" class="btn-ghost as-remove" data-remove-root="${escapeHtml(name)}" aria-label="Forget the path of ${escapeHtml(name)}">Forget</button>` : ''}
+                  </div>
+                  <div class="as-error" id="${id}_err" role="alert"></div>
+                </div>`;
+            }).join('');
+          }
+          updateHelperLine();
+          updatePending();
+        }
+
+        function updateHelperLine() {
+          const paths = Object.values(getRoots()).filter(Boolean);
+          el.helper.hidden = paths.length === 0;
+          el.preview.textContent = `$MusicRoots = @(${paths.map(p => `'${p.replace(/'/g, "''")}'`).join(', ')})`;
+        }
+
+        function updatePending() {
+          el.pending.hidden = !pending;
+          if (!pending) return;
+          el.pendingRoot.textContent = `“${pending.rootName}”`;
+          el.pendingTitle.textContent = `“${pending.title}”`;
+        }
+
+        /** Validate + save one row. Returns the saved path, '' if cleared, or null on error. */
+        function commitRow(row) {
+          const name = row.dataset.root;
+          const input = row.querySelector('.as-input');
+          const err = row.querySelector('.as-error');
+          const r = normalizeRoot(input.value, name);
+          if (!r.path) {
+            if (r.error) { err.textContent = r.error; return null; }
+            err.textContent = '';
+            if (getRoots()[name]) { setRoot(name, ''); renderSettings(); }
+            return '';
+          }
+          err.textContent = '';
+          if (getRoots()[name] !== r.path) {
+            setRoot(name, r.path);
+            input.value = r.path;
+            const badge = row.querySelector('.as-state');
+            if (badge) badge.textContent = 'Saved';
+            updateHelperLine();
+          }
+          return r.path;
+        }
+
         function open(track, forceSetup = false) {
           if (!canOpen(track)) { showToast(UNKNOWN_LOCATION); return; }
           const root = getRoots()[track.rootName];
-          if (!root || forceSetup) { showSetup(track, root || ''); return; }
+          if (!root || forceSetup) { showSetup(track); return; }
           launch(buildUrl(root, track));
-          showToast('Opening in Audacity… If nothing happens, install the helper from tools/audacity.');
+          showToast('Opening in Audacity… If nothing happens, install the helper (Settings → Integrations).');
         }
 
-        function updatePreview() {
-          const r = normalizeRoot(el.path.value, pending && pending.rootName);
-          if (!r.path) { el.preview.textContent = ''; return; }
-          el.preview.textContent =
-            `Helper line: $MusicRoots = @('${r.path.replace(/'/g, "''")}')\n` +
-            `This track: ${filePath(r.path, pending)}`;
-        }
-
-        function showSetup(track, current) {
+        /** First use (or Shift+click): open Settings at the Audacity section. */
+        function showSetup(track) {
+          const fromEditor = Editor.isOpen();
+          if (fromEditor && !Editor.close()) return;   // Settings sits under the modal editor
           pending = track;
-          el.rootName.textContent = track.rootName;
-          el.rootName2.textContent = track.rootName;
-          el.path.value = current;
-          el.error.textContent = '';
-          updatePreview();
-          el.dialog.showModal();
-          el.path.focus();
-          el.path.select();
+          renderSettings();
+          const show = () => openSettings({ section: 'setAudacity', focus: '#' + rootId(track.rootName) });
+          // The editor's close handler restores focus first; open Settings after it
+          if (fromEditor) setTimeout(show, 60); else show();
         }
 
-        el.path.addEventListener('input', () => {
-          el.error.textContent = '';
-          updatePreview();
+        el.roots.addEventListener('input', (e) => {
+          const row = e.target.closest('.as-root');
+          if (row) row.querySelector('.as-error').textContent = '';
         });
-
-        el.form.addEventListener('submit', (e) => {
+        el.roots.addEventListener('change', (e) => {
+          const row = e.target.closest('.as-root');
+          if (row && e.target.classList.contains('as-input')) commitRow(row);
+        });
+        el.roots.addEventListener('keydown', (e) => {
+          if (e.key !== 'Enter' || !e.target.classList.contains('as-input')) return;
           e.preventDefault();
-          if (!pending) { el.dialog.close(); return; }
-          const r = normalizeRoot(el.path.value, pending.rootName);
-          if (!r.path) {
-            el.error.textContent = r.error || 'Enter the full path of the folder.';
-            el.path.focus();
+          const row = e.target.closest('.as-root');
+          if (pending && row.dataset.root === pending.rootName) el.openPending.click();
+          else commitRow(row);
+        });
+        el.roots.addEventListener('click', (e) => {
+          const btn = e.target.closest('[data-remove-root]');
+          if (!btn) return;
+          setRoot(btn.dataset.removeRoot, '');
+          renderSettings();
+          showToast(`Forgot the path of “${btn.dataset.removeRoot}”.`);
+        });
+        el.openPending.addEventListener('click', () => {
+          if (!pending) return;
+          const row = [...el.roots.querySelectorAll('.as-root')].find(r => r.dataset.root === pending.rootName);
+          const path = row ? commitRow(row) : null;
+          if (!path) {
+            if (row) {
+              const err = row.querySelector('.as-error');
+              if (!err.textContent) err.textContent = 'Enter the full path of the folder.';
+              row.querySelector('.as-input').focus();
+            }
             return;
           }
           const track = pending;
-          setRoot(track.rootName, r.path);
-          el.dialog.close();
-          launch(buildUrl(r.path, track));
+          pending = null;
+          updatePending();
+          renderSettings();
+          closeSettings();
+          launch(buildUrl(path, track));
           showToast('Saved. Opening in Audacity…');
         });
+        el.copy.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(el.preview.textContent);
+            showToast('Helper line copied');
+          } catch (err) {
+            const range = document.createRange();
+            range.selectNodeContents(el.preview);
+            const sel = getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+            showToast('Press Ctrl+C to copy the selected line');
+          }
+        });
 
-        el.cancel.addEventListener('click', () => el.dialog.close());
-        el.dialog.addEventListener('close', () => { pending = null; });
-        el.dialog.addEventListener('keydown', (e) => e.stopPropagation());
-
-        return { open, canOpen, UNKNOWN_LOCATION, isOpen: () => el.dialog.open };
+        return {
+          open, canOpen, UNKNOWN_LOCATION, renderSettings,
+          /** Settings closed: drop a half-finished "open this track" request. */
+          onSettingsClosed() { if (pending) { pending = null; updatePending(); } }
+        };
       })();
       /* ---- [Audacity integration] — end ---- */
 
@@ -8574,6 +9664,836 @@
 
 
       /* ========================================================================
+         [Looks] Look-and-feel pass: shared helpers.
+         ======================================================================== */
+      const reducedMotionQuery = window.matchMedia ? matchMedia('(prefers-reduced-motion: reduce)') : null;
+      function prefersReducedMotion() { return !!(reducedMotionQuery && reducedMotionQuery.matches); }
+      /* ---- [Looks] icons + empty-state illustrations (all currentColor / tokens) ---- */
+      const LOOKS_SVG = (() => {
+        const s = (size, body, fill) => `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="${fill ? 'currentColor' : 'none'}" stroke="${fill ? 'none' : 'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
+        // Illustrations: a soft accent disc with layered shapes; colors come from CSS (.looks-illus …)
+        const illus = (body) => `<svg class="looks-illus" width="120" height="120" viewBox="0 0 120 120" fill="none" aria-hidden="true"><circle class="li-halo" cx="60" cy="60" r="56"></circle>${body}</svg>`;
+        return {
+          more: s(18, '<circle cx="5" cy="12" r="1.9"></circle><circle cx="12" cy="12" r="1.9"></circle><circle cx="19" cy="12" r="1.9"></circle>', true),
+          play: (n) => s(n, '<path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z"></path>', true),
+          pause: (n) => s(n, '<rect x="5.5" y="4" width="4.5" height="16" rx="1.2"></rect><rect x="14" y="4" width="4.5" height="16" rx="1.2"></rect>', true),
+          prev: s(26, '<path d="M19 5.2v13.6a.9.9 0 0 1-1.38.76L8 13.2V18a1 1 0 0 1-2 0V6a1 1 0 0 1 2 0v4.8l9.62-6.36A.9.9 0 0 1 19 5.2z"></path>', true),
+          next: s(26, '<path d="M5 5.2v13.6a.9.9 0 0 0 1.38.76L16 13.2V18a1 1 0 0 0 2 0V6a1 1 0 0 0-2 0v4.8L6.38 4.44A.9.9 0 0 0 5 5.2z"></path>', true),
+          shuffle: s(22, '<polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line>'),
+          repeat: s(22, '<polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path>'),
+          disc: (n) => s(n, '<circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle><path d="M12 2a10 10 0 0 1 7.07 2.93" opacity=".6"></path>'),
+          person: (n) => s(n, '<circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path>'),
+          illus: {
+            welcome: illus('<rect class="li-card" x="30" y="34" width="60" height="52" rx="8"></rect><path class="li-fg" d="M52 74V48l20-4v26" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path><circle class="li-fg-fill" cx="47" cy="74" r="6"></circle><circle class="li-fg-fill" cx="67" cy="70" r="6"></circle><path class="li-spark" d="M92 26v8M88 30h8M26 84v6M23 87h6" stroke-width="2.5" stroke-linecap="round"></path>'),
+            search: illus('<rect class="li-card" x="26" y="36" width="50" height="8" rx="4"></rect><rect class="li-card" x="26" y="52" width="38" height="8" rx="4"></rect><rect class="li-card" x="26" y="68" width="30" height="8" rx="4"></rect><circle class="li-fg" cx="74" cy="66" r="15" stroke-width="5"></circle><path class="li-fg" d="M85 77l10 10" stroke-width="6" stroke-linecap="round"></path><path class="li-muted" d="M69 61l10 10M79 61l-10 10" stroke-width="3" stroke-linecap="round"></path>'),
+            liked: illus('<path class="li-card" d="M60 92 32 64a16 16 0 0 1 22.6-22.6L60 46.8l5.4-5.4A16 16 0 0 1 88 64z"></path><path class="li-fg" d="M60 84 38 62a11 11 0 0 1 15.6-15.6L60 52.8l6.4-6.4A11 11 0 0 1 82 62z" stroke-width="3.5" stroke-linejoin="round"></path><path class="li-spark" d="M92 30v8M88 34h8M28 34v6M25 37h6" stroke-width="2.5" stroke-linecap="round"></path>'),
+            albums: illus('<rect class="li-card" x="24" y="38" width="44" height="44" rx="6"></rect><circle class="li-fg" cx="72" cy="60" r="22" stroke-width="3.5"></circle><circle class="li-fg-fill" cx="72" cy="60" r="5"></circle><path class="li-muted" d="M58 60a14 14 0 0 1 14-14" stroke-width="3" stroke-linecap="round"></path>'),
+            artists: illus('<circle class="li-card" cx="44" cy="52" r="12"></circle><path class="li-card" d="M24 88a20 20 0 0 1 40 0z"></path><circle class="li-fg" cx="72" cy="50" r="13" stroke-width="3.5"></circle><path class="li-fg" d="M50 88a22 22 0 0 1 44 0" stroke-width="3.5" stroke-linecap="round"></path>')
+          }
+        };
+      })();
+
+      /* ---- [Looks] artwork crossfade: the old art fades out on top of the new one ---- */
+      function looksSetArt(el, html) {
+        if (!el || el.dataset.artKey === html) return;
+        el.dataset.artKey = html;
+        const hasOld = Array.prototype.some.call(el.children, c => !c.classList.contains('looks-art-old'));
+        if (prefersReducedMotion() || !hasOld || el.getClientRects().length === 0) { el.innerHTML = html; return; }
+        const old = document.createElement('div');
+        old.className = 'looks-art-old';
+        old.setAttribute('aria-hidden', 'true');
+        for (const c of Array.from(el.childNodes)) {
+          if (c.classList && c.classList.contains('looks-art-old')) c.remove(); else old.appendChild(c);
+        }
+        el.innerHTML = html;
+        el.appendChild(old);
+        const done = () => old.remove();
+        old.addEventListener('animationend', done, { once: true });
+        setTimeout(done, 700);
+      }
+
+      /* ---- [Looks] album-art tint: sample the cover on a tiny canvas ---- */
+      const Tint = (() => {
+        const cache = new Map();   // track id -> "r, g, b" ('' = use accent)
+        let token = 0;
+
+        function rgbToHsl(r, g, b) {
+          const max = Math.max(r, g, b), min = Math.min(r, g, b), l = (max + min) / 2;
+          if (max === min) return [0, 0, l];
+          const d = max - min;
+          const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+          let h = max === r ? (g - b) / d + (g < b ? 6 : 0) : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+          return [h / 6, s, l];
+        }
+        function hslToRgb(h, s, l) {
+          if (s === 0) return [l, l, l];
+          const q = l < 0.5 ? l * (1 + s) : l + s - l * s, p = 2 * l - q;
+          const f = (t) => {
+            if (t < 0) t += 1; if (t > 1) t -= 1;
+            if (t < 1 / 6) return p + (q - p) * 6 * t;
+            if (t < 1 / 2) return q;
+            if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+            return p;
+          };
+          return [f(h + 1 / 3), f(h), f(h - 1 / 3)];
+        }
+
+        /** Dominant, saturation-weighted color of a cover, tamed so text on top stays readable. */
+        async function sampleBlob(blob) {
+          const canvas = await renderCoverToCanvas(blob, 24);
+          const data = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
+          let r = 0, g = 0, b = 0, w = 0;
+          for (let i = 0; i < data.length; i += 4) {
+            if (data[i + 3] < 128) continue;
+            const R = data[i] / 255, G = data[i + 1] / 255, B = data[i + 2] / 255;
+            const [, s, l] = rgbToHsl(R, G, B);
+            if (l < 0.08 || l > 0.92) continue;          // ignore near-black / near-white borders
+            const wt = 0.1 + s * s * 3;                  // colorful pixels win
+            r += R * wt; g += G * wt; b += B * wt; w += wt;
+          }
+          if (!w) return '';
+          let [h, s, l] = rgbToHsl(r / w, g / w, b / w);
+          s = Math.min(s, 0.75);
+          l = Math.min(0.58, Math.max(0.32, l));
+          return hslToRgb(h, s, l).map(v => Math.round(v * 255)).join(', ');
+        }
+
+        function apply(rgb) {
+          const root = document.documentElement;
+          if (rgb) root.style.setProperty('--tint-rgb', rgb);
+          else root.style.removeProperty('--tint-rgb');     // falls back to the accent
+        }
+
+        function fromTrack(track) {
+          const my = ++token;
+          if (!track || !track.cover) { apply(''); return; }
+          if (cache.has(track.id)) { apply(cache.get(track.id)); return; }
+          sampleBlob(track.cover).then((rgb) => {
+            cache.set(track.id, rgb);
+            if (my === token) apply(rgb);
+          }).catch(() => { if (my === token) apply(''); });
+        }
+
+        return { fromTrack, sampleBlob };
+      })();
+
+      /* ---- [Looks] Albums & Artists: card grids grouped from parsed tags ---- */
+      const Browse = (() => {
+        const selection = { albums: null, artists: null };
+        const gridScroll = { albums: 0, artists: 0 };
+        const coverPromises = new Map();   // track id -> Promise<objectURL|null> (320px)
+        const coverReady = new Map();      // track id -> objectURL|null once resolved
+        let groupsMemo = { list: null, mode: null, groups: [] };
+        let shownGroups = [];
+        let lastSig = '';
+        let heroToken = 0;
+        let changeTimer = 0;
+
+        const lower = (v) => String(v || '').trim().toLowerCase();
+        const mode = () => (state.activeView === 'albums' || state.activeView === 'artists') ? state.activeView : null;
+        const isBrowseView = (v) => v === 'albums' || v === 'artists';
+        const albumName = (t) => t.album || t.folder || 'Unknown Album';
+        const artistName = (t) => t.artist || 'Unknown Artist';
+        const albumKey = (t) => lower(albumName(t)) + '\u0001' + lower(t.albumArtist);
+        const artistKey = (t) => lower(artistName(t));
+        const keyFor = (m) => (m === 'albums' ? albumKey : artistKey);
+        const selected = () => { const m = mode(); return m ? selection[m] : null; };
+        const isGrid = () => !!mode() && !selected();
+        const sortGroup = (m, list) => list.sort(m === 'albums' ? albumOrder
+          : (a, b) => collator.compare(albumName(a), albumName(b)) || albumOrder(a, b));
+
+        function filterSelected(list) {
+          const m = mode(), key = selection[m], fn = keyFor(m);
+          return sortGroup(m, list.filter(t => fn(t) === key));
+        }
+
+        function buildGroups(m, tracks) {
+          const fn = keyFor(m), map = new Map();
+          for (const t of tracks) {
+            const key = fn(t);
+            let g = map.get(key);
+            if (!g) {
+              g = { key, name: m === 'albums' ? albumName(t) : artistName(t), tracks: [], artists: new Set(), albums: new Set(), year: 0, coverTrack: null, gradient: t.gradient };
+              map.set(key, g);
+            }
+            g.tracks.push(t);
+            g.artists.add(t.albumArtist || artistName(t));
+            g.albums.add(albumKey(t));
+            if (+t.year > g.year) g.year = +t.year;
+            if (!g.coverTrack && t.cover) g.coverTrack = t;
+          }
+          return [...map.values()].sort((a, b) => collator.compare(a.name, b.name));
+        }
+
+        function groups() {
+          const m = mode(), list = getVisibleTracks();
+          if (groupsMemo.v !== looksVisibleVersion || groupsMemo.list !== list || groupsMemo.mode !== m) {
+            groupsMemo = { v: looksVisibleVersion, list, mode: m, groups: buildGroups(m, list) };
+          }
+          return groupsMemo.groups;
+        }
+
+        function groupFor(m, key) {
+          const fn = keyFor(m);
+          const g = buildGroups(m, state.tracks.filter(t => fn(t) === key));
+          return g[0] || null;
+        }
+
+        const groupArtist = (g) => g.artists.size === 1 ? [...g.artists][0] : 'Various Artists';
+        const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+
+        function loadCover(track) {
+          let p = coverPromises.get(track.id);
+          if (!p) {
+            p = coverQueue(async () => {
+              if (!track.cover) return null;
+              const canvas = await renderCoverToCanvas(track.cover, 320);
+              const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.85));
+              return blob ? URL.createObjectURL(blob) : null;
+            }).catch(() => null).then((url) => { coverReady.set(track.id, url); return url; });
+            coverPromises.set(track.id, p);
+          }
+          return p;
+        }
+        let coverActive = 0;
+        const coverWaiting = [];
+        function coverQueue(fn) {
+          return new Promise((res, rej) => { coverWaiting.push([fn, res, rej]); pumpCovers(); });
+        }
+        function pumpCovers() {
+          while (coverActive < 2 && coverWaiting.length) {
+            const [fn, res, rej] = coverWaiting.shift();
+            coverActive++;
+            fn().then(res, rej).finally(() => { coverActive--; pumpCovers(); });
+          }
+        }
+
+        const io = 'IntersectionObserver' in window ? new IntersectionObserver((entries) => {
+          for (const en of entries) {
+            if (!en.isIntersecting) continue;
+            io.unobserve(en.target);
+            fillCover(en.target);
+          }
+        }, { root: dom.mainScroll, rootMargin: '400px 0px' }) : null;
+
+        function fillCover(el) {
+          const track = state.trackMap.get(el.dataset.ct);
+          if (!track) return;
+          loadCover(track).then((url) => {
+            if (!url || !el.isConnected) return;
+            el.insertAdjacentHTML('beforeend', `<img src="${url}" alt="" decoding="async" class="looks-fade-in">`);
+          });
+        }
+
+        function artInner(g, iconSize) {
+          const ct = g.coverTrack;
+          const ready = ct && coverReady.get(ct.id);
+          return ready ? `<img src="${ready}" alt="" decoding="async">` : buildFallbackArtHTML(g.gradient, iconSize);
+        }
+
+        function cardHTML(g, i, m) {
+          const sub = m === 'albums'
+            ? [groupArtist(g), g.year || ''].filter(Boolean).map(escapeHtml).join(' • ')
+            : [plural(g.albums.size, 'album', 'albums'), plural(g.tracks.length, 'song', 'songs')].join(' • ');
+          const ct = g.coverTrack && !coverReady.has(g.coverTrack.id) ? ` data-ct="${g.coverTrack.id}"` : '';
+          const label = `${g.name}${m === 'albums' ? ', ' + groupArtist(g) : ''}, ${plural(g.tracks.length, 'song', 'songs')}`;
+          return `<div class="looks-card${m === 'artists' ? ' is-artist' : ''}" role="listitem">
+              <button type="button" class="looks-card-main" data-i="${i}" aria-label="${escapeHtml(label)}">
+                <span class="looks-card-art"${ct}>${artInner(g, 40)}</span>
+                <span class="looks-card-title" title="${escapeHtml(g.name)}">${escapeHtml(g.name)}</span>
+                <span class="looks-card-sub">${sub}</span>
+              </button>
+              <span class="looks-card-overlay"><button type="button" class="looks-card-play" data-play="${i}" tabindex="-1" aria-label="Play ${escapeHtml(g.name)}">${LOOKS_SVG.play(22)}</button></span>
+            </div>`;
+        }
+
+        function renderGrid() {
+          const wrap = $('looksGridWrap');
+          const visible = isGrid() ? getVisibleTracks() : null;
+          if (!visible || visible.length === 0) { wrap.hidden = true; return false; }
+          const m = mode();
+          clearRenderedRows();
+          dom.tracklistBody.style.height = '0px';
+          dom.tracklistContainer.style.display = 'none';
+          dom.emptyState.style.display = 'none';
+          looksShowSkeleton(false);
+          dom.actionBar.style.display = 'flex';
+          wrap.hidden = false;
+          const gs = groups();
+          const sig = m + '|' + gs.map(g => `${g.key}:${g.tracks.length}:${g.coverTrack ? g.coverTrack.id : ''}:${g.year}`).join('|');
+          if (sig !== lastSig) {
+            lastSig = sig;
+            shownGroups = gs;
+            const grid = $('looksGrid');
+            grid.classList.toggle('is-artists', m === 'artists');
+            grid.setAttribute('aria-label', m === 'albums' ? 'Albums' : 'Artists');
+            grid.innerHTML = gs.map((g, i) => cardHTML(g, i, m)).join('');
+            grid.querySelectorAll('[data-ct]').forEach(el => { if (io) io.observe(el); else fillCover(el); });
+          }
+          return true;
+        }
+
+        function subtitlePrefix(visible) {
+          const m = mode();
+          if (!m) return '';
+          const dot = '<span class="hero-dot">&bull;</span>';
+          if (!selected()) return `<span>${plural(groups().length, m === 'albums' ? 'album' : 'artist', m === 'albums' ? 'albums' : 'artists')}</span>${dot}`;
+          const g = groupFor(m, selected());
+          if (!g) return '';
+          if (m === 'albums') {
+            const bits = [groupArtist(g), g.year || ''].filter(Boolean);
+            return bits.map(b => `<span class="looks-strong">${escapeHtml(String(b))}</span>${dot}`).join('');
+          }
+          return `<span>${plural(g.albums.size, 'album', 'albums')}</span>${dot}`;
+        }
+
+        function renderHero() {
+          const back = $('looksHeroBack');
+          const m = mode();
+          const my = ++heroToken;
+          dom.heroBanner.style.removeProperty('--tint-rgb');
+          dom.heroCover.classList.remove('looks-round');
+          dom.heroBanner.classList.toggle('looks-browse', !!m);
+          back.hidden = true;
+          if (!m) return false;
+          dom.heroBanner.classList.remove('liked-theme');
+          const sel = selected();
+          if (!sel) {
+            dom.heroType.textContent = 'Browse';
+            dom.heroTitle.textContent = m === 'albums' ? 'Albums' : 'Artists';
+            dom.heroCover.innerHTML = m === 'albums' ? LOOKS_SVG.disc(64) : LOOKS_SVG.person(64);
+            return true;
+          }
+          const g = groupFor(m, sel);
+          back.hidden = false;
+          $('looksHeroBackLabel').textContent = m === 'albums' ? 'Albums' : 'Artists';
+          back.setAttribute('aria-label', `Back to ${m === 'albums' ? 'albums' : 'artists'}`);
+          dom.heroType.textContent = m === 'albums' ? 'Album' : 'Artist';
+          dom.heroTitle.textContent = g ? g.name : (m === 'albums' ? 'Album' : 'Artist');
+          dom.heroCover.classList.toggle('looks-round', m === 'artists');
+          if (!g) { dom.heroCover.innerHTML = m === 'albums' ? LOOKS_SVG.disc(64) : LOOKS_SVG.person(64); return true; }
+          dom.heroCover.innerHTML = artInner(g, 56);
+          const ct = g.coverTrack;
+          if (ct) {
+            if (!coverReady.has(ct.id)) loadCover(ct).then((url) => {
+              if (my === heroToken && url) dom.heroCover.innerHTML = `<img src="${url}" alt="" decoding="async" class="looks-fade-in">`;
+            });
+            Tint.sampleBlob(ct.cover).then((rgb) => {
+              if (my === heroToken && rgb) dom.heroBanner.style.setProperty('--tint-rgb', rgb);
+            }).catch(() => {});
+          }
+          return true;
+        }
+
+        function rerender() {
+          invalidateVisible();
+          state.focusIndex = -1;
+          renderHeroHeader();
+          renderTracklist();
+          updateStats();
+        }
+
+        function open(m, key) {
+          if (state.activeView !== m) switchView(m);
+          else if (!selection[m]) gridScroll[m] = dom.mainScroll.scrollTop;
+          selection[m] = key;
+          rerender();
+          dom.mainScroll.scrollTop = 0;
+        }
+
+        function back() {
+          const m = mode();
+          if (!m || !selection[m]) return;
+          const prevKey = selection[m];
+          selection[m] = null;
+          rerender();
+          dom.mainScroll.scrollTop = gridScroll[m] || 0;
+          // put focus back on the card we came from
+          const i = shownGroups.findIndex(g => g.key === prevKey);
+          const btn = i >= 0 && $('looksGrid').querySelector(`.looks-card-main[data-i="${i}"]`);
+          if (btn) btn.focus({ preventScroll: true });
+        }
+
+        function onViewChanged() {
+          selection.albums = selection.artists = null;
+          lastSig = '';
+        }
+
+        /** Tags or covers changed: refresh the grid (debounced, only while it is shown). */
+        function trackChanged() {
+          if (!isGrid()) return;
+          clearTimeout(changeTimer);
+          changeTimer = setTimeout(() => {
+            if (!isGrid()) return;
+            invalidateVisible();
+            renderTracklist();
+            updateStats();
+          }, 400);
+        }
+
+        // Card clicks: open the album/artist, or play it straight away
+        $('looksGrid').addEventListener('click', (e) => {
+          const m = mode();
+          if (!m) return;
+          const playBtn = e.target.closest('.looks-card-play');
+          if (playBtn) {
+            const g = shownGroups[+playBtn.dataset.play];
+            if (g) startPlaybackFromList(sortGroup(m, g.tracks.slice()));
+            return;
+          }
+          const card = e.target.closest('.looks-card-main');
+          if (!card) return;
+          const g = shownGroups[+card.dataset.i];
+          if (g) { gridScroll[m] = dom.mainScroll.scrollTop; open(m, g.key); }
+        });
+        $('looksHeroBack').addEventListener('click', back);
+        // Clicking Albums/Artists in the nav while inside one goes back to the grid
+        ['navAlbums', 'navArtists'].forEach((id) => {
+          $(id).addEventListener('click', (e) => {
+            const v = e.currentTarget.dataset.view;
+            if (state.activeView === v && selection[v]) { selection[v] = null; gridScroll[v] = 0; invalidateVisible(); }
+          }, true);
+        });
+        // Backspace / Alt+Left inside a detail view goes back
+        window.addEventListener('keydown', (e) => {
+          if (!selected() || e.defaultPrevented || isTypingTarget(e.target) || Editor.isOpen()) return;
+          if ((e.key === 'Backspace' && !e.ctrlKey && !e.metaKey && !e.altKey) || (e.key === 'ArrowLeft' && e.altKey)) {
+            e.preventDefault();
+            back();
+          }
+        });
+
+        return {
+          mode, isBrowseView, selected, isGrid, filterSelected, onViewChanged, trackChanged,
+          subtitlePrefix, renderHero, renderGrid, open, back, albumKey, artistKey
+        };
+      })();
+
+      /* ---- [Looks] loading skeleton ---- */
+      function looksShowSkeleton(show) {
+        const sk = $('looksSkeleton');
+        if (!sk) return;
+        if (show) {
+          if (!sk.childElementCount) {
+            sk.innerHTML = Array.from({ length: 9 }, (_, i) =>
+              `<div class="looks-sk-row" style="--i:${i}"><span class="looks-sk-num"></span><span class="looks-sk-box"></span><span class="looks-sk-lines"><span class="looks-sk-line"></span><span class="looks-sk-line short"></span></span><span class="looks-sk-line dur"></span></div>`).join('');
+          }
+          sk.hidden = false;
+          dom.emptyState.style.display = 'none';
+        } else if (!sk.hidden) {
+          sk.hidden = true;
+          if (!state.tracks.length && state.activeView !== 'visualizer') dom.emptyState.style.display = 'flex';
+        }
+      }
+
+      /* ---- [Looks] empty states: illustration + one clear next step ---- */
+      let looksEmptyAction = null;
+      function looksDecorateEmpty() {
+        const sk = $('looksSkeleton');
+        if (sk && !sk.hidden) { dom.emptyState.style.display = 'none'; return; }   // still loading
+        const hasLib = state.tracks.length > 0;
+        const m = Browse.mode();
+        const kind = !hasLib ? 'welcome'
+          : state.searchQuery.trim() ? 'search'
+          : state.activeView === 'liked' ? 'liked'
+          : m || 'welcome';
+        dom.emptyState.dataset.kind = kind;
+        const wrap = dom.emptyState.querySelector('.empty-icon-wrap');
+        if (wrap) wrap.innerHTML = LOOKS_SVG.illus[kind];
+        const formats = dom.emptyState.querySelector('.empty-formats');
+        if (formats) formats.style.display = kind === 'welcome' ? '' : 'none';
+
+        let label = '';
+        looksEmptyAction = null;
+        if (kind === 'liked') {
+          label = 'Browse All Tracks';
+          looksEmptyAction = () => switchView('all');
+        } else if (kind === 'search') {
+          label = 'Clear Search';
+          looksEmptyAction = () => { clearSearch(); dom.searchInput.focus(); };
+        } else if (kind === 'albums' || kind === 'artists') {
+          dom.emptyTitle.textContent = kind === 'albums' ? 'This Album Is Empty' : 'No Songs by This Artist';
+          dom.emptyDesc.textContent = 'Reload the folder to bring its songs back.';
+          dom.emptyActions.style.display = 'none';
+          label = kind === 'albums' ? 'Back to Albums' : 'Back to Artists';
+          looksEmptyAction = () => Browse.back();
+        }
+        $('looksEmptyCtaWrap').hidden = !label;
+        $('looksEmptyCta').textContent = label;
+      }
+      $('looksEmptyCta').addEventListener('click', () => { if (looksEmptyAction) looksEmptyAction(); });
+
+      /* ---- [Looks] thin progress line under the top bar (mobile) ---- */
+      (() => {
+        const bar = $('looksTopProgress').firstElementChild;
+        let last = -1;
+        const update = () => {
+          const d = audio.duration, c = audio.currentTime;
+          const p = Number.isFinite(d) && d > 0 ? Math.min(1, Math.max(0, c / d)) : 0;
+          const r = Math.round(p * 1000);
+          if (r === last) return;
+          last = r;
+          bar.style.transform = `scaleX(${p})`;
+        };
+        ['timeupdate', 'loadedmetadata', 'seeked', 'emptied'].forEach(t => onPlayers(t, update));
+      })();
+
+      /* ---- [Looks] track actions menu: "⋯" button, right-click, long-press, Shift+F10 ---- */
+      const LooksMenu = (() => {
+        const menu = $('looksMenu'), backdrop = $('looksMenuBackdrop');
+        const sheetQuery = matchMedia('(max-width: 768px)');
+        let opener = null, trackId = null, isOpen = false;
+
+        function items(t) {
+          const liked = state.likedKeys.has(t.likeKey);
+          const canAud = Audacity.canOpen(t);
+          return [
+            { act: 'edit', label: 'Edit audio', icon: SVG.edit, kbd: 'E' },
+            { act: 'audacity', label: 'Open in Audacity', icon: SVG.audacity, disabled: !canAud, title: canAud ? '' : Audacity.UNKNOWN_LOCATION },
+            { act: 'like', label: liked ? 'Remove from Liked Songs' : 'Add to Liked Songs', icon: SVG.heart, kbd: 'L', on: liked },
+            null,
+            { act: 'album', label: 'Go to album', icon: LOOKS_SVG.disc(16) },
+            { act: 'artist', label: 'Go to artist', icon: LOOKS_SVG.person(16) }
+          ];
+        }
+
+        function render(t, sheet) {
+          const head = sheet
+            ? `<div class="looks-menu-head"><div class="looks-menu-art">${artHTML(t, 20)}</div><div class="looks-menu-text"><div class="looks-menu-title">${escapeHtml(t.title)}</div><div class="looks-menu-sub">${escapeHtml(t.artist)}</div></div></div>`
+            : '';
+          return head + items(t).map((it) => it === null
+            ? '<div class="looks-menu-sep" role="separator"></div>'
+            : `<button type="button" role="menuitem" class="looks-menu-item${it.on ? ' is-on' : ''}" data-act="${it.act}" tabindex="-1"${it.disabled ? ` aria-disabled="true" title="${escapeHtml(it.title)}"` : ''}>${it.icon}<span>${it.label}</span>${it.kbd && !sheet ? `<kbd>${it.kbd}</kbd>` : ''}</button>`
+          ).join('');
+        }
+
+        function enabledItems() { return Array.from(menu.querySelectorAll('.looks-menu-item:not([aria-disabled="true"])')); }
+
+        /** point: {x, y} for right-click; otherwise the menu anchors to `from`. */
+        function openFor(id, from, point) {
+          const t = state.trackMap.get(id);
+          if (!t) return;
+          close(false);
+          trackId = id; opener = from || document.activeElement; isOpen = true;
+          const sheet = sheetQuery.matches;
+          menu.classList.toggle('is-sheet', sheet);
+          menu.classList.remove('open');
+          menu.innerHTML = render(t, sheet);
+          menu.style.left = menu.style.top = '';
+          menu.hidden = false;
+          backdrop.hidden = !sheet;
+          if (!sheet) {
+            const w = menu.offsetWidth, h = menu.offsetHeight;
+            const vw = document.documentElement.clientWidth, vh = document.documentElement.clientHeight;
+            const r = from && from.getBoundingClientRect ? from.getBoundingClientRect() : null;
+            let x = point ? point.x : r ? r.right - w : vw / 2 - w / 2;
+            let y = point ? point.y : r ? r.bottom + 4 : vh / 2 - h / 2;
+            if (y + h > vh - 8) y = point ? point.y - h : r ? r.top - h - 4 : vh - h - 8;
+            menu.style.left = `${Math.round(Math.max(8, Math.min(x, vw - w - 8)))}px`;
+            menu.style.top = `${Math.round(Math.max(8, Math.min(y, vh - h - 8)))}px`;
+          }
+          requestAnimationFrame(() => { menu.classList.add('open'); backdrop.classList.add('open'); });
+          const first = enabledItems()[0];
+          if (first) first.focus({ preventScroll: true });
+        }
+
+        function close(restoreFocus = true) {
+          if (!isOpen) return;
+          isOpen = false;
+          menu.hidden = true;
+          backdrop.hidden = true;
+          menu.classList.remove('open');
+          backdrop.classList.remove('open');
+          if (restoreFocus) {
+            const target = opener && opener.isConnected ? opener : (FsPlayer.isOpen() ? $('fsMore') : dom.tracklistBody);
+            if (target && target.focus) target.focus({ preventScroll: true });
+          }
+        }
+
+        function run(act) {
+          const t = state.trackMap.get(trackId);
+          if (!t) { close(); return; }
+          if (act === 'audacity' && !Audacity.canOpen(t)) { showToast(Audacity.UNKNOWN_LOCATION); return; }
+          close(act === 'like');
+          if (act !== 'like' && FsPlayer.isOpen()) FsPlayer.close(false);
+          if (act === 'edit') Editor.open(t.id, opener && opener.isConnected ? opener : undefined);
+          else if (act === 'audacity') Audacity.open(t, false);
+          else if (act === 'like') toggleLikeTrack(t.id);
+          else if (act === 'album') Browse.open('albums', Browse.albumKey(t));
+          else if (act === 'artist') Browse.open('artists', Browse.artistKey(t));
+        }
+
+        menu.addEventListener('click', (e) => {
+          const it = e.target.closest('.looks-menu-item');
+          if (it) run(it.dataset.act);
+        });
+        menu.addEventListener('keydown', (e) => {
+          const list = enabledItems();
+          const i = list.indexOf(document.activeElement);
+          let handled = true;
+          switch (e.key) {
+            case 'ArrowDown': list[(i + 1) % list.length].focus(); break;
+            case 'ArrowUp': list[(i - 1 + list.length) % list.length].focus(); break;
+            case 'Home': list[0].focus(); break;
+            case 'End': list[list.length - 1].focus(); break;
+            case 'Escape': close(); break;
+            case 'Tab': close(); break;
+            default: handled = false;
+          }
+          if (handled) { e.preventDefault(); e.stopPropagation(); }
+        });
+        backdrop.addEventListener('click', () => close());
+        document.addEventListener('pointerdown', (e) => {
+          if (isOpen && !menu.contains(e.target) && e.target !== backdrop) close(false);
+        }, true);
+        window.addEventListener('resize', () => close(false));
+        dom.mainScroll.addEventListener('scroll', () => { if (isOpen && !sheetQuery.matches) close(false); }, { passive: true });
+
+        // Row triggers
+        let lpTimer = 0, lpStart = null, suppressClick = false;
+        const cancelLongPress = () => { clearTimeout(lpTimer); lpTimer = 0; lpStart = null; };
+        dom.tracklistBody.addEventListener('click', (e) => {
+          if (suppressClick) { suppressClick = false; e.preventDefault(); e.stopPropagation(); return; }
+          const more = e.target.closest('.row-more');
+          if (more) { e.preventDefault(); e.stopPropagation(); openFor(more.dataset.moreId, more); }
+        }, true);
+        dom.tracklistBody.addEventListener('contextmenu', (e) => {
+          const row = e.target.closest('.track-row');
+          if (!row) return;
+          e.preventDefault();
+          if (isOpen && trackId === row.dataset.id) return;   // long-press already opened it
+          cancelLongPress();
+          openFor(row.dataset.id, row, sheetQuery.matches ? null : { x: e.clientX, y: e.clientY });
+        });
+        dom.tracklistBody.addEventListener('pointerdown', (e) => {
+          suppressClick = false;
+          if (e.pointerType !== 'touch') return;
+          const row = e.target.closest('.track-row');
+          if (!row || e.target.closest('button')) return;
+          lpStart = { x: e.clientX, y: e.clientY };
+          lpTimer = setTimeout(() => {
+            lpTimer = 0;
+            suppressClick = true;
+            if (navigator.vibrate) try { navigator.vibrate(8); } catch (err) { /* optional */ }
+            openFor(row.dataset.id, row, null);
+          }, 500);
+        });
+        dom.tracklistBody.addEventListener('pointermove', (e) => {
+          if (lpStart && Math.hypot(e.clientX - lpStart.x, e.clientY - lpStart.y) > 10) cancelLongPress();
+        });
+        ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => dom.tracklistBody.addEventListener(t, cancelLongPress));
+        dom.mainScroll.addEventListener('scroll', cancelLongPress, { passive: true });
+        dom.tracklistBody.addEventListener('keydown', (e) => {
+          if (!(e.key === 'ContextMenu' || (e.key === 'F10' && e.shiftKey))) return;
+          const t = getVisibleTracks()[state.focusIndex];
+          if (!t) return;
+          e.preventDefault();
+          e.stopPropagation();
+          openFor(t.id, rowEls.get(t.id) || dom.tracklistBody);
+        });
+
+        return { openFor, close, isOpen: () => isOpen };
+      })();
+
+      /* ---- [Looks] mobile full-screen Now Playing ---- */
+      const FsPlayer = (() => {
+        const el = $('fsPlayer'), sheet = $('fsSheet'), art = $('fsArt'), artWrap = $('fsArtWrap'), seek = $('fsSeek');
+        const ui = { title: $('fsTitle'), artist: $('fsArtist'), like: $('fsLike'), play: $('fsPlay'), shuffle: $('fsShuffle'), repeat: $('fsRepeat'), cur: $('fsCur'), dur: $('fsDur'), context: $('fsContext') };
+        const mobile = matchMedia('(max-width: 768px)');
+        let open = false, raf = 0, opener = null, dragging = false, closeTimer = 0;
+        const last = {};
+
+        $('fsPrev').innerHTML = LOOKS_SVG.prev;
+        $('fsNext').innerHTML = LOOKS_SVG.next;
+        ui.shuffle.innerHTML = LOOKS_SVG.shuffle;
+        ui.repeat.innerHTML = LOOKS_SVG.repeat + '<span class="fs-one" aria-hidden="true">1</span>';
+
+        const current = () => state.trackMap.get(state.currentTrackId) || null;
+        const setText = (k, node, v) => { if (last[k] !== v) { last[k] = v; node.textContent = v; } };
+        const pctOf = () => { const d = audio.duration; return Number.isFinite(d) && d > 0 ? audio.currentTime / d : 0; };
+
+        function contextLabel() {
+          const m = Browse.mode(), sel = Browse.selected();
+          if (state.activeView === 'liked') return 'Liked Songs';
+          if (m && sel) return dom.heroTitle.textContent;
+          return 'Your library';
+        }
+
+        function artChanged() {
+          if (!open) return;
+          const t = current();
+          looksSetArt(art, t ? artHTML(t, 96, true) : SVG.note(96, 'currentColor'));
+        }
+
+        function sync() {
+          const t = current();
+          if (!t) { close(); return; }
+          setText('title', ui.title, t.title);
+          setText('artist', ui.artist, [t.artist, t.album].filter(Boolean).join(' — '));
+          const liked = state.likedKeys.has(t.likeKey);
+          if (last.liked !== liked) {
+            last.liked = liked;
+            ui.like.classList.toggle('liked', liked);
+            ui.like.setAttribute('aria-pressed', String(liked));
+            ui.like.setAttribute('aria-label', liked ? 'Remove from Liked Songs' : 'Add to Liked Songs');
+          }
+          if (last.playing !== state.isPlaying) {
+            last.playing = state.isPlaying;
+            ui.play.innerHTML = state.isPlaying ? LOOKS_SVG.pause(30) : LOOKS_SVG.play(30);
+            ui.play.setAttribute('aria-label', state.isPlaying ? 'Pause' : 'Play');
+          }
+          if (last.shuffle !== state.shuffle) {
+            last.shuffle = state.shuffle;
+            ui.shuffle.classList.toggle('active', state.shuffle);
+            ui.shuffle.setAttribute('aria-pressed', String(state.shuffle));
+          }
+          if (last.repeat !== state.repeatMode) {
+            last.repeat = state.repeatMode;
+            ui.repeat.classList.toggle('active', state.repeatMode !== 'off');
+            ui.repeat.classList.toggle('repeat-one', state.repeatMode === 'one');
+            ui.repeat.setAttribute('aria-label', `Repeat: ${state.repeatMode === 'one' ? 'One' : state.repeatMode === 'all' ? 'All' : 'Off'}`);
+          }
+          const d = audio.duration;
+          const p = dragging ? seek.value / 1000 : pctOf();
+          if (!dragging) {
+            const v = String(Math.round(p * 1000));
+            if (seek.value !== v) seek.value = v;
+          }
+          seek.style.setProperty('--pct', `${(p * 100).toFixed(2)}%`);
+          setText('cur', ui.cur, formatTime(Number.isFinite(d) ? p * d : 0));
+          setText('dur', ui.dur, Number.isFinite(d) ? formatTime(d) : '0:00');
+        }
+
+        function loop() {
+          if (!open) return;
+          sync();
+          raf = requestAnimationFrame(loop);
+        }
+
+        function openPlayer(from) {
+          if (open || !current()) return;
+          clearTimeout(closeTimer);
+          open = true;
+          opener = from || document.activeElement;
+          for (const k in last) delete last[k];
+          art.dataset.artKey = '';
+          art.innerHTML = '';
+          artChanged();
+          ui.context.textContent = contextLabel();
+          el.hidden = false;
+          document.documentElement.classList.add('looks-fs-open');
+          sheet.style.transform = '';
+          requestAnimationFrame(() => el.classList.add('open'));
+          $('fsClose').focus({ preventScroll: true });
+          loop();
+        }
+
+        function close(restoreFocus = true) {
+          if (!open) return;
+          open = false;
+          cancelAnimationFrame(raf);
+          LooksMenu.close(false);
+          el.classList.remove('open');
+          sheet.style.transform = '';
+          document.documentElement.classList.remove('looks-fs-open');
+          closeTimer = setTimeout(() => { if (!open) el.hidden = true; }, prefersReducedMotion() ? 0 : 320);
+          if (restoreFocus) {
+            const target = opener && opener.isConnected && opener.tabIndex >= 0 ? opener : dom.btnPlayPause;
+            target.focus({ preventScroll: true });
+          } else if (el.contains(document.activeElement)) {
+            document.activeElement.blur();
+          }
+        }
+
+        // Open from the mini player (art or title) on phones; desktop keeps "open visualizer"
+        const left = document.querySelector('.player-left');
+        left.addEventListener('click', (e) => {
+          if (!mobile.matches || !current() || e.target.closest('#btnLikeCurrent')) return;
+          e.preventDefault();
+          e.stopPropagation();
+          openPlayer(dom.playerArt);
+        }, true);
+        mobile.addEventListener('change', (e) => { if (!e.matches) close(false); });
+
+        $('fsClose').addEventListener('click', () => close());
+        $('fsMore').addEventListener('click', (e) => { const t = current(); if (t) LooksMenu.openFor(t.id, e.currentTarget); });
+        ui.play.addEventListener('click', () => togglePlayPause());
+        $('fsPrev').addEventListener('click', () => playPrevTrack());
+        $('fsNext').addEventListener('click', () => playNextTrack(false));
+        ui.shuffle.addEventListener('click', () => toggleShuffle());
+        ui.repeat.addEventListener('click', () => cycleRepeatMode());
+        ui.like.addEventListener('click', () => { const t = current(); if (t) toggleLikeTrack(t.id); });
+
+        seek.addEventListener('input', () => { dragging = true; });
+        seek.addEventListener('change', () => {
+          const d = audio.duration;
+          if (Number.isFinite(d) && d > 0) seekTo(seek.value / 1000 * d);
+          dragging = false;
+        });
+
+        // Keyboard: Escape closes, Tab stays inside the sheet
+        el.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(); return; }
+          if (e.key !== 'Tab') return;
+          const f = Array.from(el.querySelectorAll('button, input')).filter(n => n.offsetParent !== null);
+          if (!f.length) return;
+          const i = f.indexOf(document.activeElement);
+          if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); }
+          else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); }
+        });
+
+        // Gestures: swipe the cover left/right to skip; drag the sheet down to close
+        let g = null;
+        sheet.addEventListener('pointerdown', (e) => {
+          if (e.button !== 0 || e.target.closest('input, .looks-menu')) return;
+          g = { id: e.pointerId, x: e.clientX, y: e.clientY, t: performance.now(), axis: null, onArt: artWrap.contains(e.target) };
+        });
+        sheet.addEventListener('pointermove', (e) => {
+          if (!g || e.pointerId !== g.id) return;
+          const dx = e.clientX - g.x, dy = e.clientY - g.y;
+          if (!g.axis) {
+            if (Math.hypot(dx, dy) < 10) return;
+            g.axis = Math.abs(dx) > Math.abs(dy) ? (g.onArt ? 'x' : 'none') : (dy > 0 ? 'y' : 'none');
+            if (g.axis !== 'none') { try { sheet.setPointerCapture(e.pointerId); } catch (err) { /* ok */ } el.classList.add('dragging'); }
+          }
+          if (g.axis === 'x') art.style.transform = `translateX(${dx * 0.6}px) rotate(${dx * 0.02}deg)`;
+          else if (g.axis === 'y') sheet.style.transform = `translateY(${Math.max(0, dy)}px)`;
+        });
+        const endGesture = (e) => {
+          if (!g || e.pointerId !== g.id) return;
+          const dx = e.clientX - g.x, dy = e.clientY - g.y;
+          const fast = performance.now() - g.t < 250;
+          const axis = g.axis;
+          g = null;
+          el.classList.remove('dragging');
+          art.style.transform = '';
+          if (axis === 'x' && e.type === 'pointerup' && (Math.abs(dx) > 70 || (fast && Math.abs(dx) > 30))) {
+            if (dx < 0) playNextTrack(false); else playPrevTrack();
+            art.classList.remove('looks-swipe-l', 'looks-swipe-r');
+            void art.offsetWidth;
+            art.classList.add(dx < 0 ? 'looks-swipe-l' : 'looks-swipe-r');
+          } else if (axis === 'y' && e.type === 'pointerup' && (dy > 90 || (fast && dy > 40))) {
+            close();
+          } else {
+            sheet.style.transform = '';
+          }
+          if (axis && axis !== 'none') {
+            // a drag is not a tap on whatever button it started on
+            const swallow = (ev) => { ev.stopPropagation(); ev.preventDefault(); };
+            sheet.addEventListener('click', swallow, { capture: true, once: true });
+            setTimeout(() => sheet.removeEventListener('click', swallow, true), 50);
+          }
+        };
+        sheet.addEventListener('pointerup', endGesture);
+        sheet.addEventListener('pointercancel', endGesture);
+        art.addEventListener('animationend', () => art.classList.remove('looks-swipe-l', 'looks-swipe-r'));
+
+        return { open: openPlayer, close, isOpen: () => open, artChanged };
+      })();
+
+      /* [/Looks] helpers */
+
+      /* ========================================================================
          Init
          ======================================================================== */
       ensureRoundRectPolyfill();
@@ -8589,7 +10509,7 @@
       updateControlStatesUI();
       updateVolumeUI();
       updatePlayerBarUI();
-      switchView(state.activeView === 'liked' ? 'liked' : 'all');
+      switchView(state.activeView === 'liked' || Browse.isBrowseView(state.activeView) ? state.activeView : 'all');   // [Looks] + browse views
       renderAll();
       restoreSessionFolders();
     })();
