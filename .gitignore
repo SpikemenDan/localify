@@ -1,2 +1,19 @@
 songs/
 songs.lnk
+
+# [PWA] Never commit music or personal data (the Pages site is built from an allowlist too).
+*.lnk
+*.mp3
+*.m4a
+*.aac
+*.flac
+*.wav
+*.ogg
+*.opus
+*.wma
+*.aiff
+*.aif
+*.webm
+# Localify backups contain your likes, history and settings.
+*.localify.json
+_site/
