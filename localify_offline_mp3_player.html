@@ -4107,8 +4107,8 @@
           <button type="button" class="switch" id="setAfOnline" role="switch" aria-checked="true" aria-labelledby="setAfOnlineLabel"></button>
         </div>
         <div class="settings-row">
-          <span class="settings-label" id="setAfMbLabel">Look up songs on MusicBrainz<span class="settings-hint">Off by default. Sends only the song's title and artist text to musicbrainz.org (and asks coverartarchive.org for album covers). No file names, folders or audio are sent. One request per second.</span></span>
-          <button type="button" class="switch" id="setAfMb" role="switch" aria-checked="false" aria-labelledby="setAfMbLabel"></button>
+          <span class="settings-label" id="setAfMbLabel">Look up songs online<span class="settings-hint">Asks MusicBrainz and iTunes for missing details, genres and album covers. Only the song's title and artist text are sent (to musicbrainz.org and itunes.apple.com). No file names, folders or audio are sent. Covers come from coverartarchive.org or Apple and are shown in your library only.</span></span>
+          <button type="button" class="switch" id="setAfMb" role="switch" aria-checked="true" aria-labelledby="setAfMbLabel"></button>
         </div>
         <div class="settings-row">
           <span class="settings-label" id="setAfApplyLabel">Auto-apply to files<span class="settings-hint">Writes filled-in details straight into the files, only in folders you've already allowed Localify to edit. Undo from Tidy names &amp; tags.</span></span>
@@ -8928,10 +8928,12 @@
         const FIELDS = ['title', 'artist', 'album', 'year', 'genre', 'track'];
         const FIELD_LABELS = { title: 'Title', artist: 'Artist', album: 'Album', year: 'Year', genre: 'Genre', track: 'Track' };
         const FRAME_FOR = { title: 'TIT2', artist: 'TPE1', album: 'TALB', year: 'TYER', genre: 'TCON', track: 'TRCK' };
-        const TEMPLATE_PRESETS = ['{title} - {artist}', '{artist} - {title}', '{track} {title}', '{track}. {artist} - {title}'];
-        // Defaults follow the library's existing "Title - Artist" file name convention (see parseFileMeta)
-        const DEFAULT_TAGGER_PREFS = { template: '{title} - {artist}', dashOrder: 'title-artist', ai: false,
-          autoFill: true, onlineOnly: true, autoApply: false, musicbrainz: false };
+        const TEMPLATE_PRESETS = ['{artist} - {title}', '{title} - {artist}', '{track} {title}', '{track}. {artist} - {title}'];
+        // "Artist - Title" is the most common naming online, so it's the easiest to read back (for the rules and the AI).
+        // The player shows the tags, which Apply always writes, so the file name order doesn't change what you see.
+        // `musicbrainz` switches all online lookups: MusicBrainz, Cover Art Archive and iTunes Search.
+        const DEFAULT_TAGGER_PREFS = { template: '{artist} - {title}', dashOrder: 'artist-title', ai: false,
+          autoFill: true, onlineOnly: true, autoApply: false, musicbrainz: true };
         const READ_WORKERS = 4;
         const UNDO_MAX_BYTES = 256 * 1024 * 1024;   // original tag bytes kept for "Undo last batch"
         const ZIP_MAX_BYTES = 3.5 * 1024 * 1024 * 1024;
@@ -8951,7 +8953,8 @@
         let prefs = loadTaggerPrefs();
         const savePrefs = () => saveJSON(STORAGE_KEYS.TAGGER, prefs);
         // Set by the auto-fill module below: stored details, after-apply cleanup, settings changes
-        const hooks = { suggestion: null, applied: null, prefsChanged: null };
+        // knownArtist(name): true if that artist is already in the library (tags, lookups or answers)
+        const hooks = { suggestion: null, applied: null, prefsChanged: null, knownArtist: null };
 
         /* ---------------- Text rules (offline) ---------------- */
         const NOISE = [
@@ -9085,30 +9088,47 @@
           const ym = base.match(RE_YEAR_BRACKET);
           if (ym) { year = ym[1]; base = collapse(base.replace(RE_YEAR_BRACKET, ' ')); }
 
-          let title = base, artist = '';
+          let title = base, artist = '', orderSure = true, alt = null;
           const parts = base.split(RE_DASH).map(p => p.trim()).filter(Boolean);
           if (parts.length >= 2) {
-            const order = guessDashOrder(parts, tags);
-            if (order === 'artist-title') { artist = parts[0]; title = parts.slice(1).join(' - '); }
-            else { title = parts.slice(0, -1).join(' - '); artist = parts[parts.length - 1]; }
+            const split = (order) => (order === 'artist-title'
+              ? { artist: parts[0], title: parts.slice(1).join(' - ') }
+              : { title: parts.slice(0, -1).join(' - '), artist: parts[parts.length - 1] });
+            const g = guessDashOrder(parts, tags);
+            ({ title, artist } = split(g.order));
+            orderSure = g.sure;
+            if (!g.sure) {
+              const o = split(g.order === 'artist-title' ? 'title-artist' : 'artist-title');
+              alt = { title: stripNoise(o.title), artist: stripNoise(o.artist) };
+            }
           }
-          return { title: stripNoise(title), artist: stripNoise(artist), year, track };
+          return { title: stripNoise(title), artist: stripNoise(artist), year, track, orderSure, alt };
         }
 
-        /** Which side of "A - B" is the artist? Tags win; otherwise the user's setting. */
+        /**
+         * Which side of "A - B" is the artist? The song's own tags first, then artists already
+         * in the library, otherwise the user's setting (sure: false, so auto-fill can check online or ask).
+         */
         function guessDashOrder(parts, tags) {
           const first = parts[0], last = parts[parts.length - 1];
+          const sure = (order) => ({ order, sure: true });
           if (tags) {
             if (tags.artist) {
-              if (sameish(first, tags.artist) && !sameish(last, tags.artist)) return 'artist-title';
-              if (sameish(last, tags.artist) && !sameish(first, tags.artist)) return 'title-artist';
+              if (sameish(first, tags.artist) && !sameish(last, tags.artist)) return sure('artist-title');
+              if (sameish(last, tags.artist) && !sameish(first, tags.artist)) return sure('title-artist');
             }
             if (tags.title) {
-              if (sameish(last, tags.title) && !sameish(first, tags.title)) return 'artist-title';
-              if (sameish(first, tags.title) && !sameish(last, tags.title)) return 'title-artist';
+              if (sameish(last, tags.title) && !sameish(first, tags.title)) return sure('artist-title');
+              if (sameish(first, tags.title) && !sameish(last, tags.title)) return sure('title-artist');
             }
           }
-          return prefs.dashOrder;
+          if (hooks.knownArtist) {
+            const known = (p) => { try { return !!hooks.knownArtist(splitFeat(stripNoise(p)).base); } catch (e) { return false; } };
+            const kf = known(first), kl = known(last);
+            if (kf && !kl) return sure('artist-title');
+            if (kl && !kf) return sure('title-artist');
+          }
+          return { order: prefs.dashOrder, sure: false };
         }
 
         /**
@@ -9136,9 +9156,14 @@
           if (!title) { title = fromName.title; src.title = 'name'; }
           if (!artist && fromName.artist) { artist = fromName.artist; src.artist = 'name'; }
 
-          const ft = splitFeat(title), fa = splitFeat(artist);
-          title = joinFeat(fixCase(ft.base), [...fa.feats, ...ft.feats].map(fixCase));
-          artist = fixCase(fa.base);
+          const tidyPair = (ti, ar) => {
+            const ft = splitFeat(ti), fa = splitFeat(ar);
+            return { title: joinFeat(fixCase(ft.base), [...fa.feats, ...ft.feats].map(fixCase)), artist: fixCase(fa.base) };
+          };
+          ({ title, artist } = tidyPair(title, artist));
+          // Both from an "A - B" file name and no way to tell which is the artist: keep the other reading too
+          const alt = src.title === 'name' && src.artist === 'name' && fromName.alt
+            ? tidyPair(fromName.alt.title, fromName.alt.artist) : null;
 
           let album = stripNoise(t.album);
           if (album) src.album = 'tag';
@@ -9152,7 +9177,7 @@
           if (track) src.track = 'tag';
           else if (fromName.track) { track = fromName.track; src.track = 'name'; }
 
-          return { fields: { title, artist, album, year, genre, track: track ? String(track) : '' }, src };
+          return { fields: { title, artist, album, year, genre, track: track ? String(track) : '' }, src, alt };
         }
 
         /* ---------------- Naming template ---------------- */
@@ -9574,6 +9599,8 @@
         const stubEngine = () => (typeof window.__LOCALIFY_AI_STUB__ === 'function' ? window.__LOCALIFY_AI_STUB__ : null);
 
         async function pickDevice() {
+          // Test seam: window.__LOCALIFY_AI_FORCE_WASM__ = true tries the CPU (q8) build even where WebGPU exists
+          if (window.__LOCALIFY_AI_FORCE_WASM__) return { device: 'wasm', dtype: 'q8', file: 'model_quantized.onnx' };
           try {
             if (navigator.gpu) {
               const adapter = await navigator.gpu.requestAdapter();
@@ -9670,12 +9697,14 @@
               }
             });
             ai.generator = gen;
-            ai.plan.cached = true;
+            // Some browsers (private windows, low storage) can't keep a file this big: say so instead of "downloads once"
+            ai.plan.cached = await isCached(AI_MODEL_CACHE, modelFileUrl(plan.file));
             return gen;
           })();
           try {
             const g = await ai.loading;
-            setAI('ready', 'AI ready (runs on this device)');
+            setAI('ready', ai.plan.cached ? 'AI ready (runs on this device)'
+              : 'AI ready, but this browser couldn\'t keep the model (private window or low storage?), so it will download again next time');
             return g;
           } catch (e) {
             ai.loading = null;
@@ -9713,9 +9742,12 @@
               { role: 'assistant', content: AI_EXAMPLE_REPLY },
               { role: 'user', content: `File name: ${input.fileName}\nTags: ${describeTags(input.tags)}\nRule guess: title=${input.rules.title}; artist=${input.rules.artist}` }
             ];
+            const t0 = performance.now();
             const out = await gen(messages, { max_new_tokens: 80, do_sample: false, return_full_text: false });
             const g = out && out[0] && out[0].generated_text;
             const text = Array.isArray(g) ? (g[g.length - 1] && g[g.length - 1].content) : g;
+            // Test seam: window.__LOCALIFY_AI_LOG__ = [] collects the model's raw replies
+            if (Array.isArray(window.__LOCALIFY_AI_LOG__)) window.__LOCALIFY_AI_LOG__.push({ file: input.fileName, text: String(text || ''), ms: Math.round(performance.now() - t0) });
             const m = String(text || '').match(/\{[\s\S]*?\}/);
             if (!m) return null;
             try { raw = JSON.parse(m[0]); } catch (e) { return null; }
@@ -9810,7 +9842,7 @@
           const r = suggestRules(track.fileName, { ...old, trackNo: old.track });
           const item = {
             track, mp3, old, cover, readError,
-            rules: r.fields, ruleSrc: r.src, aiBy: {}, aiDone: false,
+            rules: r.fields, ruleSrc: r.src, ruleAlt: r.alt || null, aiBy: {}, aiDone: false,
             next: null, nextName: '', manual: false, editing: false,
             status: 'pending', message: '', where: null
           };
@@ -10606,13 +10638,17 @@
         const T = Tagger.internals;
         const FIELDS = ['title', 'artist', 'album', 'year', 'genre', 'track'];
         const LABEL = { title: 'title', artist: 'artist', album: 'album', year: 'year', genre: 'genre', track: 'track number' };
-        // How much each source is trusted (0..1). MusicBrainz is scaled by its own match score.
-        const CONF = { user: 1, hint: 0.98, tag: 1, ripped: 0.85, mb: 0.95, ai: 0.7, name: 0.6, folder: 0.45 };
+        // How much each source is trusted (0..1). MusicBrainz is scaled by its own match score,
+        // iTunes by how well its result matches. nameAlt: the other way round of an "A - B" file name.
+        const CONF = { user: 1, hint: 0.98, tag: 1, ripped: 0.85, mb: 0.95, itunes: 0.9, ai: 0.7, name: 0.6, nameAlt: 0.5, folder: 0.45 };
         const ASK_GAP = 0.2;       // two different values closer than this → ask
         const MIN_OPTION = 0.5;    // weaker guesses are not offered as answers
         const BATCH = 3;           // songs processed at a time
         const GAP_MS = 150;        // pause between batches
         const MB_GAP_MS = 1100;    // MusicBrainz asks for at most one request per second
+        const IT_GAP_MS = 3100;    // iTunes Search allows about 20 requests a minute
+        const IT_URL = 'https://itunes.apple.com/search';
+        const IT_ART = /^https:\/\/is\d+-ssl\.mzstatic\.com\/image\/thumb\/[^\s?#]+\/\d+x\d+bb\.(?:jpg|png)$/;
         const REACH_TTL = 60000;
         const MB_URL = 'https://musicbrainz.org/ws/2/recording/';
         const CAA_URL = 'https://coverartarchive.org/release/';
@@ -10659,7 +10695,7 @@
           if (f.genre) track.genre = f.genre;
           if (f.track && +f.track) track.trackNo = +f.track;
           track.afState = e.state === 'unsorted' ? 'unsorted' : (e.q && e.q.length ? 'question' : 'filled');
-          if (e.mbid && !track.cover) loadCover(track, e.mbid);
+          if ((e.mbid || e.art) && !track.cover) loadCover(track, e);
           buildSearchText(track);
           patchTrackEverywhere(track);
         }
@@ -10668,6 +10704,25 @@
           invalidateVisible();
           scheduleUI({ list: true, stats: true, queue: true });
           updateChip();
+        }
+
+        /* ---------------- Artists already in the library ---------------- */
+        // From songs' own tags, earlier answers and confirmed lookups. File-name guesses don't count,
+        // and neither does track.artist on its own (it falls back to the folder name).
+        const tagArtists = new Set();   // artists read from tags this session
+        let knownCache = { at: 0, set: new Set() };
+        function knownArtists() {
+          if (Date.now() - knownCache.at < 2000) return knownCache.set;
+          const set = new Set(tagArtists);
+          const put = (v) => { const n = norm(v); if (n && n.length >= 2) set.add(n); };
+          for (const v of Object.values(answers.artists)) put(v);
+          for (const t of state.tracks) {
+            const d = details[keyOf(t)];
+            if (d === 'ok') { if (t.artist && t.artist !== t.folder) put(t.artist); }   // checked: the tags were complete
+            else if (d && d.f && d.f.artist && ['tag', 'ripped', 'mb', 'itunes', 'user', 'hint'].includes(d.src && d.src.artist)) put(d.f.artist);
+          }
+          knownCache = { at: Date.now(), set };
+          return set;
         }
 
         /** Called by enrichTrack once a song's own tags are read. */
@@ -10820,6 +10875,7 @@
           const item = await T.readItem(track, { raw: true });
           const orig = {};
           for (const k of FIELDS) orig[k] = String(item.old[k] || '').trim();
+          if (orig.artist && norm(orig.artist)) { tagArtists.add(norm(orig.artist)); knownCache.at = 0; }
           const cands = {};
           FIELDS.forEach(k => { cands[k] = []; });
           const add = (k, v, src, conf, extra) => {
@@ -10836,6 +10892,8 @@
             else add(k, v, 'name', CONF.name);
           }
           if (track.rootName && dirOf(track)) add('album', track.folder, 'folder', CONF.folder);
+          const pair = item.ruleAlt;   // "A - B" that could be either way round
+          if (pair) { add('title', pair.title, 'name', CONF.nameAlt); add('artist', pair.artist, 'name', CONF.nameAlt); }
 
           // 2. The in-browser AI, only if it's on and already downloaded (never downloads by itself)
           if (item.mp3 && await T.aiAvailable()) {
@@ -10848,21 +10906,76 @@
             } catch (e) { /* rules only */ }
           }
 
-          // 3. MusicBrainz (opt-in): only the title and artist text are sent
+          // 3. Online lookups (on by default, switchable in Settings): only the title and artist text are sent
+          let art = '';
           if (pref().musicbrainz) {
             const ti = groupCands(cands.title)[0], ar = groupCands(cands.artist)[0];
             if (ti) {
-              const recs = await mbSearch(ti.v, ar ? ar.v : '');
-              for (const r of recs.slice(0, 3)) {
-                if (r.score < 60) continue;
-                let c = (r.score / 100) * CONF.mb;
-                if (!T.sameish(r.title, ti.v)) c *= 0.5;
-                if (ar && r.artist && !T.sameish(r.artist, ar.v)) c *= 0.8;
-                add('title', r.title, 'mb', c);
-                add('artist', r.artist, 'mb', c);
-                add('album', r.album, 'mb', c, { mbid: r.mbid });
-                add('year', r.year, 'mb', c * 0.9);
-                add('track', r.track, 'mb', c * 0.8);
+              // Readings to check: the best guess, plus the other way round for an unclear "A - B" name
+              const readings = [{ title: ti.v, artist: ar ? ar.v : '' }];
+              if (pair && !(T.sameish(pair.title, ti.v) && T.sameish(pair.artist, ar ? ar.v : ''))) readings.push(pair);
+              const fits = (r, x) => T.sameish(r.title, x.title) && (!x.artist || !r.artist || T.sameish(r.artist, x.artist));
+
+              // MusicBrainz: one reading at a time, the other only if the first finds nothing that fits
+              let mbGood = 0, confirmed = null;
+              for (const x of readings) {
+                const recs = await mbSearch(x.title, x.artist);
+                // The exact title before remixes and versions ("Get Lucky (… remix)"); otherwise keep MusicBrainz's order
+                const exact = (r) => (norm(r.title) === norm(x.title) ? 0 : 1);
+                recs.sort((a, b) => exact(a) - exact(b));
+                for (const r of recs.slice(0, 3)) {
+                  if (r.score < 60) continue;
+                  if (exact(r) && recs[0] && !exact(recs[0])) continue;   // a remix when the plain song was found too
+                  let c = (r.score / 100) * CONF.mb;
+                  if (!T.sameish(r.title, x.title)) c *= 0.5;
+                  if (x.artist && r.artist && !T.sameish(r.artist, x.artist)) c *= 0.8;
+                  if (fits(r, x) && c > mbGood) { mbGood = c; if (c >= 0.7) confirmed = x; }
+                  add('title', r.title, 'mb', c);
+                  add('artist', r.artist, 'mb', c);
+                  // Live sets, compilations and bootlegs make poor album names
+                  const rk = r.rank === 0 ? 1 : r.rank < 3 ? 0.75 : 0.55;
+                  add('album', r.album, 'mb', c * rk, { mbid: r.mbid });
+                  add('year', r.year, 'mb', c * 0.9 * (r.rank < 3 ? 1 : 0.7));
+                  add('track', r.track, 'mb', c * 0.8 * (r.rank === 0 ? 1 : 0.5));   // track numbers only mean something on the album
+                }
+                if (mbGood >= 0.7) break;
+              }
+
+              // iTunes: genre, cover and release date, and a second opinion when MusicBrainz is unsure.
+              // A free-text search, so one request covers both readings of "A - B".
+              const needGenre = !groupCands(cands.genre).some(g => g.src === 'tag');
+              if (mbGood < 0.8 || needGenre || (!track.cover && !groupCands(cands.album).some(g => g.mbid))) {
+                const term = readings.length > 1 ? `${pair.artist} ${pair.title}` : `${readings[0].artist} ${readings[0].title}`;
+                const hits = await itSearch(term.trim());
+                let best = null;
+                for (const r of hits) {
+                  const x = readings.find(rd => fits(r, rd));
+                  if (!x) continue;
+                  const c = CONF.itunes * (x.artist && r.artist ? 1 : 0.75);
+                  if (!best || c > best.c) best = { r, x, c };
+                }
+                if (best) {
+                  const { r, x, c } = best;
+                  if (!confirmed && x.artist) confirmed = x;
+                  // iTunes credits list every artist ("A, B & C"): back up the name we already had instead
+                  const credit = x.artist && T.sameish(r.artist, x.artist) && norm(r.artist) !== norm(x.artist);
+                  add('title', T.sameish(r.title, x.title) && r.title.length > x.title.length + 2 ? x.title : r.title, 'itunes', c);
+                  add('artist', credit ? x.artist : r.artist, 'itunes', credit ? c * 0.7 : c);
+                  if (r.album) add('album', r.album, 'itunes', c * (r.single ? 0.6 : 0.85));
+                  add('year', r.year, 'itunes', c * 0.8);
+                  add('genre', r.genre, 'itunes', c * 0.9);
+                  if (!r.single) add('track', r.track, 'itunes', c * 0.7);
+                  art = r.art;
+                }
+              }
+
+              // A lookup settled which part of "A - B" is the artist: drop the other reading
+              if (pair && confirmed) {
+                const isPair = T.sameish(confirmed.title, pair.title) && T.sameish(confirmed.artist, pair.artist);
+                const wrong = isPair ? { title: item.rules.title, artist: item.rules.artist } : pair;
+                for (const k of ['title', 'artist']) {
+                  cands[k] = cands[k].filter(c => !(c.src === 'name' && norm(c.v) === norm(wrong[k])));
+                }
               }
             }
           }
@@ -10870,7 +10983,8 @@
           // 4. Earlier answers from the user
           const leave = hintsFor(track, cands);
 
-          const f = {}, src = {}, conf = {}, q = [];
+          const f = {}, src = {}, conf = {};
+          let q = [];
           let mbid = '';
           for (const k of FIELDS) {
             if (leave[k]) { f[k] = orig[k]; src[k] = 'user'; continue; }
@@ -10904,6 +11018,26 @@
             if (k === 'album' && top.mbid) mbid = top.mbid;
           }
 
+          if (pair) {
+            // Keep title and artist the same way round
+            const same = T.sameish;
+            if (f.artist && same(f.artist, pair.artist) && !same(f.artist, pair.title) && src.title === 'name') f.title = pair.title;
+            else if (f.title && same(f.title, pair.title) && !same(f.title, pair.artist) && src.artist === 'name') f.artist = pair.artist;
+            // Nothing could tell which part is the artist: ask once instead of twice
+            const qTi = q.find(x => x.field === 'title'), qAr = q.find(x => x.field === 'artist');
+            const both = [pair.artist, pair.title];
+            const onlyPair = (x) => x && x.options.length === 2 && x.options.every(o => both.some(b => norm(b) === norm(o)));
+            if (onlyPair(qTi) && onlyPair(qAr)) {
+              q = q.filter(x => x !== qTi && x !== qAr);
+              const name = `${pair.title} - ${pair.artist}`;
+              q.unshift({
+                field: 'artist', options: [pair.artist, pair.title], titles: [pair.title, pair.artist],
+                ask: 'Which part of the file name is the artist?',
+                why: `“${name.length > 60 ? name.slice(0, 59) + '…' : name}” could be either way round, and nothing online settled it.`
+              });
+            }
+          }
+
           if (!state.trackMap.has(track.id) || keyOf(track) !== key) return;
           const changed = FIELDS.some(k => (f[k] || '') !== orig[k]);
           if (!q.length && !changed) {
@@ -10914,6 +11048,7 @@
           }
           const e = { state: q.length ? 'question' : 'filled', f, src, conf, q, orig, at: Date.now() };
           if (mbid) e.mbid = mbid;
+          if (art && IT_ART.test(art)) e.art = art;
           details[key] = e;
           saveDetails();
           overlay(track, e);
@@ -10923,7 +11058,7 @@
         }
 
         function whyDisagree(k, options) {
-          const srcName = { tag: 'the tags', ripped: 'the tags', name: 'the file name', ai: 'the AI', mb: 'MusicBrainz', folder: 'the folder name', hint: 'an earlier answer' };
+          const srcName = { tag: 'the tags', ripped: 'the tags', name: 'the file name', ai: 'the AI', mb: 'MusicBrainz', itunes: 'iTunes', folder: 'the folder name', hint: 'an earlier answer' };
           const from = [...new Set(options.map(o => srcName[o.src] || o.src))];
           return from.length > 1
             ? `${from.slice(0, -1).join(', ')} and ${from[from.length - 1]} don't agree on the ${LABEL[k]}.`
@@ -10945,7 +11080,7 @@
           } catch (err) { /* stays as a suggestion */ }
         }
 
-        /* ---------------- MusicBrainz (opt-in) ---------------- */
+        /* ---------------- MusicBrainz ---------------- */
         let mbChain = Promise.resolve();
         let mbNext = 0;
         const luceneEscape = (s) => String(s).replace(/([+\-&|!(){}[\]^"~*?:\\/])/g, '\\$1');
@@ -10961,16 +11096,25 @@
             let json;
             if (typeof stub === 'function') json = await stub({ title, artist, query });
             else {
-              const ctl = new AbortController();
-              const timer = setTimeout(() => ctl.abort(), 8000);
-              // Browsers don't let a page replace its User-Agent, so the browser's own generic one is sent.
-              // No cookies, no referrer, and nothing but the title/artist text.
-              const res = await fetch(`${MB_URL}?query=${encodeURIComponent(query)}&fmt=json&limit=5`,
-                { headers: { Accept: 'application/json' }, credentials: 'omit', referrerPolicy: 'no-referrer', signal: ctl.signal });
-              clearTimeout(timer);
-              if (res.status === 503 || res.status === 429) { mbNext = Date.now() + 3000; return []; }
-              if (!res.ok) return [];
-              json = await res.json();
+              // MusicBrainz often answers 503 "busy" even at one request a second: wait and try again (3 s, then 6 s)
+              for (let attempt = 0; ; attempt++) {
+                const ctl = new AbortController();
+                const timer = setTimeout(() => ctl.abort(), 8000);
+                // Browsers don't let a page replace its User-Agent, so the browser's own generic one is sent.
+                // No cookies, no referrer, and nothing but the title/artist text.
+                const res = await fetch(`${MB_URL}?query=${encodeURIComponent(query)}&fmt=json&limit=10`,
+                  { headers: { Accept: 'application/json' }, credentials: 'omit', referrerPolicy: 'no-referrer', signal: ctl.signal });
+                clearTimeout(timer);
+                if (res.status === 503 || res.status === 429) {
+                  if (attempt >= 2) { mbNext = Date.now() + 10000; return []; }
+                  await sleep(3000 * (attempt + 1));
+                  mbNext = Date.now() + MB_GAP_MS;
+                  continue;
+                }
+                if (!res.ok) return [];
+                json = await res.json();
+                break;
+              }
             }
             return parseMB(json);
           };
@@ -10990,7 +11134,7 @@
 
         function parseMB(json) {
           const recs = (json && Array.isArray(json.recordings)) ? json.recordings : [];
-          return recs.slice(0, 5).map(r => {
+          return recs.slice(0, 10).map(r => {
             const artist = (r['artist-credit'] || []).map(c => (c.name || (c.artist && c.artist.name) || '') + (c.joinphrase || '')).join('').trim();
             const rels = (r.releases || []).filter(x => x && x.title)
               .sort((a, b) => releaseRank(a) - releaseRank(b) || String(a.date || '9999').localeCompare(String(b.date || '9999')));
@@ -11001,36 +11145,95 @@
             return {
               score: +r.score || 0, title: String(r.title || ''), artist,
               album: rel ? String(rel.title) : '', mbid: rel && /^[0-9a-f-]{36}$/i.test(rel.id || '') ? rel.id : '',
-              year: /^(19|20)\d{2}$/.test(year) ? year : '', track: /^\d{1,3}$/.test(trk) ? trk : ''
+              year: /^(19|20)\d{2}$/.test(year) ? year : '', track: /^\d{1,3}$/.test(trk) ? trk : '',
+              rank: rel ? releaseRank(rel) : 9
+            };
+          // Equally good matches (score 90+): the one on an official studio album first, not a live set or mixtape
+          }).sort((a, b) => Math.min(b.score, 90) - Math.min(a.score, 90) || a.rank - b.rank);
+        }
+
+        /* ---------------- iTunes Search ---------------- */
+        // No key needed, and it allows cross-origin requests (Access-Control-Allow-Origin: *), so no JSONP.
+        let itChain = Promise.resolve();
+        let itNext = 0;
+
+        function itSearch(term) {
+          const run = async () => {
+            if (!term) return [];
+            const wait = itNext - Date.now();
+            if (wait > 0) await sleep(wait);
+            itNext = Date.now() + IT_GAP_MS;
+            // Test seam: window.__LOCALIFY_ITUNES_STUB__ = async ({ term }) => iTunes Search JSON
+            const stub = window.__LOCALIFY_ITUNES_STUB__;
+            let json;
+            if (typeof stub === 'function') json = await stub({ term });
+            else {
+              const ctl = new AbortController();
+              const timer = setTimeout(() => ctl.abort(), 8000);
+              const res = await fetch(`${IT_URL}?term=${encodeURIComponent(term.slice(0, 200))}&media=music&entity=song&limit=5`,
+                { credentials: 'omit', referrerPolicy: 'no-referrer', signal: ctl.signal });
+              clearTimeout(timer);
+              if (res.status === 403 || res.status === 429) { itNext = Date.now() + 60000; return []; }   // over the limit: back off a minute
+              if (!res.ok) return [];
+              json = await res.json();
+            }
+            return parseIT(json);
+          };
+          const p = itChain.then(run, run);
+          itChain = p.catch(() => {});
+          return p.catch(() => []);
+        }
+
+        function parseIT(json) {
+          const list = (json && Array.isArray(json.results)) ? json.results : [];
+          return list.filter(r => r && r.kind === 'song' && r.trackName).slice(0, 5).map(r => {
+            let album = String(r.collectionName || '');
+            const single = / - (?:Single|EP)$/i.test(album);
+            album = album.replace(/ - (?:Single|EP)$/i, '');
+            const year = String(r.releaseDate || '').slice(0, 4);
+            const art = String(r.artworkUrl100 || '').replace(/\/\d+x\d+bb\.(jpg|png)$/, '/600x600bb.$1');
+            return {
+              title: String(r.trackName), artist: String(r.artistName || ''), album, single,
+              year: /^(19|20)\d{2}$/.test(year) ? year : '', genre: String(r.primaryGenreName || '').replace(/^Music$/, ''),
+              track: Number.isInteger(r.trackNumber) && r.trackNumber > 0 && r.trackNumber < 1000 ? String(r.trackNumber) : '',
+              art: IT_ART.test(art) ? art : ''
             };
           });
         }
 
-        /** Album cover from the Cover Art Archive, kept in Cache Storage. Shown in the library only. */
-        async function loadCover(track, mbid) {
-          if (!mbid || track.cover || track.afCoverTried) return;
+        /** Album cover from the Cover Art Archive, else iTunes, kept in Cache Storage. Shown in the library only. */
+        async function loadCover(track, e) {
+          if (!e || track.cover || track.afCoverTried) return;
+          const urls = [];
+          if (e.mbid) urls.push(`${CAA_URL}${e.mbid}/front-250`);
+          if (e.art && IT_ART.test(e.art)) urls.push(e.art);
+          if (!urls.length) return;
           track.afCoverTried = true;
-          const url = `${CAA_URL}${mbid}/front-250`;
           try {
             const cache = 'caches' in window ? await caches.open(COVER_CACHE) : null;
             let blob = null;
-            const hit = cache && await cache.match(url);
-            if (hit) blob = await hit.blob();
-            else {
+            for (const url of urls) {
+              const hit = cache && await cache.match(url);
+              if (hit) { blob = await hit.blob(); break; }
+            }
+            for (let i = 0; !blob && i < urls.length; i++) {
+              const url = urls[i];
               if (!pref().musicbrainz || !(await canRun())) { track.afCoverTried = false; return; }
-              if (typeof window.__LOCALIFY_MB_STUB__ === 'function') {
-                // Tests: never reach the real archive. Optional window.__LOCALIFY_COVER_STUB__ = async (mbid) => Blob
+              let b = null;
+              if (typeof window.__LOCALIFY_MB_STUB__ === 'function' || typeof window.__LOCALIFY_ITUNES_STUB__ === 'function') {
+                // Tests: never reach the real servers. Optional window.__LOCALIFY_COVER_STUB__ = async (mbidOrUrl) => Blob
                 const cs = window.__LOCALIFY_COVER_STUB__;
                 if (typeof cs !== 'function') return;
-                blob = await cs(mbid);
+                b = await cs(url.startsWith(CAA_URL) ? e.mbid : url);
               } else {
                 const res = await fetch(url, { credentials: 'omit', referrerPolicy: 'no-referrer' });
-                if (!res.ok) return;
-                blob = await res.blob();
+                if (res.ok) b = await res.blob();
               }
-              if (!blob || !blob.size || !/^image\//.test(blob.type)) return;
+              if (!b || !b.size || !/^image\//.test(b.type)) continue;
+              blob = b;
               if (cache) await cache.put(url, new Response(blob, { headers: { 'Content-Type': blob.type } }));
             }
+            if (!blob) return;
             if (track.cover || !state.trackMap.has(track.id)) return;
             track.cover = blob;
             track.thumbState = undefined;
@@ -11059,10 +11262,16 @@
         function resolve(key, field, value, src) {
           const e = details[key];
           if (!e || typeof e !== 'object' || !e.q) return false;
+          const q = e.q.find(x => x.field === field);
           e.q = e.q.filter(x => x.field !== field);
           e.f[field] = value;
           e.src[field] = src;
           if (src !== 'leave') e.conf[field] = 1;
+          if (q && q.titles && src !== 'leave') {
+            // "Which part is the artist?": the other part is the title
+            const i = q.options.findIndex(o => norm(o) === norm(value));
+            if (i >= 0) { e.f.title = q.titles[i]; e.src.title = src; e.conf.title = 1; }
+          }
           const st = finishEntry(key, e);
           const track = trackForKey(key);
           if (track) {
@@ -11125,6 +11334,11 @@
             if (e && e.q && e.q.some(x => x.field === 'artist' && x.options.some(o => names.has(norm(o))) && x.options.every(o => asked.has(norm(o))))) {
               resolve(k, 'artist', v, 'hint'); n++;
               continue;
+            }
+            const pq = e && e.q && e.q.find(x => x.field === 'artist' && x.titles);
+            if (pq) {
+              const hits = pq.options.filter(o => names.has(norm(o)));
+              if (hits.length === 1 && pq.options.length === 2) { resolve(k, 'artist', hits[0], 'hint'); n++; continue; }
             }
             // Same artist spelled differently elsewhere: use the confirmed spelling (library only)
             if (names.has(norm(t.artist)) && t.artist !== v) {
@@ -11231,7 +11445,7 @@
           qa.cover.innerHTML = artHTML(track, 28);
           qa.name.textContent = `${cur.e.f.title || track.title}${cur.e.f.artist ? ' · ' + cur.e.f.artist : ''}`;
           qa.file.textContent = track.relPath || track.fileName;
-          qa.question.textContent = `What's the ${LABEL[cur.field]} of this song?`;
+          qa.question.textContent = cur.q.ask || `What's the ${LABEL[cur.field]} of this song?`;
           qa.why.textContent = cur.q.why || '';
           const now = cur.e.orig[cur.field];
           qa.leave.textContent = now ? `Leave as “${now.length > 24 ? now.slice(0, 23) + '…' : now}”` : 'Leave it blank';
@@ -11382,7 +11596,7 @@
           for (const k of FIELDS) {
             if (asked.has(k) || !e.f[k]) continue;
             fields[k] = e.f[k];
-            if (['ai', 'mb', 'hint', 'user'].includes(e.src[k]) && e.f[k] !== e.orig[k]) by[k] = true;
+            if (['ai', 'mb', 'itunes', 'hint', 'user'].includes(e.src[k]) && e.f[k] !== e.orig[k]) by[k] = true;
           }
           return { fields, by };
         };
@@ -11394,6 +11608,7 @@
           saveDetails();
           updateChip();
         };
+        Tagger.hooks.knownArtist = (name) => knownArtists().has(norm(name));
         Tagger.hooks.prefsChanged = (name) => {
           if (name === 'autoFill' && pref().autoFill) {
             for (const t of state.tracks) if (t.enriched) onEnriched(t);   // show stored details, queue the rest
@@ -11413,7 +11628,8 @@
           onEnriched, badgeHTML, updateChip, openQuestions, questionCount,
           isOpen: () => qa.dialog.open,
           // For tests in the console
-          _test: { details: () => details, answers: () => answers, isOnline, mbSearch, parseMB, keyOf, folderKey, resumeUnsorted, reset: () => { reach.ok = null; } }
+          _test: { details: () => details, answers: () => answers, isOnline, mbSearch, parseMB, itSearch, parseIT, knownArtists, keyOf, folderKey, resumeUnsorted,
+            reset: () => { reach.ok = null; knownCache.at = 0; } }
         };
       })();
       window.LocalifyAutoFill = AutoFill._test;
