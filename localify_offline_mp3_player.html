@@ -9578,7 +9578,7 @@
         const AI_RUNTIME_CACHE = 'localify-ai-runtime-v1';
         const AI_MODEL_CACHE = 'transformers-cache';   // transformers.js' own Cache Storage name
         // Fallback sizes (MB) if the Hugging Face API can't be reached to ask
-        const AI_FALLBACK_MB = { q4f16: 483, q8: 512, extra: 7, runtime: 23 };
+        const AI_FALLBACK_MB = { q8: 512, extra: 7, runtime: 23 };
         const ai = {
           status: 'off',          // off | checking | needs-download | downloading | loading | ready | running | error | unavailable
           message: '',
@@ -9599,14 +9599,9 @@
         const stubEngine = () => (typeof window.__LOCALIFY_AI_STUB__ === 'function' ? window.__LOCALIFY_AI_STUB__ : null);
 
         async function pickDevice() {
-          // Test seam: window.__LOCALIFY_AI_FORCE_WASM__ = true tries the CPU (q8) build even where WebGPU exists
-          if (window.__LOCALIFY_AI_FORCE_WASM__) return { device: 'wasm', dtype: 'q8', file: 'model_quantized.onnx' };
-          try {
-            if (navigator.gpu) {
-              const adapter = await navigator.gpu.requestAdapter();
-              if (adapter && adapter.features && adapter.features.has('shader-f16')) return { device: 'webgpu', dtype: 'q4f16', file: 'model_q4f16.onnx' };
-            }
-          } catch (e) { /* no WebGPU */ }
+          // Always the CPU (q8) build. The WebGPU q4f16 build replied with gibberish on a real AMD GPU
+          // (fp16 overflow), while q8 gave sensible answers at ~8 s a song. The fp16/fp32 GPU builds are
+          // 2-4x bigger downloads, and q4 on WebGPU is untested, so one well-behaved file for everyone.
           return { device: 'wasm', dtype: 'q8', file: 'model_quantized.onnx' };
         }
 
