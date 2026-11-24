@@ -4916,6 +4916,198 @@
       overflow-wrap: anywhere;
     }
     /* [/Looks] visual pass */
+
+    /* ==========================================================================
+       [AI Tagger] "Tidy names & tags" dialog + Settings bits
+       ========================================================================== */
+    .tg-dialog {
+      width: min(1040px, calc(100vw - 32px));
+      max-width: none;
+      height: min(760px, calc(100vh - 32px));
+      max-height: none;
+      padding: 0;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+    }
+    .tg-dialog[open] { display: flex; flex-direction: column; }
+    .tg-dialog::backdrop { background: rgba(0, 0, 0, 0.62); }
+    .tg-dialog [hidden], .settings-panel .tg-model-row [hidden] { display: none !important; }
+    .tg-dialog button:disabled { opacity: 0.45; cursor: default; pointer-events: none; }
+    .tg-head { display: flex; align-items: flex-start; gap: 12px; padding: 16px 20px 10px; }
+    .tg-head h2 { font-size: 18px; font-weight: 700; margin: 0; }
+    .tg-sub { font-size: 12.5px; color: var(--text-secondary); margin-top: 4px; line-height: 1.45; }
+    .tg-head .tg-close { margin-left: auto; flex-shrink: 0; }
+    .tg-toolbar {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px;
+      padding: 8px 20px 12px; border-bottom: 1px solid var(--border-subtle); font-size: 13px; color: var(--text-secondary);
+    }
+    .tg-toolbar select {
+      background: var(--bg-base); color: var(--text-primary); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm); padding: 6px 8px; font: inherit; max-width: 260px;
+    }
+    .tg-field { display: inline-flex; align-items: center; gap: 8px; }
+    .tg-field code {
+      background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);
+      padding: 3px 7px; color: var(--text-primary); font-size: 12px;
+    }
+    .tg-ai-status { font-size: 12px; color: var(--text-muted); }
+    .tg-ai-status[data-kind="error"], .tg-ai-status[data-kind="unavailable"] { color: var(--danger); }
+    .tg-linkbtn {
+      background: none; border: 0; padding: 2px 4px; color: var(--accent); font: inherit; font-size: 12.5px;
+      cursor: pointer; border-radius: var(--radius-sm);
+    }
+    .tg-linkbtn:hover { text-decoration: underline; }
+    .tg-check { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+    .tg-check input { accent-color: var(--accent); }
+    .tg-consent {
+      margin: 12px 20px 0; padding: 12px 14px; border-radius: var(--radius-sm);
+      border: 1px solid var(--accent); background: rgba(var(--fg-rgb), 0.04);
+      font-size: 13px; line-height: 1.5; color: var(--text-secondary);
+    }
+    .tg-consent strong { color: var(--text-primary); }
+    .tg-consent-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .tg-body { flex: 1; min-height: 0; overflow: auto; padding: 8px 12px 12px; }
+    .tg-empty { padding: 40px 16px; text-align: center; color: var(--text-muted); font-size: 14px; }
+    .tg-row {
+      display: grid; grid-template-columns: 44px minmax(0, 1fr) 20px minmax(0, 1fr) auto;
+      gap: 12px; align-items: start; padding: 10px 8px; border-bottom: 1px solid var(--border-subtle);
+    }
+    .tg-row[data-status="same"], .tg-row[data-status="skipped"] { opacity: 0.55; }
+    .tg-row[data-status="accepted"] { background: rgba(var(--fg-rgb), 0.035); }
+    .tg-cover { width: 44px; height: 44px; border-radius: 6px; overflow: hidden; background: var(--bg-highlight); }
+    .tg-cover img, .tg-cover > * { width: 100%; height: 100%; object-fit: cover; display: flex; align-items: center; justify-content: center; }
+    .tg-arrow { color: var(--text-muted); padding-top: 2px; text-align: center; }
+    .tg-fname { font-size: 13px; font-weight: 600; color: var(--text-primary); overflow-wrap: anywhere; margin-bottom: 4px; }
+    .tg-old .tg-fname { color: var(--text-secondary); font-weight: 500; }
+    .tg-tags { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 1px 8px; font-size: 12px; }
+    .tg-tags.tg-none { display: block; color: var(--text-muted); font-style: italic; }
+    .tg-k { color: var(--text-muted); }
+    .tg-v { color: var(--text-secondary); overflow-wrap: anywhere; }
+    .tg-changed { color: var(--accent) !important; }
+    .tg-removed { color: var(--danger) !important; text-decoration: line-through; }
+    .tg-badge {
+      display: inline-block; font-size: 9.5px; font-weight: 700; letter-spacing: 0.04em; padding: 0 5px; margin-left: 4px;
+      border-radius: var(--radius-full); background: var(--accent); color: var(--on-accent); vertical-align: 1px;
+    }
+    .tg-msg { font-size: 12px; color: var(--danger); margin-top: 4px; }
+    .tg-actions { display: flex; flex-direction: column; align-items: stretch; gap: 6px; min-width: 86px; }
+    .tg-act {
+      background: transparent; border: 1px solid var(--border-subtle); color: var(--text-primary);
+      border-radius: var(--radius-full); padding: 5px 12px; font: inherit; font-size: 12px; cursor: pointer;
+      transition: background var(--transition-fast), border-color var(--transition-fast);
+    }
+    .tg-act:hover { background: var(--bg-highlight); }
+    .tg-act.tg-accept[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+    .tg-act.tg-skip[aria-pressed="true"] { border-color: var(--text-muted); color: var(--text-muted); }
+    .tg-act:focus-visible, .tg-linkbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .tg-pill { font-size: 11px; text-align: center; padding: 3px 8px; border-radius: var(--radius-full); background: var(--bg-highlight); color: var(--text-secondary); }
+    .tg-pill[data-kind="done"], .tg-pill[data-kind="downloaded"] { color: var(--accent); }
+    .tg-pill[data-kind="error"] { color: var(--danger); }
+    .tg-edit { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 8px; }
+    .tg-edit label { display: flex; flex-direction: column; gap: 2px; font-size: 11px; color: var(--text-muted); min-width: 0; }
+    .tg-edit .tg-edit-name { grid-column: 1 / -1; }
+    .tg-edit input, .tg-settings-input {
+      background: var(--bg-base); color: var(--text-primary); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm); padding: 6px 8px; font: inherit; font-size: 13px; min-width: 0; width: 100%;
+    }
+    .tg-edit input:focus, .tg-settings-input:focus { outline: none; border-color: var(--accent); }
+    .tg-edit input:disabled { opacity: 0.5; }
+    .tg-foot {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 20px;
+      border-top: 1px solid var(--border-subtle);
+    }
+    .tg-status { flex: 1; min-width: 160px; font-size: 12.5px; color: var(--text-secondary); }
+    .tg-foot button { white-space: nowrap; }
+    .tg-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .tg-chip {
+      background: var(--bg-base); border: 1px solid var(--border-subtle); color: var(--text-secondary);
+      border-radius: var(--radius-full); padding: 4px 10px; font: inherit; font-size: 12px; cursor: pointer;
+    }
+    .tg-chip[aria-pressed="true"] { border-color: var(--accent); color: var(--text-primary); }
+    .tg-example { font-size: 12px; color: var(--text-muted); margin-top: 6px; overflow-wrap: anywhere; }
+    .tg-model-row { display: flex; align-items: center; gap: 10px; }
+    .tg-model-row .settings-hint { flex: 1; }
+    @media (max-width: 768px) {
+      .tg-dialog { width: 100vw; height: 100dvh; max-height: 100dvh; border-radius: 0; border: 0; margin: 0; }
+      .row-action.row-tidy { display: none; }
+    }
+    @media (max-width: 640px) {
+      .tg-head, .tg-toolbar, .tg-foot { padding-left: 16px; padding-right: 16px; }
+      .tg-consent { margin-left: 16px; margin-right: 16px; }
+      .tg-body { padding: 4px 8px 8px; }
+      .tg-row { grid-template-columns: 40px minmax(0, 1fr); gap: 8px 10px; }
+      .tg-cover { width: 40px; height: 40px; grid-row: span 2; }
+      .tg-arrow { display: none; }
+      .tg-new { grid-column: 2; padding-top: 6px; border-top: 1px dashed var(--border-subtle); }
+      .tg-actions { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; }
+      .tg-actions .tg-act { flex: 1; }
+      .tg-toolbar select { max-width: 100%; }
+      .tg-edit { grid-template-columns: 1fr; }
+      .tg-foot .btn-primary, .tg-foot .btn-secondary { flex: 1; }
+    }
+
+    /* [AI Tagger] auto-fill: chip, badges, action toasts, questions */
+    .nav-item[hidden], .af-chip[hidden] { display: none; }
+    .af-chip {
+      display: inline-flex; align-items: center; gap: 6px; flex-shrink: 1; min-width: 0; max-width: 260px;
+      height: 30px; padding: 0 12px; border-radius: var(--radius-full);
+      background: var(--bg-highlight, rgba(var(--fg-rgb), 0.08)); color: var(--text-secondary);
+      font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .af-chip:hover { color: var(--text-primary); }
+    .af-chip > span:last-child { overflow: hidden; text-overflow: ellipsis; }
+    .af-chip-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; background: var(--text-muted); }
+    .af-chip[data-mode="busy"] .af-chip-dot { background: var(--accent); animation: afPulse 1.1s ease-in-out infinite; }
+    .af-chip[data-mode="question"] { background: var(--accent-dim); color: var(--accent); }
+    .af-chip[data-mode="question"] .af-chip-dot { background: var(--accent); }
+    @keyframes afPulse { 50% { opacity: 0.3; } }
+    @media (prefers-reduced-motion: reduce) { .af-chip[data-mode="busy"] .af-chip-dot { animation: none; } }
+    .af-badge {
+      display: inline-block; vertical-align: 1px; margin-right: 6px; padding: 1px 6px; border-radius: var(--radius-full);
+      font-size: 10px; font-weight: 700; letter-spacing: 0.02em; line-height: 1.5;
+    }
+    .af-unsorted { background: rgba(var(--fg-rgb), 0.1); color: var(--text-secondary); }
+    .af-filled { background: rgba(var(--fg-rgb), 0.06); color: var(--text-muted); }
+    .af-q { background: var(--accent-dim); color: var(--accent); cursor: pointer; min-width: 18px; text-align: center; }
+    .af-q:hover { background: var(--accent); color: var(--bg-base, #000); }
+    .toast.af-toast { display: flex; align-items: center; gap: 12px; pointer-events: auto; }
+    .af-toast-btn { color: var(--accent); font-weight: 700; font-size: 13px; padding: 2px 4px; border-radius: 4px; }
+    .af-toast-btn:hover { text-decoration: underline; }
+    .tg-dialog.af-qa { width: min(560px, calc(100vw - 32px)); height: fit-content; max-height: calc(100dvh - 32px); margin: auto; }
+    .af-qa .toast-container { bottom: 24px; }
+    .af-qa .toast.af-toast { display: none; }   /* "Review" / "Answer" prompts don't belong over the Q&A itself */
+    .af-qa-body { padding: 8px 20px 4px; overflow: auto; min-height: 0; }
+    .af-qa-song { display: flex; align-items: center; gap: 12px; padding: 10px 0 14px; border-bottom: 1px solid var(--border-subtle); }
+    .af-qa-meta { flex: 1; min-width: 0; }
+    .af-qa-meta .tg-sub { overflow-wrap: anywhere; }
+    .af-qa-play { flex-shrink: 0; }
+    .af-qa-q { font-size: 16px; font-weight: 700; margin: 16px 0 2px; }
+    .af-qa-opts { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+    .af-opt {
+      padding: 8px 14px; border-radius: var(--radius-full); border: 1px solid var(--border-subtle);
+      color: var(--text-primary); font-size: 13px; font-weight: 600; text-align: left; overflow-wrap: anywhere;
+    }
+    .af-opt:hover, .af-opt:focus-visible { border-color: var(--accent); color: var(--accent); }
+    .af-qa-none { font-size: 13px; color: var(--text-muted); }
+    .af-qa-free { display: flex; gap: 8px; }
+    .af-qa-free input {
+      flex: 1; min-width: 0; height: 36px; padding: 0 12px; border-radius: var(--radius-sm, 6px);
+      border: 1px solid var(--border-subtle); background: var(--bg-base); color: var(--text-primary); font: inherit; font-size: 13px;
+    }
+    .af-qa-free input:focus { outline: none; border-color: var(--accent); }
+    .af-qa-done { padding: 18px 0 6px; }
+    .af-qa-status { min-height: 1.4em; font-size: 12.5px; color: var(--accent); margin: 10px 0 0; }
+    .af-qa .tg-foot { justify-content: flex-end; }
+    @media (max-width: 640px) {
+      .af-chip { max-width: 120px; padding: 0 10px; }
+      .af-qa-body { padding: 8px 16px 4px; }
+      .af-qa-song { flex-wrap: wrap; }
+      .af-qa-play { width: 100%; }
+    }
+    /* ---- end [AI Tagger] ---- */
   </style>
 </head>
 <body>
@@ -5053,6 +5245,86 @@
     </div>
   </dialog>
 
+  <!-- [AI Tagger] "Tidy names & tags" -->
+  <dialog id="taggerDialog" class="tg-dialog" aria-labelledby="tgTitle" aria-describedby="tgSubtitle">
+    <div class="tg-head">
+      <div>
+        <h2 id="tgTitle">Tidy names &amp; tags</h2>
+        <div class="tg-sub" id="tgSubtitle"></div>
+      </div>
+      <button type="button" class="btn-ghost tg-close" id="tgClose" aria-label="Close">Close</button>
+    </div>
+    <div class="tg-toolbar">
+      <label class="tg-field"><span>Songs</span><select id="tgScope" aria-label="Which songs to tidy"></select></label>
+      <span class="tg-field">
+        <button type="button" class="switch" id="tgAi" role="switch" aria-checked="false" aria-labelledby="tgAiLabel" aria-describedby="tgAiStatus"></button>
+        <span id="tgAiLabel">AI suggestions</span>
+        <span class="tg-ai-status" id="tgAiStatus" aria-live="polite"></span>
+        <button type="button" class="tg-linkbtn" id="tgAiStop" hidden>Stop</button>
+      </span>
+      <span class="tg-field"><span>Name</span><code id="tgTemplate"></code><button type="button" class="tg-linkbtn" id="tgTemplateEdit">Change</button></span>
+      <label class="tg-check"><input type="checkbox" id="tgShowSame"> Show tidy songs</label>
+    </div>
+    <div class="tg-consent" id="tgConsent" hidden role="region" aria-label="AI model download">
+      <strong>Download the AI model?</strong>
+      <div id="tgConsentText"></div>
+      <div class="tg-consent-actions">
+        <button type="button" class="btn-primary" id="tgConsentYes">Download</button>
+        <button type="button" class="btn-secondary" id="tgConsentNo">Use rules only</button>
+      </div>
+    </div>
+    <div class="tg-body">
+      <div class="tg-list" id="tgList" role="list" aria-label="Suggested changes"></div>
+      <div class="tg-empty" id="tgEmpty" hidden></div>
+    </div>
+    <div class="tg-foot">
+      <span class="tg-status" id="tgStatus" aria-live="polite"></span>
+      <button type="button" class="btn-ghost" id="tgUndo" hidden>Undo last batch</button>
+      <button type="button" class="btn-secondary" id="tgAcceptAll">Accept all</button>
+      <button type="button" class="btn-primary" id="tgApply" disabled>Apply</button>
+    </div>
+  </dialog>
+
+  <!-- [AI Tagger] Questions about songs -->
+  <dialog id="qaDialog" class="tg-dialog af-qa" aria-labelledby="qaTitle" aria-describedby="qaQuestion">
+    <div class="tg-head">
+      <div>
+        <h2 id="qaTitle">Questions about your songs</h2>
+        <div class="tg-sub" id="qaCount"></div>
+      </div>
+      <button type="button" class="btn-ghost tg-close" id="qaClose">Stop for now</button>
+    </div>
+    <div class="af-qa-body">
+      <div class="af-qa-song">
+        <div class="tg-cover" id="qaCover" aria-hidden="true"></div>
+        <div class="af-qa-meta">
+          <div class="tg-fname" id="qaName"></div>
+          <div class="tg-sub" id="qaFile"></div>
+        </div>
+        <button type="button" class="btn-secondary af-qa-play" id="qaPlay" aria-pressed="false">Play preview</button>
+      </div>
+      <div id="qaAsk">
+        <h3 class="af-qa-q" id="qaQuestion"></h3>
+        <p class="tg-sub" id="qaWhy"></p>
+        <div class="af-qa-opts" id="qaOptions" role="group" aria-label="Suggested answers"></div>
+        <form class="af-qa-free" id="qaFreeForm">
+          <input type="text" id="qaFree" autocomplete="off" aria-label="Your answer" maxlength="200">
+          <button type="submit" class="btn-primary">Save</button>
+        </form>
+      </div>
+      <div class="af-qa-done" id="qaDone" hidden>
+        <strong>All done.</strong>
+        <p class="tg-sub">Thanks! Your answers are saved and used for related songs too. Press Apply in Tidy names &amp; tags to write them into the files.</p>
+      </div>
+      <p class="af-qa-status" id="qaStatus" aria-live="polite"></p>
+    </div>
+    <div class="tg-foot">
+      <button type="button" class="btn-ghost" id="qaSkip">Skip</button>
+      <button type="button" class="btn-secondary" id="qaLeave">Leave as is</button>
+    </div>
+  </dialog>
+  <!-- [/AI Tagger] -->
+
   <!-- Mobile Sidebar Backdrop -->
   <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
 
@@ -5107,6 +5379,15 @@
             <span>Artists</span>
           </button>
           <!-- [/Looks] -->
+          <!-- [AI Tagger] songs waiting for details -->
+          <button class="nav-item" data-view="unsorted" id="navUnsorted" hidden>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+              <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+            </svg>
+            <span>Unsorted</span>
+            <span class="nav-count" id="countUnsorted">0</span>
+          </button>
 
           <button class="nav-item" data-view="visualizer" id="navVisualizer">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -5283,6 +5564,11 @@
           <option value="duration">Sort: Duration</option>
         </select>
 
+        <!-- [AI Tagger] auto-fill status -->
+        <button type="button" class="af-chip" id="afChip" hidden aria-live="polite">
+          <span class="af-chip-dot" aria-hidden="true"></span>
+          <span id="afChipText"></span>
+        </button>
         <!-- [Settings] Sleep-timer indicator + gear button -->
         <button type="button" class="sleep-indicator" id="sleepIndicator" hidden title="Sleep timer active (click to change)" aria-label="Sleep timer active">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
@@ -5357,6 +5643,12 @@
                 <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
               </svg>
               <span>Load Folder</span>
+            </button>
+
+            <!-- [AI Tagger] -->
+            <button class="btn-action-pill" id="btnTidyHero" title="Clean up file names and tags of the songs shown (T on a song for just that one)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+              <span>Tidy names &amp; tags</span>
             </button>
           </div>
 
@@ -5449,6 +5741,7 @@
               <div class="np-edit-actions" id="npEditActions" hidden>
                 <button type="button" class="btn-secondary ed-btn" id="btnNpEdit" title="Open this track in the built-in editor">Edit audio</button>
                 <button type="button" class="btn-secondary ed-btn" id="btnNpAudacity" title="Open the original file in Audacity (Shift+click to change the folder path)">Open in Audacity</button>
+                <button type="button" class="btn-secondary ed-btn" id="btnNpTidy" title="Clean up this song's file name and tags">Tidy name &amp; tags</button>
               </div>
             </div>
 
@@ -5950,6 +6243,54 @@
       </section>
       <!-- [/PWA] -->
 
+      <!-- [AI Tagger] Tidy names & tags -->
+      <section class="settings-section" aria-labelledby="setTaggerTitle">
+        <h3 class="settings-section-title" id="setTaggerTitle">Tidy names &amp; tags</h3>
+
+        <div class="settings-row stacked">
+          <label class="settings-label" for="setTgTemplate">File name template<span class="settings-hint">Use {artist}, {title}, {album}, {year}, {genre} and {track}. The extension is kept.</span></label>
+          <input type="text" class="tg-settings-input" id="setTgTemplate" spellcheck="false" autocomplete="off" maxlength="120" aria-describedby="setTgExample">
+          <div class="tg-chips" id="setTgPresets" aria-label="Template presets"></div>
+          <div class="tg-example" id="setTgExample" aria-live="polite"></div>
+        </div>
+
+        <div class="settings-row stacked">
+          <span class="settings-label" id="setTgOrderLabel">Names like “A - B” are usually<span class="settings-hint">Used when the tags don't say which part is the artist.</span></span>
+          <div class="segmented" id="setTgOrder" role="radiogroup" aria-labelledby="setTgOrderLabel">
+            <button type="button" role="radio" data-value="title-artist">Title - Artist</button>
+            <button type="button" role="radio" data-value="artist-title">Artist - Title</button>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <span class="settings-label" id="setTgAiLabel">AI suggestions<span class="settings-hint" id="setTgAiHint">A small model that runs in this browser. It sees only names and tags, never the audio. Downloads once when you first use it.</span></span>
+          <button type="button" class="switch" id="setTgAi" role="switch" aria-checked="false" aria-labelledby="setTgAiLabel"></button>
+        </div>
+
+        <div class="settings-row tg-model-row">
+          <span class="settings-hint" id="setTgModel" aria-live="polite"></span>
+          <button type="button" class="btn-secondary" id="setTgRemoveModel" disabled>Remove model</button>
+        </div>
+
+        <div class="settings-row">
+          <span class="settings-label" id="setAfAutoLabel">Fill in song details automatically<span class="settings-hint">New songs get a title, artist, album and more in your library. Your files aren't changed until you press Apply in Tidy.</span></span>
+          <button type="button" class="switch" id="setAfAuto" role="switch" aria-checked="true" aria-labelledby="setAfAutoLabel"></button>
+        </div>
+        <div class="settings-row">
+          <span class="settings-label" id="setAfOnlineLabel">Only run when online<span class="settings-hint">Songs added while offline are marked Unsorted and filled in once you're back online.</span></span>
+          <button type="button" class="switch" id="setAfOnline" role="switch" aria-checked="true" aria-labelledby="setAfOnlineLabel"></button>
+        </div>
+        <div class="settings-row">
+          <span class="settings-label" id="setAfMbLabel">Look up songs online<span class="settings-hint">Asks MusicBrainz and iTunes for missing details, genres and album covers. Only the song's title and artist text are sent (to musicbrainz.org and itunes.apple.com). No file names, folders or audio are sent. Covers come from coverartarchive.org or Apple and are shown in your library only.</span></span>
+          <button type="button" class="switch" id="setAfMb" role="switch" aria-checked="true" aria-labelledby="setAfMbLabel"></button>
+        </div>
+        <div class="settings-row">
+          <span class="settings-label" id="setAfApplyLabel">Auto-apply to files<span class="settings-hint">Writes filled-in details straight into the files, only in folders you've already allowed Localify to edit. Undo from Tidy names &amp; tags.</span></span>
+          <button type="button" class="switch" id="setAfApply" role="switch" aria-checked="false" aria-labelledby="setAfApplyLabel"></button>
+        </div>
+      </section>
+      <!-- [/AI Tagger] -->
+
       <p class="settings-footer-note">Settings are saved on this device.</p>
     </div>
   </aside>
@@ -6106,7 +6447,10 @@
         // [Pitch] / [Focus]
         PITCH: 'localify_pitch_v1',                     // { pitchWithSpeed, reverb }
         FOCUS: 'localify_focus_v1',                     // { minutes, sound, alarmVolume, duck, notify, vibrate }
-        FOCUS_RUN: 'localify_focus_run_v1'              // { endAt, pausedLeft, total, ringing } (survives reloads)
+        FOCUS_RUN: 'localify_focus_run_v1',             // { endAt, pausedLeft, total, ringing } (survives reloads)
+        TAGGER: 'localify_tagger_v1',    // [AI Tagger] { template, dashOrder, ai, autoFill, onlineOnly, autoApply, musicbrainz }
+        SONG_DETAILS: 'localify_song_details_v1',   // [AI Tagger] auto-fill { "likekey|size": details | 'ok' }
+        SONG_ANSWERS: 'localify_song_answers_v1'    // [AI Tagger] { artists: { name: spelling }, albums: { folder: { album, year } } }
       };
 
       const AUDIO_EXTENSIONS = new Set(['mp3', 'wav', 'ogg', 'm4a', 'flac', 'aac', 'opus', 'webm']);
@@ -6151,6 +6495,7 @@
         close: '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>',
         edit: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>',
         audacity: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12h2l2-6 3 14 3-16 3 12 2-4h5"></path></svg>',
+        tag: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>',   // [AI Tagger]
         eqBars: (paused) => `<div class="eq-bars${paused ? ' paused' : ''}" aria-hidden="true"><span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span></div>`
       };
 
@@ -6313,6 +6658,8 @@
         navVisualizer: $('navVisualizer'),
         countAll: $('countAll'),
         countLiked: $('countLiked'),
+        navUnsorted: $('navUnsorted'),     // [AI Tagger]
+        countUnsorted: $('countUnsorted'), // [AI Tagger]
         statTracks: $('statTracks'),
         statDuration: $('statDuration'),
 
@@ -7260,6 +7607,7 @@
 
         if (!state.trackMap.has(track.id)) return;
         track.enriched = true;
+        try { AutoFill.onEnriched(track); } catch (e) { /* [AI Tagger] not ready yet */ }
         buildSearchText(track);
         patchTrackEverywhere(track);
         if (track.id === state.currentTrackId) {
@@ -7341,6 +7689,8 @@
         let list = state.tracks;
         if (state.activeView === 'liked') {
           list = list.filter(t => state.likedKeys.has(t.likeKey));
+        } else if (state.activeView === 'unsorted') {   // [AI Tagger]
+          list = list.filter(t => t.afState === 'unsorted');
         }
         if (Browse.selected()) list = Browse.filterSelected(list);   // [Looks] album/artist detail
         const q = state.searchQuery.trim().toLowerCase();
@@ -7917,13 +8267,13 @@
          Views & rendering
          ======================================================================== */
       function switchView(view) {
-        if (view !== 'all' && view !== 'liked' && view !== 'visualizer' && !Browse.isBrowseView(view)) view = 'all';   // [Looks] + albums/artists
+        if (view !== 'all' && view !== 'liked' && view !== 'visualizer' && view !== 'unsorted' && !Browse.isBrowseView(view)) view = 'all';   // [Looks] albums/artists + [AI Tagger] unsorted
         const prev = state.activeView;
         state.activeView = view;
         saveJSON(STORAGE_KEYS.VIEW, view);
         closeMobileSidebar();
 
-        [dom.navAll, dom.navLiked, dom.navVisualizer, $('navAlbums'), $('navArtists')].forEach(el => {   // [Looks] + browse views
+        [dom.navAll, dom.navLiked, dom.navUnsorted, dom.navVisualizer, $('navAlbums'), $('navArtists')].forEach(el => {   // [Looks] + [AI Tagger]
           const isActive = el.dataset.view === view;
           el.classList.toggle('active', isActive);
           if (isActive) el.setAttribute('aria-current', 'page'); else el.removeAttribute('aria-current');
@@ -7968,6 +8318,7 @@
         }
         dom.countAll.textContent = state.tracks.length;
         dom.countLiked.textContent = liked;
+        AutoFill.updateChip();   // [AI Tagger]
         dom.statTracks.textContent = state.tracks.length;
         dom.statDuration.textContent = formatTotalDuration(totalSec);
 
@@ -7986,6 +8337,10 @@
         dom.heroBanner.classList.toggle('liked-theme', isLiked);
         dom.heroType.textContent = isLiked ? 'Favorites' : 'Local Music Library';
         dom.heroTitle.textContent = isLiked ? 'Liked Songs' : 'All Tracks';
+        if (state.activeView === 'unsorted') {   // [AI Tagger]
+          dom.heroType.textContent = 'Waiting for details';
+          dom.heroTitle.textContent = 'Unsorted';
+        }
         dom.heroCover.innerHTML = isLiked ? SVG.heartFilled64 : SVG.note(64, '#ffffff');
       }
 
@@ -8029,6 +8384,10 @@
           } else if (state.activeView === 'liked') {
             dom.emptyTitle.textContent = 'No Liked Songs Yet';
             dom.emptyDesc.textContent = 'Tap the heart on a song to save it.';
+            dom.emptyActions.style.display = 'none';
+          } else if (state.activeView === 'unsorted') {   // [AI Tagger]
+            dom.emptyTitle.textContent = 'Nothing unsorted';
+            dom.emptyDesc.textContent = 'Songs added while you\'re offline wait here until Localify can fill in their details.';
             dom.emptyActions.style.display = 'none';
           }
           looksDecorateEmpty();   // [Looks] illustration + call to action
@@ -8114,7 +8473,7 @@
             <div class="track-title-cell">
               <div class="track-thumb">${artHTML(track, 18)}</div>
               <div class="track-text">
-                <div class="track-name" title="${escapeHtml(track.title)}">${escapeHtml(track.title)}</div>
+                <div class="track-name" title="${escapeHtml(track.title)}">${AutoFill.badgeHTML(track)}${escapeHtml(track.title)}</div>
                 <div class="track-artist" title="${escapeHtml(track.artist)}">${escapeHtml(track.artist)}</div>
               </div>
             </div>
@@ -8123,6 +8482,7 @@
               <button class="row-action row-edit" data-edit-id="${track.id}" tabindex="-1" aria-label="Edit audio" title="Edit audio (E)">${SVG.edit}</button>
               <button class="row-action row-audacity" data-audacity-id="${track.id}" tabindex="-1" aria-label="Open in Audacity"${Audacity.canOpen(track) ? ' title="Open in Audacity"' : ` aria-disabled="true" title="${escapeHtml(Audacity.UNKNOWN_LOCATION)}"`}>${SVG.audacity}</button>
               <button class="row-action row-more" data-more-id="${track.id}" tabindex="-1" aria-label="More actions" aria-haspopup="menu" title="More actions">${LOOKS_SVG.more}</button>
+              <button class="row-action row-tidy" data-tidy-id="${track.id}" tabindex="-1" aria-label="Tidy name and tags" title="Tidy name &amp; tags (I)">${SVG.tag}</button>
               <button class="btn-like${isLiked ? ' liked' : ''}" data-like-id="${track.id}" tabindex="-1" aria-pressed="${isLiked}" aria-label="${isLiked ? 'Remove from' : 'Add to'} Liked Songs">${SVG.heart}</button>
             </div>
             <div class="track-dur">${track.duration ? formatTime(track.duration) : '--:--'}</div>`;
@@ -8498,7 +8858,7 @@
       });
 
       // Navigation
-      [dom.navAll, dom.navLiked, dom.navVisualizer, $('navAlbums'), $('navArtists')].forEach(btn => {   // [Looks] + browse views
+      [dom.navAll, dom.navLiked, dom.navUnsorted, dom.navVisualizer, $('navAlbums'), $('navArtists')].forEach(btn => {   // [Looks] + [AI Tagger]
         btn.addEventListener('click', () => switchView(btn.dataset.view));
       });
       dom.btnVisualizerToggle.addEventListener('click', () => {
@@ -8584,6 +8944,8 @@
         if (editBtn) { e.stopPropagation(); Editor.open(editBtn.dataset.editId, editBtn); return; }
         const audBtn = e.target.closest('.row-audacity');
         if (audBtn) { e.stopPropagation(); Audacity.open(state.trackMap.get(audBtn.dataset.audacityId), e.shiftKey); return; }
+        const tidyBtn = e.target.closest('.row-tidy');   // [AI Tagger]
+        if (tidyBtn) { e.stopPropagation(); Tagger.openForTrack(tidyBtn.dataset.tidyId, tidyBtn); return; }
         const likeBtn = e.target.closest('.btn-like');
         if (likeBtn) {
           e.stopPropagation();
@@ -8621,6 +8983,7 @@
           case 'Enter': if (visible[i]) activateTrack(visible[i].id); break;
           case 'l': case 'L': if (visible[i]) toggleLikeTrack(visible[i].id); break;
           case 'e': case 'E': if (visible[i]) { e.preventDefault(); Editor.open(visible[i].id); } break;
+          case 'i': case 'I': if (visible[i]) { e.preventDefault(); Tagger.openForTrack(visible[i].id); } break;   // [AI Tagger] (I = song info; T is the focus timer)
           default: handled = false;
         }
         if (handled) { e.preventDefault(); e.stopPropagation(); }
@@ -8804,7 +9167,7 @@
 
       window.addEventListener('keydown', (e) => {
         // The editor and the Audacity setup dialog handle their own keys
-        if (Editor.isOpen()) return;   // [Looks] Audacity setup moved into Settings
+        if (Editor.isOpen() || Tagger.isOpen() || AutoFill.isOpen()) return;   // [Looks] Audacity setup lives in Settings; [AI Tagger] dialogs
         if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
         const target = e.target;
         if (e.key === 'Escape') {
@@ -9318,6 +9681,7 @@
         applyLevelingRoute();
         if (sleep.mode !== 'off') setSleepTimer('off');
         resetPitchFocusSettings();   // [Pitch]/[Focus]
+        Tagger.resetPrefs();   // [AI Tagger]
         setPlaybackSpeed(1);
         syncSettingsUI();
         showToast('Settings reset');
@@ -9348,6 +9712,7 @@
         setRadioGroup(setDom.accent, appearance.accent);
         setSwitch(setDom.compact, appearance.density === 'compact');
         setRadioGroup(setDom.eqPreset, fx.eqPreset);
+        Tagger.syncSettings();   // [AI Tagger]
         setDom.eqBands.querySelectorAll('input').forEach(input => {
           const v = fx.eq[Number(input.dataset.band)];
           input.value = v;
@@ -12004,6 +12369,2721 @@
       /* ---- [Audacity integration] — end ---- */
 
       /* ========================================================================
+         [AI Tagger] — begin
+         "Tidy names & tags": read ID3 + file name → rule-based cleanup (offline)
+         → optional in-browser AI suggestions → preview → write ID3v2.3 + rename.
+         Only the file name and the tag bytes change: the audio bytes are copied
+         over as-is (a slice of the original file).
+         Needs: STORAGE_KEYS.TAGGER, the #taggerDialog markup, the .tg-* CSS block,
+         the Settings "Tidy names & tags" section and the row / action-bar buttons.
+         ======================================================================== */
+      const Tagger = (() => {
+        const FIELDS = ['title', 'artist', 'album', 'year', 'genre', 'track'];
+        const FIELD_LABELS = { title: 'Title', artist: 'Artist', album: 'Album', year: 'Year', genre: 'Genre', track: 'Track' };
+        const FRAME_FOR = { title: 'TIT2', artist: 'TPE1', album: 'TALB', year: 'TYER', genre: 'TCON', track: 'TRCK' };
+        const TEMPLATE_PRESETS = ['{artist} - {title}', '{title} - {artist}', '{track} {title}', '{track}. {artist} - {title}'];
+        // "Artist - Title" is the most common naming online, so it's the easiest to read back (for the rules and the AI).
+        // The player shows the tags, which Apply always writes, so the file name order doesn't change what you see.
+        // `musicbrainz` switches all online lookups: MusicBrainz, Cover Art Archive and iTunes Search.
+        const DEFAULT_TAGGER_PREFS = { template: '{artist} - {title}', dashOrder: 'artist-title', ai: false,
+          autoFill: true, onlineOnly: true, autoApply: false, musicbrainz: true };
+        const READ_WORKERS = 4;
+        const UNDO_MAX_BYTES = 256 * 1024 * 1024;   // original tag bytes kept for "Undo last batch"
+        const ZIP_MAX_BYTES = 3.5 * 1024 * 1024 * 1024;
+
+        /* ---------------- Prefs ---------------- */
+        function loadTaggerPrefs() {
+          const p = loadJSON(STORAGE_KEYS.TAGGER, null);
+          const out = { ...DEFAULT_TAGGER_PREFS };
+          if (p && typeof p === 'object') {
+            if (typeof p.template === 'string' && p.template.trim()) out.template = p.template.slice(0, 120);
+            if (p.dashOrder === 'artist-title' || p.dashOrder === 'title-artist') out.dashOrder = p.dashOrder;
+            out.ai = p.ai === true;
+            for (const k of ['autoFill', 'onlineOnly', 'autoApply', 'musicbrainz']) if (typeof p[k] === 'boolean') out[k] = p[k];
+          }
+          return out;
+        }
+        let prefs = loadTaggerPrefs();
+        const savePrefs = () => saveJSON(STORAGE_KEYS.TAGGER, prefs);
+        // Set by the auto-fill module below: stored details, after-apply cleanup, settings changes
+        // knownArtist(name): true if that artist is already in the library (tags, lookups or answers)
+        const hooks = { suggestion: null, applied: null, prefsChanged: null, knownArtist: null };
+
+        /* ---------------- Text rules (offline) ---------------- */
+        const NOISE = [
+          'official\\s+(?:music\\s+|lyrics?\\s+|hd\\s+|4k\\s+|video\\s+)?(?:video|audio|visuali[sz]er|clip|mv|lyrics?)',
+          'official', '(?:music|lyrics?)\\s+video', 'with\\s+lyrics', 'lyrics?', 'letra', 'audio(?:\\s+only)?', 'video',
+          'visuali[sz]er', 'hd', 'hq', '4k', 'uhd', '(?:2160|1440|1080|720|480|360)p', '\\d{2,3}\\s*kbps',
+          'high\\s+quality', 'full\\s+(?:song|version|audio)', 'explicit', 'clean', 'free\\s+download', 'download',
+          'mv', 'm\\/v', '(?:video|audio)\\s+oficial', 'out\\s+now', 'premiere', 'copyright\\s+free', 'no\\s+copyright'
+        ].join('|');
+        const RE_NOISE_BRACKET = new RegExp(`\\s*[\\(\\[\\{【]\\s*(?:${NOISE})(?:\\s*[|/&,+-]\\s*(?:${NOISE}))*\\s*[\\)\\]\\}】]`, 'gi');
+        const RE_NOISE_TAIL = /\s*(?:[-|~:]\s*)?\b(?:official\s+(?:music\s+|lyrics?\s+)?(?:video|audio|visuali[sz]er)|(?:music|lyrics?)\s+video|with\s+lyrics|lyrics|hd|hq|4k|\d{2,3}\s*kbps|(?:1080|720)p)\s*$/i;
+        const TLD = '(?:com|net|org|info|me|cc|to|ru|io|fm|pk|in|co|xyz|top|biz|mobi|club|site|online|live|ws|tk|ml|link|app)';
+        const RE_SITE_BRACKET = new RegExp(`\\s*[\\(\\[\\{]\\s*(?:https?:\\/\\/)?(?:www\\.)?[\\w-]+(?:\\.[\\w-]+)*\\.${TLD}\\b[^\\)\\]\\}]*[\\)\\]\\}]`, 'gi');
+        const RE_SITE_EDGE = new RegExp(`^(?:https?:\\/\\/)?(?:www\\.)?[\\w-]+(?:\\.[\\w-]+)*\\.${TLD}\\b\\s*[-_|~:]*\\s*|\\s*[-_|~:]*\\s*(?:https?:\\/\\/)?(?:www\\.)?[\\w-]+(?:\\.[\\w-]+)*\\.${TLD}\\s*$`, 'gi');
+        const RE_SITE_ANY = new RegExp(`(?:https?:\\/\\/|www\\.)[\\w.-]+\\.${TLD}\\b\\S*`, 'gi');
+        const RE_RIPPERS = /\b(?:y2mate|ytmp3(?:cc)?|yt1s|yt5s|mp3juices?|mp3skull|savefrom|flvto|mp3paw|tubidy|onlymp3|x2convert|mp3quack|notube|320ytmp3|ssyoutube|snaptube|vidmate|mp3clan)\b(?:\.\w{2,4})?\s*[-_|~:]*\s*/gi;
+        const RE_FEAT_BRACKET = /\s*[\(\[]\s*(?:ft|feat|featuring)\b\.?\s*([^\)\]]+?)\s*[\)\]]/i;
+        const RE_FEAT_BARE = /\s+(?:ft|feat|featuring)\b\.?\s+(.+?)(?=\s+[\(\[]|\s+[-–—]\s|$)/i;
+        const RE_YEAR_BRACKET = /\s*[\(\[]\s*((?:19|20)\d{2})\s*[\)\]]/;
+        const RE_DASH = /\s+[-–—~|]\s+/;
+
+        function collapse(s) {
+          return s.replace(/[\u0000-\u001f]/g, ' ').replace(/\s{2,}/g, ' ').trim();
+        }
+
+        /** Strip download-site noise, "(Official Video)" etc. Keeps "(Live)", "(Remix)", "(Acoustic)"… */
+        function stripNoise(raw) {
+          let s = String(raw || '');
+          if (!s) return '';
+          s = s.replace(/%20/g, ' ');
+          if (/_/.test(s)) s = s.replace(/_+/g, ' ');
+          s = s.replace(RE_SITE_BRACKET, ' ').replace(RE_SITE_ANY, ' ').replace(RE_RIPPERS, ' ');
+          s = collapse(s).replace(RE_SITE_EDGE, ' ');
+          let prev;
+          do {
+            prev = s;
+            s = s.replace(RE_NOISE_BRACKET, ' ');
+            s = collapse(s).replace(RE_NOISE_TAIL, '');
+          } while (s !== prev);
+          s = s.replace(/[\(\[\{]\s*[\)\]\}]/g, ' ');
+          s = collapse(s).replace(/^[\s\-–—|~:,_]+|[\s\-–—|~:,_]+$/g, '');
+          return s;
+        }
+
+        const SMALL_WORDS = new Set('a an and as at but by for from in into nor of on onto or per the to vs vs. via with de la le el y et en da del di du von van'.split(' '));
+        const KEEP_UPPER = new Set(('DJ MC UK USA US EP LP OK TV NYC LA II III IV VI VII VIII IX XI XII R&B AC/DC BTS ABBA AKA RZA GZA ' +
+          'UB40 NWA TLC REM INXS KISS AJR MGMT LMFAO UFO EDM BPM CD DVD ASAP A$AP XXX SZA MIA M.I.A. TNT PSY OST').split(' '));
+
+        function capWord(w) {
+          return w.toLowerCase().split('-').map(part =>
+            part.replace(/^([^\p{L}\p{N}]*)(\p{L})/u, (m, pre, ch) => pre + ch.toUpperCase())
+          ).join('-');
+        }
+
+        /** Title-case strings that are ALL CAPS or all lower case; leave mixed case alone. */
+        function fixCase(s) {
+          if (!s) return s;
+          const letters = s.replace(/[^\p{L}]/gu, '');
+          if (letters.length < 2) return s;
+          const isUpper = letters === letters.toUpperCase() && letters !== letters.toLowerCase();
+          const isLower = letters === letters.toLowerCase() && letters !== letters.toUpperCase();
+          if (!isUpper && !isLower) return s;
+          if (isUpper && letters.length <= 4 && !/\s/.test(s)) return s;   // "BTS", "ABBA"
+          const words = s.split(' ');
+          return words.map((w, i) => {
+            const bare = w.replace(/^[\(\["']+|[\)\]"',:]+$/g, '');
+            const upperBare = bare.toUpperCase();
+            if (KEEP_UPPER.has(upperBare)) return w.replace(bare, upperBare);
+            const low = bare.toLowerCase();
+            if (low === 'feat.' || low === 'ft.' || low === 'feat') return w.toLowerCase();
+            const prevEnds = i > 0 ? words[i - 1] : '';
+            const startsPhrase = i === 0 || /[:(\[]$/.test(prevEnds) || /^[\(\[]/.test(w);
+            if (!startsPhrase && i < words.length - 1 && SMALL_WORDS.has(low)) return w.toLowerCase();
+            return capWord(w);
+          }).join(' ');
+        }
+
+        /** Pull "feat. X" out of a string. Returns { base, feats[] }. */
+        function splitFeat(s) {
+          const feats = [];
+          let base = s || '';
+          for (let guard = 0; guard < 3; guard++) {
+            const m = base.match(RE_FEAT_BRACKET) || base.match(RE_FEAT_BARE);
+            if (!m) break;
+            m[1].split(/\s*(?:,|&|\band\b|\bx\b)\s*/i).map(x => x.trim()).filter(Boolean).forEach(x => feats.push(x));
+            base = collapse(base.slice(0, m.index) + ' ' + base.slice(m.index + m[0].length));
+          }
+          return { base: base.replace(/[\s\-–—,]+$/, ''), feats };
+        }
+
+        function joinFeat(title, feats) {
+          const seen = new Set();
+          const uniq = feats.filter(f => { const k = norm(f); if (!k || seen.has(k)) return false; seen.add(k); return true; });
+          if (!uniq.length) return title;
+          const list = uniq.length > 1 ? uniq.slice(0, -1).join(', ') + ' & ' + uniq[uniq.length - 1] : uniq[0];
+          return `${title} (feat. ${list})`;
+        }
+
+        function norm(s) {
+          return String(s || '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/[^\p{L}\p{N}]+/gu, '');
+        }
+
+        function sameish(a, b) {
+          const x = norm(a), y = norm(b);
+          if (!x || !y) return false;
+          if (x === y) return true;
+          return Math.min(x.length, y.length) >= 3 && (x.includes(y) || y.includes(x));
+        }
+
+        /** Parse "01 - Artist - Title (Official Video) [320kbps].mp3" style names. */
+        function parseName(fileName, tags) {
+          let base = String(fileName || '').replace(/\.[^/.]+$/, '');
+          // "the_weeknd-blinding_lights": with underscores for spaces, a lone bare hyphen is the separator
+          if (/_/.test(base) && !/[_\s][-–—][_\s]/.test(base) && (base.match(/-/g) || []).length === 1) {
+            base = base.replace(/(\S)-(\S)/, '$1 - $2');
+          }
+          base = stripNoise(base);
+          let track = 0;
+          let m = base.match(/^\(?(\d{1,3})\)?\s*(?:[-.)_]|\s[-–—]\s)\s*(?=\S)/);
+          if (m) {
+            track = +m[1];
+            base = base.slice(m[0].length);
+          } else {
+            m = base.match(/^(0\d|\d{1,2}(?=\s))\s+(?=\S)/);
+            if (m && (m[1][0] === '0' || (tags && +tags.trackNo === +m[1]))) {
+              track = +m[1];
+              base = base.slice(m[0].length);
+            }
+          }
+          let year = '';
+          const ym = base.match(RE_YEAR_BRACKET);
+          if (ym) { year = ym[1]; base = collapse(base.replace(RE_YEAR_BRACKET, ' ')); }
+
+          let title = base, artist = '', orderSure = true, alt = null;
+          const parts = base.split(RE_DASH).map(p => p.trim()).filter(Boolean);
+          if (parts.length >= 2) {
+            const split = (order) => (order === 'artist-title'
+              ? { artist: parts[0], title: parts.slice(1).join(' - ') }
+              : { title: parts.slice(0, -1).join(' - '), artist: parts[parts.length - 1] });
+            const g = guessDashOrder(parts, tags);
+            ({ title, artist } = split(g.order));
+            orderSure = g.sure;
+            if (!g.sure) {
+              const o = split(g.order === 'artist-title' ? 'title-artist' : 'artist-title');
+              alt = { title: stripNoise(o.title), artist: stripNoise(o.artist) };
+            }
+          }
+          return { title: stripNoise(title), artist: stripNoise(artist), year, track, orderSure, alt };
+        }
+
+        /**
+         * Which side of "A - B" is the artist? The song's own tags first, then artists already
+         * in the library, otherwise the user's setting (sure: false, so auto-fill can check online or ask).
+         */
+        function guessDashOrder(parts, tags) {
+          const first = parts[0], last = parts[parts.length - 1];
+          const sure = (order) => ({ order, sure: true });
+          if (tags) {
+            if (tags.artist) {
+              if (sameish(first, tags.artist) && !sameish(last, tags.artist)) return sure('artist-title');
+              if (sameish(last, tags.artist) && !sameish(first, tags.artist)) return sure('title-artist');
+            }
+            if (tags.title) {
+              if (sameish(last, tags.title) && !sameish(first, tags.title)) return sure('artist-title');
+              if (sameish(first, tags.title) && !sameish(last, tags.title)) return sure('title-artist');
+            }
+          }
+          if (hooks.knownArtist) {
+            const known = (p) => { try { return !!hooks.knownArtist(splitFeat(stripNoise(p)).base); } catch (e) { return false; } };
+            const kf = known(first), kl = known(last);
+            if (kf && !kl) return sure('artist-title');
+            if (kl && !kf) return sure('title-artist');
+          }
+          return { order: prefs.dashOrder, sure: false };
+        }
+
+        /**
+         * Rule-based suggestion. `src` records where each value came from
+         * ('tag' = existing tag, 'name' = file name) so AI only overrides guesses.
+         */
+        function suggestRules(fileName, tags) {
+          const t = tags || {};
+          const fromName = parseName(fileName, t);
+          const src = {};
+          let title = stripNoise(t.title), artist = stripNoise(t.artist);
+          if (title) src.title = 'tag';
+          if (artist) src.artist = 'tag';
+
+          // Ripped tags often hold "Artist - Title" in the title field
+          if (title && RE_DASH.test(title)) {
+            const parts = title.split(RE_DASH).map(p => p.trim()).filter(Boolean);
+            if (artist && sameish(parts[0], artist)) title = parts.slice(1).join(' - ');
+            else if (artist && sameish(parts[parts.length - 1], artist)) title = parts.slice(0, -1).join(' - ');
+            else if (!artist && parts.length >= 2) {
+              const p = parseName(title + '.x', { title: fromName.title, artist: fromName.artist });
+              title = p.title; artist = p.artist; src.artist = 'name';
+            }
+          }
+          if (!title) { title = fromName.title; src.title = 'name'; }
+          if (!artist && fromName.artist) { artist = fromName.artist; src.artist = 'name'; }
+
+          const tidyPair = (ti, ar) => {
+            const ft = splitFeat(ti), fa = splitFeat(ar);
+            return { title: joinFeat(fixCase(ft.base), [...fa.feats, ...ft.feats].map(fixCase)), artist: fixCase(fa.base) };
+          };
+          ({ title, artist } = tidyPair(title, artist));
+          // Both from an "A - B" file name and no way to tell which is the artist: keep the other reading too
+          const alt = src.title === 'name' && src.artist === 'name' && fromName.alt
+            ? tidyPair(fromName.alt.title, fromName.alt.artist) : null;
+
+          let album = stripNoise(t.album);
+          if (album) src.album = 'tag';
+          album = fixCase(album);
+          let year = t.year && /^\d{4}$/.test(t.year) ? t.year : '';
+          if (year) src.year = 'tag';
+          else if (fromName.year) { year = fromName.year; src.year = 'name'; }
+          let genre = stripNoise(t.genre);
+          if (genre) { src.genre = 'tag'; if (/^[\p{Ll}\s&/-]+$/u.test(genre)) genre = capWord(genre).replace(/\b(\p{L})/gu, c => c.toUpperCase()); }
+          let track = +t.trackNo || 0;
+          if (track) src.track = 'tag';
+          else if (fromName.track) { track = fromName.track; src.track = 'name'; }
+
+          return { fields: { title, artist, album, year, genre, track: track ? String(track) : '' }, src, alt };
+        }
+
+        /* ---------------- Naming template ---------------- */
+        const WIN_RESERVED = /^(con|prn|aux|nul|com\d|lpt\d)$/i;
+        function renderTemplate(template, f) {
+          let s = String(template || '').replace(/\{(\w+)\}/g, (m, k) => {
+            k = k.toLowerCase();
+            if (k === 'track') return f.track ? String(f.track).padStart(2, '0') : '';
+            return FIELDS.includes(k) ? (f[k] || '') : '';
+          });
+          s = s.replace(/[\(\[]\s*[\)\]]/g, ' ')
+            .replace(/(\s*[-–—|]\s*){2,}/g, ' - ')
+            .replace(/^[\s\-–—|.,_]+|[\s\-–—|,_]+$/g, '');
+          return sanitizeFileBase(s);
+        }
+
+        function sanitizeFileBase(s) {
+          s = String(s || '')
+            .replace(/[\u0000-\u001f\u007f]/g, '')
+            .replace(/:/g, ' -').replace(/"/g, "'").replace(/[\/\\|]/g, '-').replace(/[<>]/g, '').replace(/[?*]/g, '');
+          s = collapse(s).replace(/[.\s]+$/, '');
+          if (WIN_RESERVED.test(s)) s = '_' + s;
+          if (s.length > 150) s = s.slice(0, 150).replace(/[.\s]+$/, '');
+          return s;
+        }
+
+        function buildFileName(template, f, oldName) {
+          const dot = oldName.lastIndexOf('.');
+          const ext = dot > 0 ? oldName.slice(dot) : '';
+          const base = renderTemplate(template, f) || (dot > 0 ? oldName.slice(0, dot) : oldName);
+          return base + ext.toLowerCase();
+        }
+
+        /* ================================================================
+           ID3v2.3 writer. Keeps every frame it doesn't replace (cover art,
+           lyrics, comments, ReplayGain…), converts v2.2/v2.4 frames to v2.3.
+           ================================================================ */
+        const isLatin1 = (s) => /^[\u0000-ÿ]*$/.test(s);
+
+        function encodeString(str, enc) {
+          if (enc === 0) {
+            const b = new Uint8Array(str.length);
+            for (let i = 0; i < str.length; i++) b[i] = str.charCodeAt(i);
+            return b;
+          }
+          const b = new Uint8Array(2 + str.length * 2);   // UTF-16 LE with BOM
+          b[0] = 0xff; b[1] = 0xfe;
+          for (let i = 0; i < str.length; i++) { const c = str.charCodeAt(i); b[2 + i * 2] = c & 0xff; b[3 + i * 2] = c >> 8; }
+          return b;
+        }
+
+        function concatBytes(list) {
+          let n = 0;
+          for (const b of list) n += b.length;
+          const out = new Uint8Array(n);
+          let o = 0;
+          for (const b of list) { out.set(b, o); o += b.length; }
+          return out;
+        }
+
+        const term = (enc) => (enc === 1 ? new Uint8Array(2) : new Uint8Array(1));
+
+        function textFrameData(value) {
+          const enc = isLatin1(value) ? 0 : 1;
+          return concatBytes([new Uint8Array([enc]), encodeString(value, enc)]);
+        }
+
+        /** Split "[desc][term][rest]" for an encoding; returns [descString, restBytes]. */
+        function splitTerminated(bytes, enc) {
+          const end = findTerminator(bytes, 0, enc);
+          const desc = decodeText(enc, bytes.subarray(0, end)).join('');
+          return [desc, bytes.subarray(end + ((enc === 1 || enc === 2) ? 2 : 1))];
+        }
+
+        /** Re-encode frames that use UTF-8 / UTF-16BE (v2.4 only) to v2.3-safe encodings. */
+        function downgradeEncoding(id, data) {
+          const enc = data[0];
+          if (enc !== 2 && enc !== 3) return data;
+          if (id[0] === 'T' && id !== 'TXXX') {
+            return textFrameData(decodeText(enc, data.subarray(1)).join('/'));
+          }
+          if (id === 'TXXX' || id === 'WXXX') {
+            const [desc, rest] = splitTerminated(data.subarray(1), enc);
+            const value = id === 'WXXX' ? rest : encodeString(decodeText(enc, rest).join('/'), isLatin1(desc) ? 0 : 1);
+            const outEnc = isLatin1(desc) && (id === 'WXXX' || isLatin1(decodeText(enc, rest).join('/'))) ? 0 : 1;
+            if (id === 'TXXX') {
+              const v = decodeText(enc, rest).join('/');
+              return concatBytes([new Uint8Array([outEnc]), encodeString(desc, outEnc), term(outEnc), encodeString(v, outEnc)]);
+            }
+            return concatBytes([new Uint8Array([outEnc]), encodeString(desc, outEnc), term(outEnc), value]);
+          }
+          if (id === 'COMM' || id === 'USLT') {
+            const lang = data.subarray(1, 4);
+            const [desc, rest] = splitTerminated(data.subarray(4), enc);
+            const text = decodeText(enc, rest).join('\n');
+            const outEnc = isLatin1(desc + text) ? 0 : 1;
+            return concatBytes([new Uint8Array([outEnc]), lang, encodeString(desc, outEnc), term(outEnc), encodeString(text, outEnc)]);
+          }
+          if (id === 'APIC') {
+            const mimeEnd = findTerminator(data, 1, 0);
+            const mime = data.subarray(1, mimeEnd + 1);
+            const type = data[mimeEnd + 1];
+            const [desc, img] = splitTerminated(data.subarray(mimeEnd + 2), enc);
+            const outEnc = isLatin1(desc) ? 0 : 1;
+            return concatBytes([new Uint8Array([outEnc]), mime, new Uint8Array([type]), encodeString(desc, outEnc), term(outEnc), img]);
+          }
+          return data;
+        }
+
+        const V22_MAP = {
+          TT1: 'TIT1', TT2: 'TIT2', TT3: 'TIT3', TP1: 'TPE1', TP2: 'TPE2', TP3: 'TPE3', TP4: 'TPE4', TAL: 'TALB', TYE: 'TYER',
+          TCO: 'TCON', TRK: 'TRCK', TPA: 'TPOS', TCM: 'TCOM', TBP: 'TBPM', TEN: 'TENC', TLA: 'TLAN', TPB: 'TPUB', TCR: 'TCOP',
+          TOA: 'TOPE', TOT: 'TOAL', TXT: 'TEXT', TSS: 'TSSE', TKE: 'TKEY', TLE: 'TLEN', TMT: 'TMED', TRC: 'TSRC', TXX: 'TXXX',
+          COM: 'COMM', ULT: 'USLT', PIC: 'APIC', WXX: 'WXXX', UFI: 'UFID', CNT: 'PCNT', POP: 'POPM'
+        };
+
+        /** List the frames of an ID3v2 tag in v2.3 form: [{ id, flags: [a, b], data }]. */
+        function listFrames(tagBytes) {
+          const major = tagBytes[3];
+          const flags = tagBytes[5];
+          const tagSize = syncsafe(tagBytes, 6);
+          if (major < 2 || major > 4) throw new Error('Unsupported ID3 version 2.' + major);
+          if (major === 2 && (flags & 0x40)) throw new Error('Compressed ID3v2.2 tag');
+          let body = tagBytes.subarray(10, 10 + tagSize);
+          const tagUnsync = (flags & 0x80) !== 0;
+          if (tagUnsync && major < 4) body = removeUnsync(body);
+          let pos = 0;
+          if (major === 3 && (flags & 0x40)) pos = 4 + u32(body, 0);
+          else if (major === 4 && (flags & 0x40)) pos = syncsafe(body, 0);
+
+          const frames = [];
+          let dropped = 0;
+          const idLen = major === 2 ? 3 : 4;
+          const hdrLen = major === 2 ? 6 : 10;
+          while (pos + hdrLen <= body.length) {
+            if (body[pos] === 0) break;
+            let id = String.fromCharCode.apply(null, body.subarray(pos, pos + idLen));
+            if (!/^[A-Z0-9]{3,4}$/.test(id)) break;
+            let size;
+            if (major === 2) size = (body[pos + 3] << 16) | (body[pos + 4] << 8) | body[pos + 5];
+            else if (major === 4) size = syncsafe(body, pos + 4);
+            else size = u32(body, pos + 4);
+            const f1 = major >= 3 ? body[pos + 8] : 0;
+            const f2 = major >= 3 ? body[pos + 9] : 0;
+            const start = pos + hdrLen, end = start + size;
+            if (size <= 0 || end > body.length) break;
+            pos = end;
+            let data = body.subarray(start, end);
+
+            if (major === 3) {
+              frames.push({ id, flags: [f1, f2], data });
+              continue;
+            }
+            if (major === 2) {
+              const mapped = V22_MAP[id];
+              if (!mapped) { dropped++; continue; }
+              if (id === 'PIC') {
+                const fmt = String.fromCharCode(data[1], data[2], data[3]).toUpperCase();
+                const mime = fmt === 'PNG' ? 'image/png' : 'image/jpeg';
+                data = concatBytes([data.subarray(0, 1), encodeString(mime, 0), new Uint8Array(1), data.subarray(4)]);
+              }
+              frames.push({ id: mapped, flags: [0, 0], data });
+              continue;
+            }
+            // v2.4 → v2.3
+            if (f2 & 0x0c) { dropped++; continue; }           // compressed / encrypted: can't convert safely
+            if (f2 & 0x40) data = data.subarray(1);            // grouping byte
+            if (f2 & 0x01) data = data.subarray(4);            // data length indicator
+            if ((f2 & 0x02) || tagUnsync) data = removeUnsync(data);
+            if (!data.length) continue;
+            data = downgradeEncoding(id, data);
+            if (id === 'TDRC') {
+              const y = decodeText(data[0], data.subarray(1)).join('').match(/\d{4}/);
+              if (!y) continue;
+              id = 'TYER'; data = textFrameData(y[0]);
+            } else if (id === 'TDOR') {
+              const y = decodeText(data[0], data.subarray(1)).join('').match(/\d{4}/);
+              if (!y) continue;
+              id = 'TORY'; data = textFrameData(y[0]);
+            }
+            frames.push({ id, flags: [(f1 & 0x60) << 1, 0], data });   // keep the tag/file-alter flags
+          }
+          return { frames, dropped, major };
+        }
+
+        function frameBytes(fr) {
+          const out = new Uint8Array(10 + fr.data.length);
+          for (let i = 0; i < 4; i++) out[i] = fr.id.charCodeAt(i);
+          const n = fr.data.length;
+          out[4] = (n >>> 24) & 0xff; out[5] = (n >>> 16) & 0xff; out[6] = (n >>> 8) & 0xff; out[7] = n & 0xff;
+          out[8] = fr.flags[0]; out[9] = fr.flags[1];
+          out.set(fr.data, 10);
+          return out;
+        }
+
+        function buildTag(frames) {
+          const padding = 256;
+          const parts = frames.map(frameBytes);
+          const size = parts.reduce((n, p) => n + p.length, 0) + padding;
+          const head = new Uint8Array([0x49, 0x44, 0x33, 3, 0, 0,
+            (size >>> 21) & 0x7f, (size >>> 14) & 0x7f, (size >>> 7) & 0x7f, size & 0x7f]);
+          return concatBytes([head, ...parts, new Uint8Array(padding)]);
+        }
+
+        /** Where the tags and the audio sit in a file. */
+        async function readLayout(file) {
+          const head = new Uint8Array(await file.slice(0, 10).arrayBuffer());
+          let tagBytes = null, audioStart = 0;
+          if (head.length === 10 && head[0] === 0x49 && head[1] === 0x44 && head[2] === 0x33 && head[3] >= 2 && head[3] <= 4) {
+            const size = syncsafe(head, 6);
+            audioStart = 10 + size + ((head[5] & 0x10) ? 10 : 0);
+            tagBytes = new Uint8Array(await file.slice(0, 10 + size).arrayBuffer());
+          }
+          let v1 = null;
+          if (file.size - 128 >= audioStart) {
+            const tail = new Uint8Array(await file.slice(file.size - 128).arrayBuffer());
+            if (tail[0] === 0x54 && tail[1] === 0x41 && tail[2] === 0x47) v1 = tail;
+          }
+          return { tagBytes, audioStart, audioEnd: file.size - (v1 ? 128 : 0), v1 };
+        }
+
+        function updateV1(v1, f, changed) {
+          const out = v1.slice();
+          const put = (s, start, len) => {
+            if (!isLatin1(s)) return;   // ID3v1 can't hold it: keep the old value
+            for (let i = 0; i < len; i++) out[start + i] = i < s.length ? s.charCodeAt(i) : 0;
+          };
+          if (changed.title) put(f.title, 3, 30);
+          if (changed.artist) put(f.artist, 33, 30);
+          if (changed.album) put(f.album, 63, 30);
+          if (changed.year) put(f.year, 93, 4);
+          if (changed.track && out[125] === 0) out[126] = Math.min(255, +f.track || 0);
+          if (changed.genre) {
+            const gi = ID3_GENRES.findIndex(g => g.toLowerCase() === String(f.genre).toLowerCase());
+            out[127] = gi >= 0 ? gi : 255;
+          }
+          return out;
+        }
+
+        /**
+         * Build the retagged file. Only the frames for changed fields are replaced.
+         * Returns { blob, oldHead, oldTail } (old bytes are kept for undo).
+         */
+        async function retag(file, f, changed) {
+          const lay = await readLayout(file);
+          let frames = [];
+          if (lay.tagBytes) frames = listFrames(lay.tagBytes).frames;
+          const oldTrck = frames.find(fr => fr.id === 'TRCK');
+          const drop = new Set();
+          for (const k of FIELDS) if (changed[k]) drop.add(FRAME_FOR[k]);
+          if (changed.year) { drop.add('TDRC'); drop.add('TDAT'); }
+          frames = frames.filter(fr => !drop.has(fr.id));
+          const fresh = [];
+          for (const k of FIELDS) {
+            if (!changed[k] || !String(f[k] || '').trim()) continue;
+            let value = String(f[k]).trim();
+            if (k === 'track' && oldTrck) {
+              const total = decodeText(oldTrck.data[0], oldTrck.data.subarray(1)).join('').split('/')[1];
+              if (total) value += '/' + total.trim();
+            }
+            fresh.push({ id: FRAME_FOR[k], flags: [0, 0], data: textFrameData(value) });
+          }
+          const tag = buildTag([...fresh, ...frames]);
+          const parts = [tag, file.slice(lay.audioStart, lay.audioEnd)];
+          if (lay.v1) parts.push(updateV1(lay.v1, f, changed));
+          return {
+            blob: new Blob(parts, { type: 'audio/mpeg' }),
+            oldHead: new Uint8Array(await file.slice(0, lay.audioStart).arrayBuffer()),
+            oldTail: lay.v1
+          };
+        }
+
+        /* ---------------- File System Access helpers ---------------- */
+        async function dirFor(track) {
+          if (!supportsDirectoryPicker || !track.rootName || !track.relPath) return null;
+          const root = await getFolderHandle(track.rootName);
+          if (!root) return null;
+          return { root, parts: track.relPath.split('/').slice(0, -1) };
+        }
+
+        async function walk(root, parts) {
+          let dir = root;
+          for (const p of parts) dir = await dir.getDirectoryHandle(p);
+          return dir;
+        }
+
+        async function hasWrite(handle, ask) {
+          try {
+            if ((await handle.queryPermission({ mode: 'readwrite' })) === 'granted') return true;
+            if (!ask) return false;
+            return (await handle.requestPermission({ mode: 'readwrite' })) === 'granted';
+          } catch (e) { return false; }
+        }
+
+        async function writeBlob(fileHandle, blob) {
+          const w = await fileHandle.createWritable();
+          try { await w.write(blob); await w.close(); }
+          catch (e) { try { await w.abort(); } catch (x) { /* ignore */ } throw e; }
+        }
+
+        async function exists(dir, name) {
+          try { await dir.getFileHandle(name); return true; }
+          catch (e) { if (e && (e.name === 'NotFoundError' || e.name === 'TypeError')) return false; throw e; }
+        }
+
+        /** Rename inside `dir`. Uses handle.move() when available, else copy + delete. */
+        async function renameIn(dir, oldName, newName) {
+          if (oldName === newName) return dir.getFileHandle(oldName);
+          const caseOnly = oldName.toLowerCase() === newName.toLowerCase();
+          if (!caseOnly && await exists(dir, newName)) {
+            throw new Error(`a file named “${newName}” already exists`);
+          }
+          const fh = await dir.getFileHandle(oldName);
+          if (typeof fh.move === 'function') {
+            try { await fh.move(newName); return dir.getFileHandle(newName); }
+            catch (e) { if (e && e.name !== 'NotSupportedError' && e.name !== 'TypeError') throw e; }
+          }
+          const copy = async (from, to) => {
+            const src = await (await dir.getFileHandle(from)).getFile();
+            const dst = await dir.getFileHandle(to, { create: true });
+            await writeBlob(dst, src);
+            await dir.removeEntry(from);
+          };
+          if (caseOnly) {
+            const tmp = newName + '.localify-tmp';
+            await copy(oldName, tmp);
+            await copy(tmp, newName);
+          } else {
+            await copy(oldName, newName);
+          }
+          return dir.getFileHandle(newName);
+        }
+
+        /* ---------------- Download fallback (single file or a stored ZIP) ---------------- */
+        let crcTable = null;
+        function crc32Update(crc, bytes) {
+          if (!crcTable) {
+            crcTable = new Uint32Array(256);
+            for (let n = 0; n < 256; n++) {
+              let c = n;
+              for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+              crcTable[n] = c >>> 0;
+            }
+          }
+          for (let i = 0; i < bytes.length; i++) crc = crcTable[(crc ^ bytes[i]) & 0xff] ^ (crc >>> 8);
+          return crc;
+        }
+
+        async function crcOfBlob(blob) {
+          let crc = 0xffffffff;
+          const chunk = 8 * 1024 * 1024;
+          for (let o = 0; o < blob.size; o += chunk) {
+            crc = crc32Update(crc, new Uint8Array(await blob.slice(o, o + chunk).arrayBuffer()));
+          }
+          return (crc ^ 0xffffffff) >>> 0;
+        }
+
+        /** Minimal "stored" (uncompressed) ZIP so a batch downloads as one file. */
+        async function makeZip(entries) {
+          const enc = new TextEncoder();
+          const parts = [], central = [];
+          let offset = 0;
+          const le = (n, bytes) => { const b = new Uint8Array(bytes); for (let i = 0; i < bytes; i++) b[i] = (n >>> (8 * i)) & 0xff; return b; };
+          for (const e of entries) {
+            const name = enc.encode(e.name);
+            const crc = await crcOfBlob(e.blob);
+            const size = e.blob.size;
+            const local = concatBytes([le(0x04034b50, 4), le(20, 2), le(0x0800, 2), le(0, 2), le(0, 2), le(0x21, 2),
+              le(crc, 4), le(size, 4), le(size, 4), le(name.length, 2), le(0, 2), name]);
+            central.push(concatBytes([le(0x02014b50, 4), le(20, 2), le(20, 2), le(0x0800, 2), le(0, 2), le(0, 2), le(0x21, 2),
+              le(crc, 4), le(size, 4), le(size, 4), le(name.length, 2), le(0, 2), le(0, 2), le(0, 2), le(0, 2), le(0, 4),
+              le(offset, 4), name]));
+            parts.push(local, e.blob);
+            offset += local.length + size;
+          }
+          const cd = concatBytes(central);
+          const end = concatBytes([le(0x06054b50, 4), le(0, 2), le(0, 2), le(entries.length, 2), le(entries.length, 2),
+            le(cd.length, 4), le(offset, 4), le(0, 2)]);
+          return new Blob([...parts, cd, end], { type: 'application/zip' });
+        }
+
+        function download(blob, name) {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = name;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 60000);
+        }
+
+        /* ================================================================
+           Optional AI suggestions (transformers.js, loaded on demand)
+           ================================================================ */
+        const AI_LIB = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/dist/';
+        const AI_MODEL = 'onnx-community/Qwen2.5-0.5B-Instruct';
+        const AI_RUNTIME_CACHE = 'localify-ai-runtime-v1';
+        const AI_MODEL_CACHE = 'transformers-cache';   // transformers.js' own Cache Storage name
+        // Fallback sizes (MB) if the Hugging Face API can't be reached to ask
+        const AI_FALLBACK_MB = { q8: 512, extra: 7, runtime: 23 };
+        const ai = {
+          status: 'off',          // off | checking | needs-download | downloading | loading | ready | running | error | unavailable
+          message: '',
+          plan: null,             // { device, dtype, file, totalMB, cached }
+          generator: null,
+          loading: null,
+          stop: false,
+          progress: { loaded: 0, total: 0 }
+        };
+        const aiListeners = new Set();
+        function setAI(status, message) {
+          ai.status = status;
+          ai.message = message || '';
+          aiListeners.forEach(fn => fn());
+        }
+
+        // Test seam: a page script may set window.__LOCALIFY_AI_STUB__ = async ({ fileName, tags, rules }) => ({ title, … })
+        const stubEngine = () => (typeof window.__LOCALIFY_AI_STUB__ === 'function' ? window.__LOCALIFY_AI_STUB__ : null);
+
+        async function pickDevice() {
+          // Always the CPU (q8) build. The WebGPU q4f16 build replied with gibberish on a real AMD GPU
+          // (fp16 overflow), while q8 gave sensible answers at ~8 s a song. The fp16/fp32 GPU builds are
+          // 2-4x bigger downloads, and q4 on WebGPU is untested, so one well-behaved file for everyone.
+          return { device: 'wasm', dtype: 'q8', file: 'model_quantized.onnx' };
+        }
+
+        const modelFileUrl = (file) => `https://huggingface.co/${AI_MODEL}/resolve/main/onnx/${file}`;
+
+        async function isCached(cacheName, url) {
+          try {
+            if (!('caches' in window)) return false;
+            const c = await caches.open(cacheName);
+            return !!(await c.match(url));
+          } catch (e) { return false; }
+        }
+
+        /** Work out what would be downloaded (and how big it is) without downloading it. */
+        async function planDownload() {
+          if (ai.plan) return ai.plan;
+          const dev = await pickDevice();
+          const cached = await isCached(AI_MODEL_CACHE, modelFileUrl(dev.file)) && await isCached(AI_RUNTIME_CACHE, AI_LIB + 'transformers.min.js');
+          let modelMB = AI_FALLBACK_MB[dev.dtype], extraMB = AI_FALLBACK_MB.extra;
+          if (!cached && navigator.onLine !== false) {
+            try {
+              const ctl = new AbortController();
+              const timer = setTimeout(() => ctl.abort(), 6000);
+              const [onnx, root] = await Promise.all([
+                fetch(`https://huggingface.co/api/models/${AI_MODEL}/tree/main/onnx`, { signal: ctl.signal }).then(r => r.json()),
+                fetch(`https://huggingface.co/api/models/${AI_MODEL}/tree/main`, { signal: ctl.signal }).then(r => r.json())
+              ]);
+              clearTimeout(timer);
+              const f = onnx.find(x => x.path === 'onnx/' + dev.file);
+              if (f && f.size) modelMB = f.size / 1e6;
+              const extras = root.filter(x => /^(tokenizer\.json|tokenizer_config\.json|config\.json|generation_config\.json)$/.test(x.path));
+              if (extras.length) extraMB = extras.reduce((n, x) => n + (x.size || 0), 0) / 1e6;
+            } catch (e) { /* keep the fallback numbers */ }
+          }
+          ai.plan = { ...dev, cached, totalMB: Math.round(modelMB + extraMB + AI_FALLBACK_MB.runtime) };
+          return ai.plan;
+        }
+
+        /** Fetch a runtime file once into Cache Storage, then serve it from there (offline later). */
+        async function runtimeUrl(name, type) {
+          const url = AI_LIB + name;
+          let res = null;
+          try {
+            if ('caches' in window) {
+              const c = await caches.open(AI_RUNTIME_CACHE);
+              res = await c.match(url);
+              if (!res) {
+                const net = await fetch(url, { mode: 'cors' });
+                if (!net.ok) throw new Error('HTTP ' + net.status);
+                await c.put(url, net.clone());
+                res = net;
+              }
+            }
+          } catch (e) { res = null; }
+          if (!res) res = await fetch(url, { mode: 'cors' });
+          if (!res.ok) throw new Error(`Couldn't load ${name} (HTTP ${res.status})`);
+          return URL.createObjectURL(new Blob([await res.blob()], { type }));
+        }
+
+        async function loadModel() {
+          if (ai.generator) return ai.generator;
+          if (ai.loading) return ai.loading;
+          ai.loading = (async () => {
+            const plan = await planDownload();
+            setAI(plan.cached ? 'loading' : 'downloading', plan.cached ? 'Starting the AI model…' : 'Downloading the AI model…');
+            const libUrl = await runtimeUrl('transformers.min.js', 'text/javascript');
+            const mjsUrl = await runtimeUrl('ort-wasm-simd-threaded.jsep.mjs', 'text/javascript');
+            const wasmUrl = await runtimeUrl('ort-wasm-simd-threaded.jsep.wasm', 'application/wasm');
+            const T = await import(/* webpackIgnore: true */ libUrl);
+            T.env.allowLocalModels = false;
+            T.env.useBrowserCache = true;
+            T.env.backends.onnx.wasm.wasmPaths = { mjs: mjsUrl, wasm: wasmUrl };
+            const files = new Map();
+            const gen = await T.pipeline('text-generation', AI_MODEL, {
+              device: plan.device,
+              dtype: plan.dtype,
+              progress_callback: (p) => {
+                if (!p || !p.file) return;
+                if (p.status === 'progress' || p.status === 'done') {
+                  files.set(p.file, { loaded: p.loaded || p.total || 0, total: p.total || p.loaded || 0 });
+                  let loaded = 0, total = 0;
+                  files.forEach(v => { loaded += v.loaded; total += v.total; });
+                  ai.progress = { loaded, total };
+                  if (ai.status === 'downloading' || ai.status === 'loading') {
+                    setAI(ai.status, total > 1e6 ? `Downloading the AI model… ${Math.round(loaded / 1e6)} / ${Math.round(total / 1e6)} MB` : 'Starting the AI model…');
+                  }
+                }
+              }
+            });
+            ai.generator = gen;
+            // Some browsers (private windows, low storage) can't keep a file this big: say so instead of "downloads once"
+            ai.plan.cached = await isCached(AI_MODEL_CACHE, modelFileUrl(plan.file));
+            return gen;
+          })();
+          try {
+            const g = await ai.loading;
+            setAI('ready', ai.plan.cached ? 'AI ready (runs on this device)'
+              : 'AI ready, but this browser couldn\'t keep the model (private window or low storage?), so it will download again next time');
+            return g;
+          } catch (e) {
+            ai.loading = null;
+            const offline = navigator.onLine === false;
+            setAI('error', offline ? 'Offline and the AI model isn\'t downloaded yet. Using the rules.' : `AI couldn't start (${(e && e.message) || e}). Using the rules.`);
+            throw e;
+          }
+        }
+
+        const AI_SYSTEM = 'You fix music file metadata. Reply with one line of JSON only: ' +
+          '{"title":"","artist":"","album":"","year":"","genre":""}. ' +
+          'The artist is who performs the song; the title is the song name. Remove junk like "Official Video", "Lyrics", "HD", ' +
+          'bitrates, track numbers and website names. Write featured artists in the title as (feat. Name). Use normal capitalization. ' +
+          'Leave a field empty if you are not sure. Never invent an album or a year.';
+        const AI_EXAMPLE_USER = 'File name: 03_the_weeknd-blinding_lights_(official_audio)_320kbps.mp3\nTags: none\nRule guess: title=The Weeknd-Blinding Lights; artist=';
+        const AI_EXAMPLE_REPLY = '{"title":"Blinding Lights","artist":"The Weeknd","album":"","year":"","genre":"Pop"}';
+
+        function describeTags(t) {
+          const bits = [];
+          for (const k of ['title', 'artist', 'album', 'year', 'genre']) if (t[k]) bits.push(`${k}=${t[k]}`);
+          return bits.length ? bits.join('; ') : 'none';
+        }
+
+        async function aiSuggest(item) {
+          const input = { fileName: item.track.fileName, tags: { ...item.old }, rules: { ...item.rules } };
+          const stub = stubEngine();
+          let raw;
+          if (stub) {
+            raw = await stub(input);
+          } else {
+            const gen = await loadModel();
+            const messages = [
+              { role: 'system', content: AI_SYSTEM },
+              { role: 'user', content: AI_EXAMPLE_USER },
+              { role: 'assistant', content: AI_EXAMPLE_REPLY },
+              { role: 'user', content: `File name: ${input.fileName}\nTags: ${describeTags(input.tags)}\nRule guess: title=${input.rules.title}; artist=${input.rules.artist}` }
+            ];
+            const t0 = performance.now();
+            const out = await gen(messages, { max_new_tokens: 80, do_sample: false, return_full_text: false });
+            const g = out && out[0] && out[0].generated_text;
+            const text = Array.isArray(g) ? (g[g.length - 1] && g[g.length - 1].content) : g;
+            // Test seam: window.__LOCALIFY_AI_LOG__ = [] collects the model's raw replies
+            if (Array.isArray(window.__LOCALIFY_AI_LOG__)) window.__LOCALIFY_AI_LOG__.push({ file: input.fileName, text: String(text || ''), ms: Math.round(performance.now() - t0) });
+            const m = String(text || '').match(/\{[\s\S]*?\}/);
+            if (!m) return null;
+            try { raw = JSON.parse(m[0]); } catch (e) { return null; }
+          }
+          return validateAI(raw, item);
+        }
+
+        /**
+         * Keep only AI values that are grounded in the input: title/artist words must
+         * appear in the name or tags, album/year must appear verbatim, genre must be
+         * a known genre. Small models make things up; this keeps them honest.
+         */
+        function validateAI(raw, item) {
+          if (!raw || typeof raw !== 'object') return null;
+          const source = norm([item.track.fileName, ...Object.values(item.old)].join(' '));
+          const out = {};
+          const str = (v) => (typeof v === 'string' || typeof v === 'number' ? collapse(String(v)).slice(0, 200) : '');
+          const grounded = (v) => {
+            const words = v.split(/[\s,&()\-]+/).map(norm).filter(w => w.length > 1 && w !== 'feat' && w !== 'ft');
+            if (!words.length) return false;
+            return words.filter(w => source.includes(w)).length / words.length >= 0.6;
+          };
+          for (const k of ['title', 'artist']) { const v = str(raw[k]); if (v && grounded(v)) out[k] = v; }
+          const album = str(raw.album);
+          if (album && norm(album) && source.includes(norm(album))) out.album = album;
+          const year = str(raw.year);
+          if (/^(19|20)\d{2}$/.test(year) && source.includes(year)) out.year = year;
+          const genre = str(raw.genre);
+          const known = ID3_GENRES.find(gn => gn.toLowerCase() === genre.toLowerCase());
+          if (known) out.genre = known;
+          return out;
+        }
+
+        /** Merge AI values over the rule guess. Values that came from real tags stay. */
+        function mergeAI(item, sug) {
+          const f = { ...item.rules };
+          const by = {};
+          for (const k of Object.keys(sug || {})) {
+            if (item.ruleSrc[k] === 'tag' && k !== 'genre') continue;
+            if (k === 'genre' && item.ruleSrc.genre === 'tag') continue;
+            let v = sug[k];
+            if (k === 'title' || k === 'artist') {
+              v = stripNoise(v);
+              if (!v) continue;
+            }
+            if (v && v !== f[k]) { f[k] = v; by[k] = true; }
+          }
+          // Keep feat. handling consistent with the rules
+          const ft = splitFeat(f.title), fa = splitFeat(f.artist);
+          f.title = joinFeat(fixCase(ft.base), [...fa.feats, ...ft.feats].map(fixCase));
+          f.artist = fixCase(fa.base);
+          return { fields: f, by };
+        }
+
+        /* ================================================================
+           Dialog: preview, accept / edit / skip, apply, undo
+           ================================================================ */
+        const el = {
+          dialog: $('taggerDialog'), title: $('tgTitle'), subtitle: $('tgSubtitle'), close: $('tgClose'),
+          scope: $('tgScope'), showSame: $('tgShowSame'), aiSwitch: $('tgAi'), aiStatus: $('tgAiStatus'), aiStop: $('tgAiStop'),
+          template: $('tgTemplate'), templateBtn: $('tgTemplateEdit'),
+          consent: $('tgConsent'), consentText: $('tgConsentText'), consentYes: $('tgConsentYes'), consentNo: $('tgConsentNo'),
+          list: $('tgList'), empty: $('tgEmpty'), status: $('tgStatus'),
+          undo: $('tgUndo'), acceptAll: $('tgAcceptAll'), apply: $('tgApply')
+        };
+
+        const ui = {
+          items: [], baseTracks: [], single: false, token: 0, busy: false, opener: null,
+          urls: [], lastBatch: null, aiRunning: false
+        };
+
+        const isOpen = () => el.dialog.open;
+        const nextTick = () => new Promise(r => setTimeout(r, 0));
+
+        function isMp3(track) {
+          return fileExt(track.fileName) === 'mp3' || track.file.type === 'audio/mpeg';
+        }
+
+        async function readItem(track, { raw } = {}) {
+          const old = { title: '', artist: '', album: '', year: '', genre: '', track: '' };
+          let cover = null, readError = '';
+          const mp3 = isMp3(track);
+          if (mp3) {
+            try {
+              const info = await readMp3Info(track.file);
+              const t = info.tags || {};
+              old.title = t.title || ''; old.artist = t.artist || ''; old.album = t.album || '';
+              old.year = t.year || ''; old.genre = t.genre || ''; old.track = t.trackNo ? String(t.trackNo) : '';
+              cover = t.cover || null;
+            } catch (e) { readError = 'Couldn\'t read the tags'; }
+          }
+          const r = suggestRules(track.fileName, { ...old, trackNo: old.track });
+          const item = {
+            track, mp3, old, cover, readError,
+            rules: r.fields, ruleSrc: r.src, ruleAlt: r.alt || null, aiBy: {}, aiDone: false,
+            next: null, nextName: '', manual: false, editing: false,
+            status: 'pending', message: '', where: null
+          };
+          setSuggestion(item, r.fields);
+          const stored = !raw && hooks.suggestion && hooks.suggestion(track);
+          if (stored) {
+            item.aiBy = stored.by;
+            setSuggestion(item, { ...r.fields, ...stored.fields });
+          }
+          return item;
+        }
+
+        function setSuggestion(item, fields) {
+          item.next = { ...fields };
+          if (!item.mp3) {   // only MP3 tags can be written: rename only
+            for (const k of FIELDS) item.next[k] = item.old[k] || fields[k];
+          }
+          item.nextName = buildFileName(prefs.template, item.next, item.track.fileName);
+          item.status = hasChanges(item) ? (item.status === 'accepted' ? 'accepted' : 'pending') : 'same';
+        }
+
+        function changedFields(item) {
+          const c = {};
+          if (!item.mp3) return c;
+          for (const k of FIELDS) if (String(item.next[k] || '').trim() !== String(item.old[k] || '').trim()) c[k] = true;
+          return c;
+        }
+
+        const nameChanged = (item) => item.nextName !== item.track.fileName;
+        const hasChanges = (item) => nameChanged(item) || Object.keys(changedFields(item)).length > 0;
+
+        function coverUrl(item) {
+          if (item.track.thumbUrl) return item.track.thumbUrl;
+          if (!item.cover) return '';
+          if (!item.coverUrl) { item.coverUrl = URL.createObjectURL(item.cover); ui.urls.push(item.coverUrl); }
+          return item.coverUrl;
+        }
+
+        function tagsHTML(values, compare, kind) {
+          const rows = [];
+          for (const k of FIELDS) {
+            const v = values[k] || '';
+            const was = compare ? (compare[k] || '') : v;
+            if (!v && !was) continue;
+            const changed = compare && v !== was;
+            const cls = kind === 'new' && changed ? (v ? ' tg-changed' : ' tg-removed') : '';
+            rows.push(`<span class="tg-k">${FIELD_LABELS[k]}</span><span class="tg-v${cls}">${v ? escapeHtml(v) : '(removed)'}${kind === 'new' && values.__ai && values.__ai[k] ? ' <span class="tg-badge">AI</span>' : ''}</span>`);
+          }
+          return rows.length ? `<div class="tg-tags">${rows.join('')}</div>` : '<div class="tg-tags tg-none">No tags</div>';
+        }
+
+        function rowHTML(item, i) {
+          const url = coverUrl(item);
+          const art = url ? `<img src="${url}" alt="" loading="lazy">` : buildFallbackArtHTML(item.track.gradient, 16);
+          const st = item.status;
+          const nextVals = { ...item.next, __ai: item.aiBy };
+          let right;
+          if (item.editing) {
+            right = `<div class="tg-edit">
+              <label class="tg-edit-name"><span>File name</span><input type="text" data-f="__name" value="${escapeHtml(item.nextName)}" spellcheck="false"></label>
+              ${FIELDS.map(k => `<label><span>${FIELD_LABELS[k]}</span><input type="text" data-f="${k}" value="${escapeHtml(item.next[k] || '')}"${item.mp3 ? '' : ' disabled'}${k === 'year' || k === 'track' ? ' inputmode="numeric"' : ''} spellcheck="false"></label>`).join('')}
+            </div>`;
+          } else {
+            right = `<div class="tg-fname${nameChanged(item) ? ' tg-changed' : ''}" title="${escapeHtml(item.nextName)}">${escapeHtml(item.nextName)}</div>
+              ${item.mp3 ? tagsHTML(nextVals, item.old, 'new') : '<div class="tg-tags tg-none">Rename only (tags can be written to MP3 files only)</div>'}`;
+          }
+          const stateLabel = { done: 'Saved', error: 'Failed', same: 'Already tidy', downloaded: 'Downloaded' }[st] || '';
+          const locked = st === 'done' || st === 'downloaded';
+          return `<div class="tg-row" role="listitem" data-i="${i}" data-status="${st}">
+            <div class="tg-cover">${art}</div>
+            <div class="tg-old">
+              <div class="tg-fname" title="${escapeHtml(item.track.fileName)}">${escapeHtml(item.track.fileName)}</div>
+              ${item.mp3 ? tagsHTML(item.old, null, 'old') : '<div class="tg-tags tg-none">Not an MP3</div>'}
+              ${item.readError ? `<div class="tg-msg">${escapeHtml(item.readError)}</div>` : ''}
+            </div>
+            <div class="tg-arrow" aria-hidden="true">→</div>
+            <div class="tg-new">${right}${item.message ? `<div class="tg-msg">${escapeHtml(item.message)}</div>` : ''}</div>
+            <div class="tg-actions">
+              ${stateLabel ? `<span class="tg-pill" data-kind="${st}">${stateLabel}</span>` : ''}
+              ${locked ? '' : `
+              <button type="button" class="tg-act tg-accept" data-act="accept" aria-pressed="${st === 'accepted'}" title="Accept this change"${st === 'same' && !item.editing ? ' hidden' : ''}>${st === 'accepted' ? 'Accepted' : 'Accept'}</button>
+              <button type="button" class="tg-act" data-act="edit" aria-pressed="${item.editing}">${item.editing ? 'Done' : 'Edit'}</button>
+              <button type="button" class="tg-act tg-skip" data-act="skip" aria-pressed="${st === 'skipped'}"${st === 'same' ? ' hidden' : ''}>${st === 'skipped' ? 'Skipped' : 'Skip'}</button>`}
+            </div>
+          </div>`;
+        }
+
+        function visibleItems() {
+          return ui.items.map((it, i) => [it, i]).filter(([it]) => el.showSame.checked || it.status !== 'same' || it.editing || ui.single);
+        }
+
+        function render() {
+          const rows = visibleItems();
+          el.list.innerHTML = rows.map(([it, i]) => rowHTML(it, i)).join('');
+          el.empty.hidden = rows.length > 0 || ui.busy;
+          if (!rows.length && !ui.busy) {
+            el.empty.textContent = ui.items.length ? 'Every song here is already tidy. Turn on “Show tidy songs” to edit one anyway.' : 'No songs to tidy.';
+          }
+          updateFooter();
+        }
+
+        function renderRow(i) {
+          const old = el.list.querySelector(`.tg-row[data-i="${i}"]`);
+          if (!old) { render(); return; }
+          const tmp = document.createElement('div');
+          tmp.innerHTML = rowHTML(ui.items[i], i);
+          old.replaceWith(tmp.firstElementChild);
+          updateFooter();
+        }
+
+        function counts() {
+          const c = { accepted: 0, pending: 0, same: 0, skipped: 0, done: 0, error: 0 };
+          for (const it of ui.items) c[it.status] = (c[it.status] || 0) + 1;
+          return c;
+        }
+
+        function updateFooter() {
+          const c = counts();
+          const n = c.accepted;
+          const anyWritable = ui.items.some(it => it.status === 'accepted' && it.where === 'folder');
+          const anyDownload = ui.items.some(it => it.status === 'accepted' && it.where !== 'folder');
+          el.apply.disabled = ui.busy || n === 0;
+          el.apply.textContent = n === 0 ? 'Apply' : anyDownload && !anyWritable ? `Download ${n}` : `Apply ${n}`;
+          el.acceptAll.disabled = ui.busy || c.pending === 0;
+          el.undo.hidden = !ui.lastBatch || !ui.lastBatch.undoable;
+          el.undo.disabled = ui.busy;
+          if (!ui.busy) {
+            const bits = [];
+            if (c.pending) bits.push(`${c.pending} to review`);
+            if (c.accepted) bits.push(`${c.accepted} accepted`);
+            if (c.skipped) bits.push(`${c.skipped} skipped`);
+            if (c.same) bits.push(`${c.same} already tidy`);
+            if (c.done) bits.push(`${c.done} saved`);
+            if (c.error) bits.push(`${c.error} failed`);
+            setStatus(bits.join(' · '));
+          }
+        }
+
+        function setStatus(msg) { el.status.textContent = msg || ''; }
+
+        function updateAIUI() {
+          el.aiSwitch.setAttribute('aria-checked', String(prefs.ai));
+          el.aiStop.hidden = !ui.aiRunning;
+          let msg = '';
+          if (!prefs.ai) msg = 'Off: rules only (works offline)';
+          else if (stubEngine()) msg = ui.aiRunning ? ai.message : 'Test engine';
+          else msg = ai.message || (ai.status === 'ready' ? 'AI ready' : '');
+          el.aiStatus.textContent = msg;
+          el.aiStatus.dataset.kind = ai.status;
+        }
+        aiListeners.add(() => { if (isOpen()) updateAIUI(); });
+
+        function writeTarget() {
+          const where = new Set(ui.items.map(it => it.where));
+          if (where.has('folder') && where.size === 1) return 'Changes are saved into your music folder (the browser will ask for permission to edit it).';
+          if (where.has('folder')) return 'Songs from a folder you opened are saved in place; the others are downloaded as retagged copies.';
+          return 'These songs were added without folder access, so retagged copies are downloaded. Open the folder with “Load Folder” to save in place.';
+        }
+
+        function scopeTracks(value) {
+          if (value === 'shown') return ui.baseTracks;
+          if (value && value.startsWith('folder:')) {
+            const name = value.slice(7);
+            return state.tracks.filter(t => (t.rootName || t.folder) === name);
+          }
+          return ui.baseTracks;
+        }
+
+        function fillScope() {
+          if (ui.single) {
+            el.scope.innerHTML = '<option value="shown">This song</option>';
+            el.scope.disabled = true;
+            return;
+          }
+          const folders = new Map();
+          for (const t of state.tracks) {
+            const k = t.rootName || t.folder;
+            folders.set(k, (folders.get(k) || 0) + 1);
+          }
+          el.scope.disabled = false;
+          el.scope.innerHTML = `<option value="shown">Songs shown in the list (${ui.baseTracks.length})</option>` +
+            [...folders].map(([name, n]) => `<option value="folder:${escapeHtml(name)}">Folder: ${escapeHtml(name)} (${n})</option>`).join('');
+        }
+
+        async function open(tracks, { single = false, opener = null } = {}) {
+          tracks = (tracks || []).filter(Boolean);
+          if (!tracks.length) { showToast('No songs to tidy.'); return; }
+          ui.single = single;
+          ui.baseTracks = tracks;
+          ui.opener = opener || document.activeElement;
+          el.title.textContent = single ? 'Tidy name & tags' : 'Tidy names & tags';
+          el.template.textContent = prefs.template;
+          fillScope();
+          if (!el.dialog.open) {
+            el.dialog.showModal();
+            el.dialog.appendChild(dom.toastContainer);
+          }
+          el.consent.hidden = true;
+          updateAIUI();
+          await load(tracks);
+        }
+
+        async function load(tracks) {
+          const token = ++ui.token;
+          stopAI();
+          ui.items = [];
+          ui.busy = true;
+          render();
+          revokeUrls();
+          el.empty.hidden = true;
+          setStatus(`Reading tags… 0 / ${tracks.length}`);
+          const items = new Array(tracks.length);
+          let next = 0, done = 0;
+          const worker = async () => {
+            while (next < tracks.length) {
+              const i = next++;
+              items[i] = await readItem(tracks[i]);
+              done++;
+              if (done % 20 === 0 && token === ui.token) setStatus(`Reading tags… ${done} / ${tracks.length}`);
+            }
+          };
+          await Promise.all(Array.from({ length: Math.min(READ_WORKERS, tracks.length) }, worker));
+          if (token !== ui.token) return;
+          await Promise.all(items.map(async it => {
+            const d = await dirFor(it.track);
+            it.where = d ? 'folder' : 'download';
+          }));
+          if (token !== ui.token) return;
+          ui.items = items;
+          ui.busy = false;
+          if (ui.single && items[0] && items[0].status === 'pending') items[0].status = 'accepted';
+          el.subtitle.textContent = writeTarget();
+          render();
+          if (prefs.ai) startAI();
+        }
+
+        function revokeUrls() {
+          ui.urls.forEach(u => URL.revokeObjectURL(u));
+          ui.urls = [];
+        }
+
+        /* ---- AI pass over the rows ---- */
+        async function startAI() {
+          if (ui.aiRunning || !ui.items.length) return;
+          if (!stubEngine() && !ai.generator) {
+            if (navigator.onLine === false && !(ai.plan && ai.plan.cached)) {
+              const plan = await planDownload().catch(() => null);
+              if (!plan || !plan.cached) { setAI('unavailable', 'Offline: the AI model isn\'t downloaded yet, so the rules are used.'); return; }
+            }
+            setAI('checking', 'Checking the AI model…');
+            const plan = await planDownload().catch(() => null);
+            if (!plan) { setAI('error', 'AI unavailable. Using the rules.'); return; }
+            if (!plan.cached) { showConsent(plan); return; }
+          }
+          runAI();
+        }
+
+        function showConsent(plan) {
+          el.consentText.textContent = `AI suggestions use ${AI_MODEL.split('/')[1]}, a small language model that runs inside this tab ` +
+            `(${plan.device === 'webgpu' ? 'on your graphics card' : 'on your processor'}). It downloads once, about ${plan.totalMB} MB, ` +
+            'and is then kept by the browser so it also works offline. It only sees file names and tags, never the audio, and nothing is uploaded.';
+          el.consentYes.textContent = `Download ${plan.totalMB} MB`;
+          el.consent.hidden = false;
+          setAI('needs-download', `Needs a one-time ${plan.totalMB} MB download`);
+          el.consentYes.focus();
+        }
+
+        async function runAI() {
+          el.consent.hidden = true;
+          ui.aiRunning = true;
+          ai.stop = false;
+          const token = ui.token;
+          updateAIUI();
+          try {
+            if (!stubEngine()) await loadModel();
+            const todo = ui.items.map((it, i) => [it, i]).filter(([it]) => !it.aiDone && !it.manual && ['pending', 'accepted', 'same'].includes(it.status));
+            let n = 0;
+            for (const [it, i] of todo) {
+              if (ai.stop || token !== ui.token) break;
+              n++;
+              setAI('running', `AI suggestions… ${n} / ${todo.length}`);
+              try {
+                const sug = await aiSuggest(it);
+                if (token !== ui.token) break;
+                it.aiDone = true;
+                if (sug && !it.manual && !it.editing) {
+                  const merged = mergeAI(it, sug);
+                  it.aiBy = merged.by;
+                  const wasAccepted = it.status === 'accepted';
+                  setSuggestion(it, merged.fields);
+                  if (wasAccepted && it.status !== 'same') it.status = 'accepted';
+                  renderRow(i);
+                }
+              } catch (e) {
+                if (!stubEngine() && !ai.generator) throw e;
+              }
+              await nextTick();
+            }
+            setAI(ai.generator || stubEngine() ? 'ready' : ai.status, ai.stop ? 'AI stopped. The rest use the rules.' : 'AI suggestions added');
+          } catch (e) {
+            /* loadModel already reported the error; the rule suggestions stay */
+          } finally {
+            ui.aiRunning = false;
+            updateAIUI();
+            if (token === ui.token && visibleItems().length !== el.list.children.length) render();
+          }
+        }
+
+        function stopAI() { ai.stop = true; }
+
+        /* ---- Row actions ---- */
+        function readEdits(i) {
+          const row = el.list.querySelector(`.tg-row[data-i="${i}"]`);
+          const it = ui.items[i];
+          if (!row || !it.editing) return;
+          const vals = {};
+          row.querySelectorAll('input[data-f]').forEach(inp => { vals[inp.dataset.f] = collapse(inp.value); });
+          const nameInput = vals.__name;
+          delete vals.__name;
+          if (it.mp3) {
+            for (const k of FIELDS) if (k in vals) it.next[k] = k === 'track' ? (vals[k].match(/^\d{1,3}/) || [''])[0] : k === 'year' ? (vals[k].match(/^\d{4}$/) || [''])[0] : vals[k];
+          }
+          const autoName = buildFileName(prefs.template, it.next, it.track.fileName);
+          if (nameInput && nameInput !== it.nameWhenEditStarted) {
+            const ext = (it.track.fileName.match(/\.[^.]+$/) || [''])[0].toLowerCase();
+            let base = sanitizeFileBase(nameInput.replace(/\.[^.]+$/, ''));
+            it.nextName = (base || it.track.fileName.replace(/\.[^.]+$/, '')) + ext;
+          } else {
+            it.nextName = autoName;
+          }
+          it.manual = true;
+        }
+
+        function onRowAction(btn) {
+          const row = btn.closest('.tg-row');
+          const i = +row.dataset.i;
+          const it = ui.items[i];
+          const act = btn.dataset.act;
+          if (act === 'edit') {
+            if (it.editing) {
+              readEdits(i);
+              it.editing = false;
+              it.status = hasChanges(it) ? 'accepted' : 'same';
+            } else {
+              it.editing = true;
+              it.nameWhenEditStarted = it.nextName;
+            }
+            renderRow(i);
+            const again = el.list.querySelector(`.tg-row[data-i="${i}"] ${it.editing ? 'input[data-f="title"]' : '[data-act="edit"]'}`);
+            if (again) again.focus();
+            return;
+          }
+          if (it.editing) { readEdits(i); it.editing = false; }
+          if (act === 'accept') it.status = it.status === 'accepted' ? 'pending' : (hasChanges(it) ? 'accepted' : 'same');
+          if (act === 'skip') it.status = it.status === 'skipped' ? (hasChanges(it) ? 'pending' : 'same') : 'skipped';
+          renderRow(i);
+          const again = el.list.querySelector(`.tg-row[data-i="${i}"] [data-act="${act}"]`);
+          if (again) again.focus();
+        }
+
+        function acceptAll() {
+          ui.items.forEach((it, i) => {
+            if (it.editing) { readEdits(i); it.editing = false; }
+            if (it.status === 'pending') it.status = 'accepted';
+          });
+          render();
+        }
+
+        /* ---- Apply ---- */
+        function snapshotMeta(track) {
+          return { fileName: track.fileName, relPath: track.relPath, likeKey: track.likeKey, title: track.title, artist: track.artist,
+            album: track.album, year: track.year, genre: track.genre, trackNo: track.trackNo, file: track.file, size: track.size, cover: track.cover };
+        }
+
+        function applyToLibrary(track, item, newFile) {
+          const n = item.next;
+          const oldLike = track.likeKey;
+          const before = { likeKey: track.likeKey, size: track.size };
+          if (item.mp3) {
+            if (n.title) track.title = n.title;
+            if (n.artist) track.artist = n.artist;
+            track.album = n.album || track.folder;
+            track.year = n.year || '';
+            track.genre = n.genre || '';
+            track.trackNo = +n.track || 0;
+          }
+          if (newFile) {
+            track.file = newFile;
+            track.size = newFile.size;
+            track.fileName = newFile.name;
+            if (track.relPath) track.relPath = track.relPath.replace(/[^/]*$/, newFile.name);
+            track.likeKey = newFile.name.toLowerCase();
+            moveLike(oldLike, track.likeKey);
+          }
+          buildSearchText(track);
+          if (hooks.applied) hooks.applied(track, before);
+        }
+
+        function moveLike(from, to) {
+          if (from === to || !state.likedKeys.has(from)) return;
+          state.likedKeys.delete(from);
+          state.likedKeys.add(to);
+          saveJSON(STORAGE_KEYS.LIKED, Array.from(state.likedKeys));
+        }
+
+        /** The current track's object URL points at the old file: reopen it at the same spot. */
+        function reloadIfCurrent(track) {
+          if (track.id !== state.currentTrackId) return;
+          const t = audio.currentTime || 0;
+          const wasPlaying = !audio.paused;
+          if (currentAudioUrl) URL.revokeObjectURL(currentAudioUrl);
+          currentAudioUrl = URL.createObjectURL(track.file);
+          audio.src = currentAudioUrl;
+          audio.addEventListener('loadedmetadata', function once() {
+            audio.removeEventListener('loadedmetadata', once);
+            try { audio.currentTime = t; } catch (e) { /* ignore */ }
+            if (wasPlaying) playAudio();
+          });
+        }
+
+        async function refreshCover(track) {
+          try {
+            const info = await readMp3Info(track.file);
+            track.cover = info.tags.cover || null;
+          } catch (e) { /* keep */ }
+        }
+
+        function refreshLibraryUI() {
+          invalidateVisible();
+          renderAll();
+          updateCurrentTrackUI();
+          if (typeof updateMediaSession === 'function') updateMediaSession();
+        }
+
+        async function apply() {
+          if (ui.busy) return;
+          ui.items.forEach((it, i) => { if (it.editing) { readEdits(i); it.editing = false; } });
+          const todo = ui.items.filter(it => it.status === 'accepted' && hasChanges(it));
+          if (!todo.length) { render(); return; }
+          ui.busy = true;
+          stopAI();
+          updateFooter();
+
+          // Ask for write access per folder (needs the click's user activation, so do it first)
+          const rootsOk = new Map();
+          for (const it of todo) {
+            if (it.where !== 'folder') continue;
+            const name = it.track.rootName;
+            if (rootsOk.has(name)) continue;
+            const root = await getFolderHandle(name);
+            rootsOk.set(name, root ? await hasWrite(root, true) : false);
+          }
+
+          const batch = { entries: [], undoable: true, bytes: 0 };
+          const downloads = [];
+          let ok = 0, failed = 0;
+          for (let n = 0; n < todo.length; n++) {
+            const it = todo[n];
+            const track = it.track;
+            setStatus(`Saving ${n + 1} / ${todo.length}…`);
+            const changed = changedFields(it);
+            const tagChange = Object.keys(changed).length > 0;
+            try {
+              let res = null;
+              if (tagChange) res = await retag(track.file, it.next, changed);
+              const canWrite = it.where === 'folder' && rootsOk.get(track.rootName);
+              if (canWrite) {
+                const loc = await dirFor(track);
+                const dir = await walk(loc.root, loc.parts);
+                const before = snapshotMeta(track);
+                let fh = await dir.getFileHandle(track.fileName);
+                if (tagChange) await writeBlob(fh, res.blob);
+                if (nameChanged(it)) fh = await renameIn(dir, track.fileName, it.nextName);
+                const newFile = await fh.getFile();
+                applyToLibrary(track, it, newFile);
+                if (tagChange) await refreshCover(track);
+                reloadIfCurrent(track);
+                const entry = { track, rootName: track.rootName, parts: loc.parts, before, after: newFile.name, tagChange };
+                if (tagChange) {
+                  entry.oldHead = res.oldHead; entry.oldTail = res.oldTail;
+                  batch.bytes += res.oldHead.length;
+                  if (batch.bytes > UNDO_MAX_BYTES) batch.undoable = false;
+                }
+                batch.entries.push(entry);
+                it.status = 'done';
+                it.message = '';
+              } else {
+                const blob = res ? res.blob : track.file;
+                downloads.push({ name: it.nextName, blob });
+                applyToLibrary(track, it, null);
+                it.status = 'downloaded';
+                it.message = it.where === 'folder' ? 'No permission to edit the folder, so a retagged copy was downloaded.' : '';
+              }
+              ok++;
+            } catch (e) {
+              failed++;
+              it.status = 'error';
+              it.message = `Couldn't save: ${(e && e.message) || e}`;
+            }
+            renderRow(ui.items.indexOf(it));
+            await nextTick();
+          }
+
+          if (downloads.length === 1) {
+            download(downloads[0].blob, downloads[0].name);
+          } else if (downloads.length > 1) {
+            const total = downloads.reduce((s, d) => s + d.blob.size, 0);
+            const used = new Map();
+            downloads.forEach(d => {   // unique names inside the ZIP
+              const k = d.name.toLowerCase();
+              const c = used.get(k) || 0;
+              used.set(k, c + 1);
+              if (c) d.name = d.name.replace(/(\.[^.]+)?$/, ` (${c + 1})$1`);
+            });
+            if (total < ZIP_MAX_BYTES) {
+              setStatus('Packing the ZIP…');
+              download(await makeZip(downloads), 'Localify retagged songs.zip');
+            } else {
+              for (const d of downloads) { download(d.blob, d.name); await new Promise(r => setTimeout(r, 400)); }
+            }
+          }
+
+          if (batch.entries.length) ui.lastBatch = batch;
+          ui.busy = false;
+          refreshLibraryUI();
+          render();
+          const parts = [];
+          if (ok) parts.push(`${ok} ${ok === 1 ? 'song' : 'songs'} ${downloads.length === ok ? 'downloaded' : 'tidied'}`);
+          if (failed) parts.push(`${failed} failed`);
+          showToast(parts.join(', ') || 'Nothing changed');
+          if (batch.entries.length && !batch.undoable) setStatus('Saved. This batch was too large to keep an undo copy of its old tags.');
+        }
+
+        async function undoLast() {
+          const batch = ui.lastBatch;
+          if (!batch || !batch.undoable || ui.busy) return;
+          ui.busy = true;
+          updateFooter();
+          let ok = 0, failed = 0;
+          for (const e of batch.entries.slice().reverse()) {
+            const track = e.track;
+            try {
+              const root = await getFolderHandle(e.rootName);
+              if (!root || !(await hasWrite(root, true))) throw new Error('no permission');
+              const dir = await walk(root, e.parts);
+              let fh = await dir.getFileHandle(e.after);
+              if (e.tagChange) {
+                const cur = await fh.getFile();
+                const lay = await readLayout(cur);
+                const parts = [e.oldHead, cur.slice(lay.audioStart, lay.audioEnd)];
+                if (e.oldTail) parts.push(e.oldTail);
+                await writeBlob(fh, new Blob(parts, { type: 'audio/mpeg' }));
+              }
+              if (e.after !== e.before.fileName) fh = await renameIn(dir, e.after, e.before.fileName);
+              const file = await fh.getFile();
+              const b = e.before;
+              const oldLike = track.likeKey;
+              Object.assign(track, { fileName: b.fileName, relPath: b.relPath, likeKey: b.likeKey, title: b.title, artist: b.artist,
+                album: b.album, year: b.year, genre: b.genre, trackNo: b.trackNo, file, size: file.size });
+              moveLike(oldLike, b.likeKey);
+              if (e.tagChange) await refreshCover(track);
+              buildSearchText(track);
+              reloadIfCurrent(track);
+              const it = ui.items.find(x => x.track === track);
+              if (it) { it.status = 'pending'; it.message = 'Undone'; it.old = { ...it.old }; }
+              ok++;
+            } catch (err) {
+              failed++;
+            }
+          }
+          ui.lastBatch = null;
+          ui.busy = false;
+          refreshLibraryUI();
+          showToast(failed ? `Undid ${ok}, ${failed} couldn't be undone` : `Undid ${ok} ${ok === 1 ? 'change' : 'changes'}`);
+          // Re-read so the preview matches the files again
+          await load(ui.items.map(it => it.track));
+        }
+
+        function requestClose() {
+          if (ui.busy) return;
+          const pending = ui.items.some(it => it.status === 'accepted' || it.editing);
+          if (pending && !confirm('Close without applying the accepted changes?')) return;
+          el.dialog.close();
+        }
+
+        el.dialog.addEventListener('cancel', (e) => { e.preventDefault(); requestClose(); });
+        el.dialog.addEventListener('close', () => {
+          ui.token++;
+          stopAI();
+          ui.items = [];
+          el.list.innerHTML = '';
+          revokeUrls();
+          document.body.appendChild(dom.toastContainer);
+          const back = ui.opener;
+          ui.opener = null;
+          if (back && back.isConnected && typeof back.focus === 'function') back.focus();
+        });
+        el.close.addEventListener('click', requestClose);
+        el.list.addEventListener('error', (e) => {
+          if (e.target.tagName !== 'IMG') return;
+          const it = ui.items[+e.target.closest('.tg-row').dataset.i];
+          e.target.outerHTML = buildFallbackArtHTML(it ? it.track.gradient : undefined, 16);
+        }, true);
+        el.list.addEventListener('click', (e) => {
+          const btn = e.target.closest('.tg-act');
+          if (btn && !ui.busy) onRowAction(btn);
+        });
+        el.list.addEventListener('keydown', (e) => {
+          if (e.key !== 'Enter' || !e.target.matches('input[data-f]')) return;
+          e.preventDefault();
+          const btn = e.target.closest('.tg-row').querySelector('[data-act="edit"]');
+          if (btn) onRowAction(btn);
+        });
+        el.acceptAll.addEventListener('click', acceptAll);
+        el.apply.addEventListener('click', apply);
+        el.undo.addEventListener('click', undoLast);
+        el.showSame.addEventListener('change', render);
+        el.scope.addEventListener('change', () => {
+          const dirty = ui.items.some(it => it.status === 'accepted' || it.manual);
+          if (dirty && !confirm('Switch songs and drop your accepted or edited rows?')) { el.scope.value = el.scope.dataset.last || 'shown'; return; }
+          el.scope.dataset.last = el.scope.value;
+          load(scopeTracks(el.scope.value));
+        });
+        el.aiSwitch.addEventListener('click', () => {
+          prefs.ai = !prefs.ai;
+          savePrefs();
+          syncSettings();
+          if (prefs.ai) startAI();
+          else { stopAI(); el.consent.hidden = true; setAI('off', ''); }
+          updateAIUI();
+        });
+        el.aiStop.addEventListener('click', stopAI);
+        el.consentYes.addEventListener('click', () => runAI());
+        el.consentNo.addEventListener('click', () => {
+          el.consent.hidden = true;
+          prefs.ai = false;
+          savePrefs();
+          syncSettings();
+          setAI('off', '');
+          updateAIUI();
+        });
+        el.templateBtn.addEventListener('click', () => {
+          el.dialog.close();
+          openSettings();
+          const input = $('setTgTemplate');
+          if (input) { input.scrollIntoView({ block: 'center' }); input.focus(); }
+        });
+
+        /* ---------------- Used by auto-fill ---------------- */
+        /** True when AI suggestions are on and can run without downloading anything. */
+        async function aiAvailable() {
+          if (!prefs.ai) return false;
+          if (stubEngine() || ai.generator) return true;
+          const dev = await pickDevice();
+          return await isCached(AI_MODEL_CACHE, modelFileUrl(dev.file)) && await isCached(AI_RUNTIME_CACHE, AI_LIB + 'transformers.min.js');
+        }
+
+        /**
+         * "Auto-apply to files": write details into one song without the dialog.
+         * Only for MP3s in a folder the user already allowed editing (never asks for permission).
+         * Joins "Undo last batch" in the Tidy dialog.
+         */
+        async function autoApply(track, fields) {
+          if (!isMp3(track) || ui.busy) return false;
+          const loc = await dirFor(track);
+          if (!loc || !(await hasWrite(loc.root, false))) return false;
+          const it = await readItem(track, { raw: true });
+          setSuggestion(it, { ...it.rules, ...fields });
+          if (!hasChanges(it)) return false;
+          const changed = changedFields(it);
+          const tagChange = Object.keys(changed).length > 0;
+          const res = tagChange ? await retag(track.file, it.next, changed) : null;
+          const dir = await walk(loc.root, loc.parts);
+          const before = snapshotMeta(track);
+          let fh = await dir.getFileHandle(track.fileName);
+          if (tagChange) await writeBlob(fh, res.blob);
+          if (nameChanged(it)) fh = await renameIn(dir, track.fileName, it.nextName);
+          const newFile = await fh.getFile();
+          applyToLibrary(track, it, newFile);
+          if (tagChange) await refreshCover(track);
+          track.thumbUrl = undefined; track.thumbState = undefined;
+          reloadIfCurrent(track);
+          if (!ui.lastBatch || !ui.lastBatch.auto) ui.lastBatch = { entries: [], undoable: true, bytes: 0, auto: true };
+          const entry = { track, rootName: track.rootName, parts: loc.parts, before, after: newFile.name, tagChange };
+          if (tagChange) {
+            entry.oldHead = res.oldHead; entry.oldTail = res.oldTail;
+            ui.lastBatch.bytes += res.oldHead.length;
+            if (ui.lastBatch.bytes > UNDO_MAX_BYTES) ui.lastBatch.undoable = false;
+          }
+          ui.lastBatch.entries.push(entry);
+          patchTrackEverywhere(track);
+          return true;
+        }
+
+        /* ---------------- Settings section ---------------- */
+        const set = {
+          template: $('setTgTemplate'), presets: $('setTgPresets'), example: $('setTgExample'),
+          order: $('setTgOrder'), aiSwitch: $('setTgAi'), aiHint: $('setTgAiHint'),
+          model: $('setTgModel'), remove: $('setTgRemoveModel'),
+          autoFill: $('setAfAuto'), onlineOnly: $('setAfOnline'), musicbrainz: $('setAfMb'), autoApply: $('setAfApply')
+        };
+        const AF_SWITCHES = ['autoFill', 'onlineOnly', 'musicbrainz', 'autoApply'];
+        const EXAMPLE = { title: 'Blinding Lights', artist: 'The Weeknd', album: 'After Hours', year: '2020', genre: 'Pop', track: '3' };
+
+        function syncSettings() {
+          if (document.activeElement !== set.template) set.template.value = prefs.template;
+          set.example.textContent = `Example: ${buildFileName(prefs.template, EXAMPLE, 'x.mp3')}`;
+          set.presets.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tpl === prefs.template)));
+          setRadioGroup(set.order, prefs.dashOrder);
+          setSwitch(set.aiSwitch, prefs.ai);
+          AF_SWITCHES.forEach(k => setSwitch(set[k], prefs[k]));
+          if (el.template) el.template.textContent = prefs.template;
+        }
+
+        async function syncModelInfo() {
+          set.model.textContent = 'Checking…';
+          const dev = await pickDevice();
+          const cached = await isCached(AI_MODEL_CACHE, modelFileUrl(dev.file));
+          set.model.textContent = cached
+            ? `${AI_MODEL.split('/')[1]} is downloaded and works offline.`
+            : `Not downloaded. ${AI_MODEL.split('/')[1]} is about ${AI_FALLBACK_MB[dev.dtype] + AI_FALLBACK_MB.extra + AI_FALLBACK_MB.runtime} MB, fetched only when you use AI suggestions.`;
+          set.remove.disabled = !cached;
+        }
+
+        function initSettingsSection() {
+          set.presets.innerHTML = TEMPLATE_PRESETS.map(t => `<button type="button" class="tg-chip" data-tpl="${escapeHtml(t)}">${escapeHtml(t)}</button>`).join('');
+          set.presets.addEventListener('click', (e) => {
+            const b = e.target.closest('[data-tpl]');
+            if (!b) return;
+            prefs.template = b.dataset.tpl;
+            set.template.value = prefs.template;
+            savePrefs();
+            syncSettings();
+          });
+          set.template.addEventListener('input', () => {
+            const v = set.template.value.slice(0, 120);
+            if (v.trim()) { prefs.template = v; savePrefs(); }
+            syncSettings();
+          });
+          set.template.addEventListener('blur', () => { if (!set.template.value.trim()) syncSettings(); });
+          wireRadioGroup(set.order, (v) => { prefs.dashOrder = v; savePrefs(); syncSettings(); });
+          set.aiSwitch.addEventListener('click', () => {
+            prefs.ai = !prefs.ai;
+            savePrefs();
+            syncSettings();
+            if (!prefs.ai) setAI('off', '');
+          });
+          AF_SWITCHES.forEach(k => set[k].addEventListener('click', () => {
+            prefs[k] = !prefs[k];
+            savePrefs();
+            syncSettings();
+            if (hooks.prefsChanged) hooks.prefsChanged(k);
+          }));
+          set.remove.addEventListener('click', async () => {
+            if (!confirm('Remove the downloaded AI model from this browser? You can download it again later.')) return;
+            try { await caches.delete(AI_MODEL_CACHE); await caches.delete(AI_RUNTIME_CACHE); } catch (e) { /* ignore */ }
+            ai.generator = null; ai.loading = null; ai.plan = null;
+            setAI('off', '');
+            showToast('AI model removed');
+            syncModelInfo();
+          });
+          syncSettings();
+          syncModelInfo();
+        }
+
+        initSettingsSection();
+
+        return {
+          open, isOpen, syncSettings, syncModelInfo,
+          resetPrefs: () => { prefs = { ...DEFAULT_TAGGER_PREFS }; try { localStorage.removeItem(STORAGE_KEYS.TAGGER); } catch (e) { /* ignore */ } syncSettings(); },
+          openForTrack: (id, opener) => open([state.trackMap.get(id)], { single: true, opener }),
+          openForShown: (opener) => open(getVisibleTracks(), { opener }),
+          hooks, autoApply,
+          // Undo the songs auto-apply saved since the last manual batch
+          undoAuto: async () => { if (!ui.lastBatch || !ui.lastBatch.auto || !ui.lastBatch.undoable) return false; await undoLast(); return true; },
+          internals: { readItem, aiSuggest, mergeAI, norm, sameish, aiAvailable, prefs: () => prefs },
+          // Pure helpers, exposed for testing in the console
+          _test: { stripNoise, fixCase, splitFeat, parseName, suggestRules, renderTemplate, buildFileName, listFrames, retag, readLayout, validateAI, makeZip }
+        };
+      })();
+      window.LocalifyTagger = Tagger._test;
+      /* [/AI Tagger] */
+
+      /* ==========================================================================
+         [AI Tagger] auto-fill: fill in song details in the background.
+         - Details live in STORAGE_KEYS.SONG_DETAILS (per song key), shown in the
+           library only. Files change only through Apply, or "Auto-apply to files".
+         - With "Only run when online" on, songs found while offline are marked
+           Unsorted and processed when the connection comes back.
+         - When sources disagree or a value is missing, it asks instead of guessing.
+         ========================================================================== */
+      const AutoFill = (() => {
+        const T = Tagger.internals;
+        const FIELDS = ['title', 'artist', 'album', 'year', 'genre', 'track'];
+        const LABEL = { title: 'title', artist: 'artist', album: 'album', year: 'year', genre: 'genre', track: 'track number' };
+        // How much each source is trusted (0..1). MusicBrainz is scaled by its own match score,
+        // iTunes by how well its result matches. nameAlt: the other way round of an "A - B" file name.
+        const CONF = { user: 1, hint: 0.98, tag: 1, ripped: 0.85, mb: 0.95, itunes: 0.9, ai: 0.7, name: 0.6, nameAlt: 0.5, folder: 0.45 };
+        const ASK_GAP = 0.2;       // two different values closer than this → ask
+        const MIN_OPTION = 0.5;    // weaker guesses are not offered as answers
+        const BATCH = 3;           // songs processed at a time
+        const GAP_MS = 150;        // pause between batches
+        const MB_GAP_MS = 1100;    // MusicBrainz asks for at most one request per second
+        const IT_GAP_MS = 3100;    // iTunes Search allows about 20 requests a minute
+        const IT_URL = 'https://itunes.apple.com/search';
+        const IT_ART = /^https:\/\/is\d+-ssl\.mzstatic\.com\/image\/thumb\/[^\s?#]+\/\d+x\d+bb\.(?:jpg|png)$/;
+        const REACH_TTL = 60000;
+        const MB_URL = 'https://musicbrainz.org/ws/2/recording/';
+        const CAA_URL = 'https://coverartarchive.org/release/';
+        const COVER_CACHE = 'localify-covers-v1';
+        const REACH_URL = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/package.json';
+
+        const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+        const pref = () => T.prefs();
+        const norm = T.norm;
+
+        /* ---------------- Storage ---------------- */
+        function loadDetails() {
+          const d = loadJSON(STORAGE_KEYS.SONG_DETAILS, {});
+          return d && typeof d === 'object' && !Array.isArray(d) ? d : {};
+        }
+        function loadAnswers() {
+          const a = loadJSON(STORAGE_KEYS.SONG_ANSWERS, {});
+          const ok = (o) => (o && typeof o === 'object' && !Array.isArray(o) ? o : {});
+          return { artists: ok(a && a.artists), albums: ok(a && a.albums) };
+        }
+        let details = loadDetails();     // key -> 'ok' | { state, f, src, conf, q, orig, mbid, at }
+        let answers = loadAnswers();     // { artists: { normName: spelling }, albums: { folderKey: { album?, year? } } }
+        let saveTimer = 0;
+        function saveDetails(now) {
+          clearTimeout(saveTimer);
+          if (now) saveJSON(STORAGE_KEYS.SONG_DETAILS, details);
+          else saveTimer = setTimeout(() => saveJSON(STORAGE_KEYS.SONG_DETAILS, details), 400);
+        }
+        const saveAnswers = () => saveJSON(STORAGE_KEYS.SONG_ANSWERS, answers);
+
+        const keyOf = (t) => `${t.likeKey}|${t.size}`;
+        const dirOf = (t) => (t.relPath && t.relPath.includes('/') ? t.relPath.split('/').slice(0, -1).join('/') : '');
+        const folderKey = (t) => (t.rootName ? `${t.rootName}/${dirOf(t)}` : `drop:${t.folder || ''}`);
+        const entryOf = (t) => { const e = details[keyOf(t)]; return e && typeof e === 'object' ? e : null; };
+        const trackForKey = (key) => state.tracks.find(t => keyOf(t) === key) || null;
+
+        /* ---------------- Library overlay ---------------- */
+        function overlay(track, e) {
+          const f = e.f || {};
+          if (f.title) track.title = f.title;
+          if (f.artist) track.artist = f.artist;
+          if (f.album) track.album = f.album;
+          if (f.year) track.year = f.year;
+          if (f.genre) track.genre = f.genre;
+          if (f.track && +f.track) track.trackNo = +f.track;
+          track.afState = e.state === 'unsorted' ? 'unsorted' : (e.q && e.q.length ? 'question' : 'filled');
+          if ((e.mbid || e.art) && !track.cover) loadCover(track, e);
+          buildSearchText(track);
+          patchTrackEverywhere(track);
+        }
+
+        function refresh() {
+          invalidateVisible();
+          scheduleUI({ list: true, stats: true, queue: true });
+          updateChip();
+        }
+
+        /* ---------------- Artists already in the library ---------------- */
+        // From songs' own tags, earlier answers and confirmed lookups. File-name guesses don't count,
+        // and neither does track.artist on its own (it falls back to the folder name).
+        const tagArtists = new Set();   // artists read from tags this session
+        let knownCache = { at: 0, set: new Set() };
+        function knownArtists() {
+          if (Date.now() - knownCache.at < 2000) return knownCache.set;
+          const set = new Set(tagArtists);
+          const put = (v) => { const n = norm(v); if (n && n.length >= 2) set.add(n); };
+          for (const v of Object.values(answers.artists)) put(v);
+          for (const t of state.tracks) {
+            const d = details[keyOf(t)];
+            if (d === 'ok') { if (t.artist && t.artist !== t.folder) put(t.artist); }   // checked: the tags were complete
+            else if (d && d.f && d.f.artist && ['tag', 'ripped', 'mb', 'itunes', 'user', 'hint'].includes(d.src && d.src.artist)) put(d.f.artist);
+          }
+          knownCache = { at: Date.now(), set };
+          return set;
+        }
+
+        /** Called by enrichTrack once a song's own tags are read. */
+        function onEnriched(track) {
+          if (!pref().autoFill) return;
+          const e = details[keyOf(track)];
+          if (e === 'ok') return;
+          if (e && e.state !== 'unsorted') { overlay(track, e); updateChip(); return; }
+          if (e) { track.afState = 'unsorted'; patchTrackEverywhere(track); }
+          enqueue(track);
+        }
+
+        /* ---------------- Online check ---------------- */
+        let reach = { ok: null, at: 0, pending: null };
+        function isOnline(force) {
+          if (navigator.onLine === false) return Promise.resolve(false);
+          if (!force && reach.ok !== null && Date.now() - reach.at < REACH_TTL) return Promise.resolve(reach.ok);
+          if (reach.pending) return reach.pending;
+          reach.pending = (async () => {
+            let ok = false;
+            try {
+              // Test seam: window.__LOCALIFY_REACH_STUB__ = () => true | false
+              const stub = window.__LOCALIFY_REACH_STUB__;
+              if (typeof stub === 'function') ok = !!(await stub());
+              else {
+                const ctl = new AbortController();
+                const timer = setTimeout(() => ctl.abort(), 4000);
+                await fetch(REACH_URL, { method: 'HEAD', mode: 'no-cors', cache: 'no-store', credentials: 'omit', signal: ctl.signal });
+                clearTimeout(timer);
+                ok = true;
+              }
+            } catch (e) { ok = false; }
+            reach = { ok, at: Date.now(), pending: null };
+            return ok;
+          })();
+          return reach.pending;
+        }
+        const canRun = () => (pref().onlineOnly ? isOnline() : Promise.resolve(true));
+
+        /* ---------------- Queue ---------------- */
+        const queue = [];
+        const queued = new Set();
+        const progress = { done: 0, total: 0 };
+        const summary = { filled: 0, questions: 0, applied: 0, tracks: [], saved: [] };
+        let pumping = false, pumpTimer = 0;
+
+        function enqueue(track) {
+          if (queued.has(track.id)) return;
+          queued.add(track.id);
+          queue.push(track);
+          progress.total++;
+          if (!pumpTimer) pumpTimer = setTimeout(() => { pumpTimer = 0; pump(); }, 300);
+        }
+
+        function markQueuedUnsorted() {
+          for (const t of queue) {
+            const k = keyOf(t);
+            if (!details[k] || details[k] === 'ok') details[k] = { state: 'unsorted', at: Date.now() };
+            t.afState = 'unsorted';
+            patchTrackEverywhere(t);
+          }
+          queue.length = 0;
+          queued.clear();
+          progress.done = progress.total = 0;
+          saveDetails();
+          refresh();
+        }
+
+        async function pump() {
+          if (pumping || !queue.length) return;
+          pumping = true;
+          updateChip();
+          try {
+            while (queue.length) {
+              if (!pref().autoFill) { queue.length = 0; queued.clear(); break; }
+              if (!(await canRun())) { markQueuedUnsorted(); break; }
+              const batch = queue.splice(0, BATCH);
+              await Promise.all(batch.map(t => processTrack(t)
+                .catch(() => { /* leave it for next time */ })
+                .finally(() => { queued.delete(t.id); progress.done++; updateChip(); })));
+              await sleep(GAP_MS);
+            }
+          } finally {
+            pumping = false;
+          }
+          if (!queue.length) finishRun();
+        }
+
+        function finishRun() {
+          progress.done = progress.total = 0;
+          saveDetails(true);
+          refresh();
+          const s = { ...summary, tracks: summary.tracks.slice() };
+          summary.filled = summary.questions = summary.applied = 0;
+          summary.tracks = []; summary.saved = [];
+          if (s.applied) {
+            notify(`Saved details into ${s.applied} ${s.applied === 1 ? 'file' : 'files'}`, 'Undo', async () => {
+              if (!(await Tagger.undoAuto())) { showToast('Nothing to undo'); return; }
+              // Put the details back as a suggestion so the song isn't saved again on its own
+              for (const { track, entry } of s.saved) if (state.trackMap.has(track.id)) details[keyOf(track)] = entry;
+              saveDetails(true);
+              refresh();
+            });
+          }
+          if (s.filled) {
+            notify(`Filled details for ${s.filled} ${s.filled === 1 ? 'song' : 'songs'}`, 'Review',
+              () => Tagger.open(s.tracks.filter(t => state.trackMap.has(t.id))));
+          }
+          const q = questionCount();
+          if (s.questions && q) notify(`Localify has ${q} ${q === 1 ? 'question' : 'questions'} about your songs`, 'Answer', () => openQuestions());
+        }
+
+        function resumeUnsorted() {
+          if (!pref().autoFill) return;
+          for (const t of state.tracks) if (t.afState === 'unsorted') enqueue(t);
+        }
+
+        /* ---------------- Working out the details ---------------- */
+        function groupCands(list) {
+          const groups = new Map();
+          for (const c of list) {
+            const k = norm(c.v) || c.v.toLowerCase();
+            const g = groups.get(k);
+            if (!g) groups.set(k, { ...c });
+            else if (c.conf > g.conf) groups.set(k, { ...c, conf: c.conf });
+          }
+          return [...groups.values()].sort((a, b) => b.conf - a.conf);
+        }
+
+        function hintsFor(track, cands) {
+          for (const c of cands.artist.slice()) {
+            const canon = answers.artists[norm(c.v)];
+            if (canon) cands.artist.push({ v: canon, src: 'hint', conf: CONF.hint });
+          }
+          const fh = answers.albums[folderKey(track)];
+          const leave = {};
+          if (fh) {
+            for (const k of ['album', 'year']) {
+              if (!(k in fh)) continue;
+              if (fh[k]) cands[k].push({ v: fh[k], src: 'hint', conf: CONF.hint });
+              else leave[k] = true;   // the user chose to leave it as is for this folder
+            }
+          }
+          return leave;
+        }
+
+        async function processTrack(track) {
+          if (!state.trackMap.has(track.id)) return;
+          const key = keyOf(track);
+          const item = await T.readItem(track, { raw: true });
+          const orig = {};
+          for (const k of FIELDS) orig[k] = String(item.old[k] || '').trim();
+          if (orig.artist && norm(orig.artist)) { tagArtists.add(norm(orig.artist)); knownCache.at = 0; }
+          const cands = {};
+          FIELDS.forEach(k => { cands[k] = []; });
+          const add = (k, v, src, conf, extra) => {
+            v = String(v == null ? '' : v).trim();
+            if (v) cands[k].push({ v, src, conf, ...(extra || {}) });
+          };
+
+          // 1. Rules: the song's own tags (cleaned) and its file name
+          for (const k of FIELDS) {
+            const v = item.rules[k];
+            if (!v) continue;
+            const s = item.ruleSrc[k];
+            if (s === 'tag') add(k, v, 'tag', String(v).trim() === orig[k] ? CONF.tag : CONF.ripped);
+            else add(k, v, 'name', CONF.name);
+          }
+          if (track.rootName && dirOf(track)) add('album', track.folder, 'folder', CONF.folder);
+          const pair = item.ruleAlt;   // "A - B" that could be either way round
+          if (pair) { add('title', pair.title, 'name', CONF.nameAlt); add('artist', pair.artist, 'name', CONF.nameAlt); }
+
+          // 2. The in-browser AI, only if it's on and already downloaded (never downloads by itself)
+          if (item.mp3 && await T.aiAvailable()) {
+            try {
+              const sug = await T.aiSuggest(item);
+              if (sug) {
+                const m = T.mergeAI(item, sug);
+                for (const k of Object.keys(m.by)) add(k, m.fields[k], 'ai', CONF.ai);
+              }
+            } catch (e) { /* rules only */ }
+          }
+
+          // 3. Online lookups (on by default, switchable in Settings): only the title and artist text are sent
+          let art = '';
+          if (pref().musicbrainz) {
+            const ti = groupCands(cands.title)[0], ar = groupCands(cands.artist)[0];
+            if (ti) {
+              // Readings to check: the best guess, plus the other way round for an unclear "A - B" name
+              const readings = [{ title: ti.v, artist: ar ? ar.v : '' }];
+              if (pair && !(T.sameish(pair.title, ti.v) && T.sameish(pair.artist, ar ? ar.v : ''))) readings.push(pair);
+              const fits = (r, x) => T.sameish(r.title, x.title) && (!x.artist || !r.artist || T.sameish(r.artist, x.artist));
+
+              // MusicBrainz: one reading at a time, the other only if the first finds nothing that fits
+              let mbGood = 0, confirmed = null;
+              for (const x of readings) {
+                const recs = await mbSearch(x.title, x.artist);
+                // The exact title before remixes and versions ("Get Lucky (… remix)"); otherwise keep MusicBrainz's order
+                const exact = (r) => (norm(r.title) === norm(x.title) ? 0 : 1);
+                recs.sort((a, b) => exact(a) - exact(b));
+                for (const r of recs.slice(0, 3)) {
+                  if (r.score < 60) continue;
+                  if (exact(r) && recs[0] && !exact(recs[0])) continue;   // a remix when the plain song was found too
+                  let c = (r.score / 100) * CONF.mb;
+                  if (!T.sameish(r.title, x.title)) c *= 0.5;
+                  if (x.artist && r.artist && !T.sameish(r.artist, x.artist)) c *= 0.8;
+                  if (fits(r, x) && c > mbGood) { mbGood = c; if (c >= 0.7) confirmed = x; }
+                  add('title', r.title, 'mb', c);
+                  add('artist', r.artist, 'mb', c);
+                  // Live sets, compilations and bootlegs make poor album names
+                  const rk = r.rank === 0 ? 1 : r.rank < 3 ? 0.75 : 0.55;
+                  add('album', r.album, 'mb', c * rk, { mbid: r.mbid });
+                  add('year', r.year, 'mb', c * 0.9 * (r.rank < 3 ? 1 : 0.7));
+                  add('track', r.track, 'mb', c * 0.8 * (r.rank === 0 ? 1 : 0.5));   // track numbers only mean something on the album
+                }
+                if (mbGood >= 0.7) break;
+              }
+
+              // iTunes: genre, cover and release date, and a second opinion when MusicBrainz is unsure.
+              // A free-text search, so one request covers both readings of "A - B".
+              const needGenre = !groupCands(cands.genre).some(g => g.src === 'tag');
+              if (mbGood < 0.8 || needGenre || (!track.cover && !groupCands(cands.album).some(g => g.mbid))) {
+                const term = readings.length > 1 ? `${pair.artist} ${pair.title}` : `${readings[0].artist} ${readings[0].title}`;
+                const hits = await itSearch(term.trim());
+                let best = null;
+                for (const r of hits) {
+                  const x = readings.find(rd => fits(r, rd));
+                  if (!x) continue;
+                  const c = CONF.itunes * (x.artist && r.artist ? 1 : 0.75);
+                  if (!best || c > best.c) best = { r, x, c };
+                }
+                if (best) {
+                  const { r, x, c } = best;
+                  if (!confirmed && x.artist) confirmed = x;
+                  // iTunes credits list every artist ("A, B & C"): back up the name we already had instead
+                  const credit = x.artist && T.sameish(r.artist, x.artist) && norm(r.artist) !== norm(x.artist);
+                  add('title', T.sameish(r.title, x.title) && r.title.length > x.title.length + 2 ? x.title : r.title, 'itunes', c);
+                  add('artist', credit ? x.artist : r.artist, 'itunes', credit ? c * 0.7 : c);
+                  if (r.album) add('album', r.album, 'itunes', c * (r.single ? 0.6 : 0.85));
+                  add('year', r.year, 'itunes', c * 0.8);
+                  add('genre', r.genre, 'itunes', c * 0.9);
+                  if (!r.single) add('track', r.track, 'itunes', c * 0.7);
+                  art = r.art;
+                }
+              }
+
+              // A lookup settled which part of "A - B" is the artist: drop the other reading
+              if (pair && confirmed) {
+                const isPair = T.sameish(confirmed.title, pair.title) && T.sameish(confirmed.artist, pair.artist);
+                const wrong = isPair ? { title: item.rules.title, artist: item.rules.artist } : pair;
+                for (const k of ['title', 'artist']) {
+                  cands[k] = cands[k].filter(c => !(c.src === 'name' && norm(c.v) === norm(wrong[k])));
+                }
+              }
+            }
+          }
+
+          // 4. Earlier answers from the user
+          const leave = hintsFor(track, cands);
+
+          const f = {}, src = {}, conf = {};
+          let q = [];
+          let mbid = '';
+          for (const k of FIELDS) {
+            if (leave[k]) { f[k] = orig[k]; src[k] = 'user'; continue; }
+            const groups = groupCands(cands[k]);
+            const top = groups[0], alt = groups[1];
+            if (!top) {
+              f[k] = orig[k];
+              if (k === 'title' || k === 'artist') {
+                q.push({ field: k, options: [], why: `Couldn't work out the ${LABEL[k]} from the file name or tags.` });
+              }
+              continue;
+            }
+            const sure = top.src === 'hint' || top.src === 'user' || (top.src === 'tag' && top.conf >= CONF.tag);
+            const options = groups.filter(g => g.conf >= MIN_OPTION).slice(0, 3);
+            if (!sure && alt && alt.conf >= MIN_OPTION && top.conf - alt.conf < ASK_GAP) {
+              f[k] = orig[k];
+              q.push({ field: k, options: options.map(g => g.v), why: whyDisagree(k, options) });
+              continue;
+            }
+            if (!sure && (k === 'album' || k === 'year') && !orig[k] && top.conf < MIN_OPTION) {
+              f[k] = orig[k];
+              q.push({ field: k, options: [top.v], why: k === 'album'
+                ? `No album in the tags. The folder is called “${top.v}”.`
+                : 'No year in the tags.' });
+              continue;
+            }
+            if (top.conf < MIN_OPTION && !orig[k]) { f[k] = ''; continue; }
+            f[k] = top.v;
+            src[k] = top.src;
+            conf[k] = Math.round(top.conf * 100) / 100;
+            if (k === 'album' && top.mbid) mbid = top.mbid;
+          }
+
+          if (pair) {
+            // Keep title and artist the same way round
+            const same = T.sameish;
+            if (f.artist && same(f.artist, pair.artist) && !same(f.artist, pair.title) && src.title === 'name') f.title = pair.title;
+            else if (f.title && same(f.title, pair.title) && !same(f.title, pair.artist) && src.artist === 'name') f.artist = pair.artist;
+            // Nothing could tell which part is the artist: ask once instead of twice
+            const qTi = q.find(x => x.field === 'title'), qAr = q.find(x => x.field === 'artist');
+            const both = [pair.artist, pair.title];
+            const onlyPair = (x) => x && x.options.length === 2 && x.options.every(o => both.some(b => norm(b) === norm(o)));
+            if (onlyPair(qTi) && onlyPair(qAr)) {
+              q = q.filter(x => x !== qTi && x !== qAr);
+              const name = `${pair.title} - ${pair.artist}`;
+              q.unshift({
+                field: 'artist', options: [pair.artist, pair.title], titles: [pair.title, pair.artist],
+                ask: 'Which part of the file name is the artist?',
+                why: `“${name.length > 60 ? name.slice(0, 59) + '…' : name}” could be either way round, and nothing online settled it.`
+              });
+            }
+          }
+
+          if (!state.trackMap.has(track.id) || keyOf(track) !== key) return;
+          const changed = FIELDS.some(k => (f[k] || '') !== orig[k]);
+          if (!q.length && !changed) {
+            details[key] = 'ok';
+            if (track.afState) { track.afState = undefined; patchTrackEverywhere(track); }
+            saveDetails();
+            return;
+          }
+          const e = { state: q.length ? 'question' : 'filled', f, src, conf, q, orig, at: Date.now() };
+          if (mbid) e.mbid = mbid;
+          if (art && IT_ART.test(art)) e.art = art;
+          details[key] = e;
+          saveDetails();
+          overlay(track, e);
+          if (changed) { summary.filled++; summary.tracks.push(track); }
+          summary.questions += q.length;
+          if (e.state === 'filled') await maybeAutoApply(track);
+        }
+
+        function whyDisagree(k, options) {
+          const srcName = { tag: 'the tags', ripped: 'the tags', name: 'the file name', ai: 'the AI', mb: 'MusicBrainz', itunes: 'iTunes', folder: 'the folder name', hint: 'an earlier answer' };
+          const from = [...new Set(options.map(o => srcName[o.src] || o.src))];
+          return from.length > 1
+            ? `${from.slice(0, -1).join(', ')} and ${from[from.length - 1]} don't agree on the ${LABEL[k]}.`
+            : `Not sure which ${LABEL[k]} is right.`;
+        }
+
+        async function maybeAutoApply(track) {
+          if (!pref().autoApply) return;
+          const e = entryOf(track);
+          if (!e || e.state !== 'filled') return;
+          try {
+            const entry = JSON.parse(JSON.stringify(e));
+            if (await Tagger.autoApply(track, e.f)) {
+              summary.applied++;
+              summary.saved.push({ track, entry });
+              const i = summary.tracks.indexOf(track);   // saved, so not "filled, waiting for review"
+              if (i >= 0) { summary.tracks.splice(i, 1); summary.filled--; }
+            }
+          } catch (err) { /* stays as a suggestion */ }
+        }
+
+        /* ---------------- MusicBrainz ---------------- */
+        let mbChain = Promise.resolve();
+        let mbNext = 0;
+        const luceneEscape = (s) => String(s).replace(/([+\-&|!(){}[\]^"~*?:\\/])/g, '\\$1');
+
+        function mbSearch(title, artist) {
+          const run = async () => {
+            const wait = mbNext - Date.now();
+            if (wait > 0) await sleep(wait);
+            mbNext = Date.now() + MB_GAP_MS;
+            const query = `recording:"${luceneEscape(title)}"` + (artist ? ` AND artist:"${luceneEscape(artist)}"` : '');
+            // Test seam: window.__LOCALIFY_MB_STUB__ = async ({ title, artist, query }) => MusicBrainz JSON
+            const stub = window.__LOCALIFY_MB_STUB__;
+            let json;
+            if (typeof stub === 'function') json = await stub({ title, artist, query });
+            else {
+              // MusicBrainz often answers 503 "busy" even at one request a second: wait and try again (3 s, then 6 s)
+              for (let attempt = 0; ; attempt++) {
+                const ctl = new AbortController();
+                const timer = setTimeout(() => ctl.abort(), 8000);
+                // Browsers don't let a page replace its User-Agent, so the browser's own generic one is sent.
+                // No cookies, no referrer, and nothing but the title/artist text.
+                const res = await fetch(`${MB_URL}?query=${encodeURIComponent(query)}&fmt=json&limit=10`,
+                  { headers: { Accept: 'application/json' }, credentials: 'omit', referrerPolicy: 'no-referrer', signal: ctl.signal });
+                clearTimeout(timer);
+                if (res.status === 503 || res.status === 429) {
+                  if (attempt >= 2) { mbNext = Date.now() + 10000; return []; }
+                  await sleep(3000 * (attempt + 1));
+                  mbNext = Date.now() + MB_GAP_MS;
+                  continue;
+                }
+                if (!res.ok) return [];
+                json = await res.json();
+                break;
+              }
+            }
+            return parseMB(json);
+          };
+          const p = mbChain.then(run, run);
+          mbChain = p.catch(() => {});
+          return p.catch(() => []);
+        }
+
+        function releaseRank(r) {
+          const rg = r['release-group'] || {};
+          let n = 0;
+          if (rg['primary-type'] !== 'Album') n += 2;
+          if ((rg['secondary-types'] || []).length) n += 3;   // compilations, live, soundtracks…
+          if (r.status && r.status !== 'Official') n += 1;
+          return n;
+        }
+
+        function parseMB(json) {
+          const recs = (json && Array.isArray(json.recordings)) ? json.recordings : [];
+          return recs.slice(0, 10).map(r => {
+            const artist = (r['artist-credit'] || []).map(c => (c.name || (c.artist && c.artist.name) || '') + (c.joinphrase || '')).join('').trim();
+            const rels = (r.releases || []).filter(x => x && x.title)
+              .sort((a, b) => releaseRank(a) - releaseRank(b) || String(a.date || '9999').localeCompare(String(b.date || '9999')));
+            const rel = rels[0] || null;
+            const year = String(r['first-release-date'] || (rel && rel.date) || '').slice(0, 4);
+            const m = rel && rel.media && rel.media[0];
+            const trk = m && m.track && m.track[0] ? String(m.track[0].number || '') : '';
+            return {
+              score: +r.score || 0, title: String(r.title || ''), artist,
+              album: rel ? String(rel.title) : '', mbid: rel && /^[0-9a-f-]{36}$/i.test(rel.id || '') ? rel.id : '',
+              year: /^(19|20)\d{2}$/.test(year) ? year : '', track: /^\d{1,3}$/.test(trk) ? trk : '',
+              rank: rel ? releaseRank(rel) : 9
+            };
+          // Equally good matches (score 90+): the one on an official studio album first, not a live set or mixtape
+          }).sort((a, b) => Math.min(b.score, 90) - Math.min(a.score, 90) || a.rank - b.rank);
+        }
+
+        /* ---------------- iTunes Search ---------------- */
+        // No key needed, and it allows cross-origin requests (Access-Control-Allow-Origin: *), so no JSONP.
+        let itChain = Promise.resolve();
+        let itNext = 0;
+
+        function itSearch(term) {
+          const run = async () => {
+            if (!term) return [];
+            const wait = itNext - Date.now();
+            if (wait > 0) await sleep(wait);
+            itNext = Date.now() + IT_GAP_MS;
+            // Test seam: window.__LOCALIFY_ITUNES_STUB__ = async ({ term }) => iTunes Search JSON
+            const stub = window.__LOCALIFY_ITUNES_STUB__;
+            let json;
+            if (typeof stub === 'function') json = await stub({ term });
+            else {
+              const ctl = new AbortController();
+              const timer = setTimeout(() => ctl.abort(), 8000);
+              const res = await fetch(`${IT_URL}?term=${encodeURIComponent(term.slice(0, 200))}&media=music&entity=song&limit=5`,
+                { credentials: 'omit', referrerPolicy: 'no-referrer', signal: ctl.signal });
+              clearTimeout(timer);
+              if (res.status === 403 || res.status === 429) { itNext = Date.now() + 60000; return []; }   // over the limit: back off a minute
+              if (!res.ok) return [];
+              json = await res.json();
+            }
+            return parseIT(json);
+          };
+          const p = itChain.then(run, run);
+          itChain = p.catch(() => {});
+          return p.catch(() => []);
+        }
+
+        function parseIT(json) {
+          const list = (json && Array.isArray(json.results)) ? json.results : [];
+          return list.filter(r => r && r.kind === 'song' && r.trackName).slice(0, 5).map(r => {
+            let album = String(r.collectionName || '');
+            const single = / - (?:Single|EP)$/i.test(album);
+            album = album.replace(/ - (?:Single|EP)$/i, '');
+            const year = String(r.releaseDate || '').slice(0, 4);
+            const art = String(r.artworkUrl100 || '').replace(/\/\d+x\d+bb\.(jpg|png)$/, '/600x600bb.$1');
+            return {
+              title: String(r.trackName), artist: String(r.artistName || ''), album, single,
+              year: /^(19|20)\d{2}$/.test(year) ? year : '', genre: String(r.primaryGenreName || '').replace(/^Music$/, ''),
+              track: Number.isInteger(r.trackNumber) && r.trackNumber > 0 && r.trackNumber < 1000 ? String(r.trackNumber) : '',
+              art: IT_ART.test(art) ? art : ''
+            };
+          });
+        }
+
+        /** Album cover from the Cover Art Archive, else iTunes, kept in Cache Storage. Shown in the library only. */
+        async function loadCover(track, e) {
+          if (!e || track.cover || track.afCoverTried) return;
+          const urls = [];
+          if (e.mbid) urls.push(`${CAA_URL}${e.mbid}/front-250`);
+          if (e.art && IT_ART.test(e.art)) urls.push(e.art);
+          if (!urls.length) return;
+          track.afCoverTried = true;
+          try {
+            const cache = 'caches' in window ? await caches.open(COVER_CACHE) : null;
+            let blob = null;
+            for (const url of urls) {
+              const hit = cache && await cache.match(url);
+              if (hit) { blob = await hit.blob(); break; }
+            }
+            for (let i = 0; !blob && i < urls.length; i++) {
+              const url = urls[i];
+              if (!pref().musicbrainz || !(await canRun())) { track.afCoverTried = false; return; }
+              let b = null;
+              if (typeof window.__LOCALIFY_MB_STUB__ === 'function' || typeof window.__LOCALIFY_ITUNES_STUB__ === 'function') {
+                // Tests: never reach the real servers. Optional window.__LOCALIFY_COVER_STUB__ = async (mbidOrUrl) => Blob
+                const cs = window.__LOCALIFY_COVER_STUB__;
+                if (typeof cs !== 'function') return;
+                b = await cs(url.startsWith(CAA_URL) ? e.mbid : url);
+              } else {
+                const res = await fetch(url, { credentials: 'omit', referrerPolicy: 'no-referrer' });
+                if (res.ok) b = await res.blob();
+              }
+              if (!b || !b.size || !/^image\//.test(b.type)) continue;
+              blob = b;
+              if (cache) await cache.put(url, new Response(blob, { headers: { 'Content-Type': blob.type } }));
+            }
+            if (!blob) return;
+            if (track.cover || !state.trackMap.has(track.id)) return;
+            track.cover = blob;
+            track.thumbState = undefined;
+            patchTrackEverywhere(track);
+            if (track.id === state.currentTrackId) updateCurrentTrackUI();
+          } catch (e) { /* no cover */ }
+        }
+
+        /* ---------------- Questions ---------------- */
+        function questionCount() {
+          let n = 0;
+          for (const t of state.tracks) {
+            const e = entryOf(t);
+            if (e && e.q) n += e.q.length;
+          }
+          return n;
+        }
+
+        function finishEntry(key, e) {
+          const changed = FIELDS.some(k => (e.f[k] || '') !== (e.orig[k] || ''));
+          if (!e.q.length && !changed) { details[key] = 'ok'; return 'ok'; }
+          e.state = e.q.length ? 'question' : 'filled';
+          return e.state;
+        }
+
+        function resolve(key, field, value, src) {
+          const e = details[key];
+          if (!e || typeof e !== 'object' || !e.q) return false;
+          const q = e.q.find(x => x.field === field);
+          e.q = e.q.filter(x => x.field !== field);
+          e.f[field] = value;
+          e.src[field] = src;
+          if (src !== 'leave') e.conf[field] = 1;
+          if (q && q.titles && src !== 'leave') {
+            // "Which part is the artist?": the other part is the title
+            const i = q.options.findIndex(o => norm(o) === norm(value));
+            if (i >= 0) { e.f.title = q.titles[i]; e.src.title = src; e.conf.title = 1; }
+          }
+          const st = finishEntry(key, e);
+          const track = trackForKey(key);
+          if (track) {
+            if (st === 'ok') { track.afState = undefined; patchTrackEverywhere(track); }
+            else overlay(track, e);
+            if (st === 'filled') maybeAutoApply(track);
+          }
+          return true;
+        }
+
+        function cleanAnswer(field, v) {
+          v = String(v || '').replace(/\s+/g, ' ').trim().slice(0, 200);
+          if (field === 'year') return /^\d{4}$/.test(v) ? v : '';
+          if (field === 'track') return /^\d{1,3}$/.test(v) ? String(+v) : '';
+          if (field === 'genre') {
+            const known = ID3_GENRES.find(g => g.toLowerCase() === v.toLowerCase());
+            return known || v;
+          }
+          return v;
+        }
+
+        /** Save one answer and pass it on to related songs. Returns how many other songs it filled. */
+        function answer(key, field, value, how) {
+          const e = details[key];
+          if (!e || typeof e !== 'object') return 0;
+          const q = (e.q || []).find(x => x.field === field);
+          const track = trackForKey(key);
+          let spread = 0;
+          if (how === 'leave') {
+            resolve(key, field, e.orig[field] || '', 'leave');
+            if (track && (field === 'album' || field === 'year')) spread += spreadFolder(track, field, '', key);
+          } else {
+            const v = cleanAnswer(field, value);
+            if (!v) return -1;
+            resolve(key, field, v, 'user');
+            if (field === 'artist') {
+              // Only exact spelling variants (case, accents, punctuation) count as the same artist:
+              // "Daft Punk feat. Pharrell Williams" stays its own credit.
+              const names = new Set([norm(v)]);
+              names.forEach(n => { if (n) answers.artists[n] = v; });
+              const asked = new Set([...(q ? q.options : []).map(o => norm(o)), ...names]);
+              spread += spreadArtist(names, asked, v, key);
+            }
+            if (track && (field === 'album' || field === 'year')) spread += spreadFolder(track, field, v, key);
+          }
+          saveAnswers();
+          saveDetails(true);
+          refresh();
+          return spread;
+        }
+
+        /** names: spellings of the confirmed artist. asked: every option the user chose between. */
+        function spreadArtist(names, asked, v, skipKey) {
+          let n = 0;
+          for (const t of state.tracks) {
+            const k = keyOf(t);
+            if (k === skipKey) continue;
+            const e = entryOf(t);
+            // Same dilemma elsewhere (its options are among the ones just decided on): same answer
+            if (e && e.q && e.q.some(x => x.field === 'artist' && x.options.some(o => names.has(norm(o))) && x.options.every(o => asked.has(norm(o))))) {
+              resolve(k, 'artist', v, 'hint'); n++;
+              continue;
+            }
+            const pq = e && e.q && e.q.find(x => x.field === 'artist' && x.titles);
+            if (pq) {
+              const hits = pq.options.filter(o => names.has(norm(o)));
+              if (hits.length === 1 && pq.options.length === 2) { resolve(k, 'artist', hits[0], 'hint'); n++; continue; }
+            }
+            // Same artist spelled differently elsewhere: use the confirmed spelling (library only)
+            if (names.has(norm(t.artist)) && t.artist !== v) {
+              if (e && e.f) { e.f.artist = v; e.src.artist = 'hint'; finishEntry(k, e); overlay(t, e); n++; }
+              else if (details[k] === 'ok' || !details[k]) {
+                const orig = { title: t.title || '', artist: t.artist || '', album: '', year: '', genre: '', track: '' };
+                const ne = { state: 'filled', f: { ...orig, artist: v }, src: { artist: 'hint' }, conf: { artist: 1 }, q: [], orig, at: Date.now() };
+                details[k] = ne; overlay(t, ne); n++;
+              }
+            }
+          }
+          return n;
+        }
+
+        function spreadFolder(track, field, v, skipKey) {
+          const fk = folderKey(track);
+          answers.albums[fk] = { ...(answers.albums[fk] || {}), [field]: v };
+          let n = 0;
+          for (const t of state.tracks) {
+            const k = keyOf(t);
+            if (k === skipKey || folderKey(t) !== fk) continue;
+            const e = entryOf(t);
+            if (!e || !e.q) continue;
+            if (e.q.some(x => x.field === field)) {
+              resolve(k, field, v || e.orig[field] || '', v ? 'hint' : 'leave'); n++;
+            } else if (v && !e.f[field]) {
+              e.f[field] = v; e.src[field] = 'hint'; finishEntry(k, e); overlay(t, e); n++;
+            }
+          }
+          return n;
+        }
+
+        /* ---------------- Q&A dialog ---------------- */
+        const qa = {
+          dialog: $('qaDialog'), count: $('qaCount'), close: $('qaClose'), cover: $('qaCover'), name: $('qaName'), file: $('qaFile'),
+          play: $('qaPlay'), question: $('qaQuestion'), why: $('qaWhy'), options: $('qaOptions'), form: $('qaFreeForm'),
+          free: $('qaFree'), done: $('qaDone'), ask: $('qaAsk'), status: $('qaStatus'), skip: $('qaSkip'), leave: $('qaLeave')
+        };
+        const session = { list: [], answered: 0, cur: null, preview: null, previewUrl: '', opener: null };
+
+        function buildSessionList(firstKey) {
+          const list = [];
+          for (const t of state.tracks) {
+            const e = entryOf(t);
+            if (!e || !e.q) continue;
+            for (const q of e.q) list.push({ key: keyOf(t), field: q.field });
+          }
+          if (firstKey) list.sort((a, b) => (b.key === firstKey) - (a.key === firstKey));
+          return list;
+        }
+
+        function openQuestions(firstTrack) {
+          if (!questionCount()) { showToast('No questions right now'); return; }
+          session.list = buildSessionList(firstTrack ? keyOf(firstTrack) : '');
+          session.answered = 0;
+          session.opener = document.activeElement;
+          if (!qa.dialog.open) {
+            qa.dialog.showModal();
+            qa.dialog.appendChild(dom.toastContainer);
+          }
+          showNext();
+        }
+
+        function currentQuestion() {
+          // Drop questions answered meanwhile (directly or through a related song)
+          while (session.list.length) {
+            const c = session.list[0];
+            const e = details[c.key];
+            const q = e && typeof e === 'object' && e.q && e.q.find(x => x.field === c.field);
+            if (q && trackForKey(c.key)) return { ...c, q, e };
+            session.list.shift();
+          }
+          return null;
+        }
+
+        function stopPreview() {
+          if (session.preview) { session.preview.pause(); session.preview.removeAttribute('src'); session.preview.load(); }
+          if (session.previewUrl) URL.revokeObjectURL(session.previewUrl);
+          session.preview = null; session.previewUrl = '';
+          qa.play.textContent = 'Play preview';
+          qa.play.setAttribute('aria-pressed', 'false');
+        }
+
+        function showNext() {
+          const cur = currentQuestion();
+          const prevKey = session.cur && session.cur.key;
+          session.cur = cur;
+          // Count only questions still open (some may have been answered through a related song)
+          session.list = session.list.filter(c => {
+            const e = details[c.key];
+            return e && typeof e === 'object' && e.q && e.q.some(x => x.field === c.field);
+          });
+          const left = session.list.length;
+          qa.count.textContent = cur
+            ? `${left} ${left === 1 ? 'question' : 'questions'} left${session.answered ? ` · ${session.answered} answered` : ''}`
+            : `${session.answered} answered`;
+          qa.done.hidden = !!cur;
+          qa.ask.hidden = !cur;
+          qa.skip.disabled = qa.leave.disabled = !cur;
+          if (!cur) { stopPreview(); qa.status.textContent = ''; qa.close.textContent = 'Done'; qa.close.focus(); return; }
+          qa.close.textContent = 'Stop for now';
+          const track = trackForKey(cur.key);
+          if (cur.key !== prevKey) stopPreview();
+          qa.cover.innerHTML = artHTML(track, 28);
+          qa.name.textContent = `${cur.e.f.title || track.title}${cur.e.f.artist ? ' · ' + cur.e.f.artist : ''}`;
+          qa.file.textContent = track.relPath || track.fileName;
+          qa.question.textContent = cur.q.ask || `What's the ${LABEL[cur.field]} of this song?`;
+          qa.why.textContent = cur.q.why || '';
+          const now = cur.e.orig[cur.field];
+          qa.leave.textContent = now ? `Leave as “${now.length > 24 ? now.slice(0, 23) + '…' : now}”` : 'Leave it blank';
+          qa.options.innerHTML = cur.q.options.map((o, i) =>
+            `<button type="button" class="af-opt" data-i="${i}">${escapeHtml(o)}</button>`).join('') ||
+            '<span class="af-qa-none">No suggestions. Type it below, or skip.</span>';
+          qa.free.value = '';
+          qa.free.placeholder = { year: 'e.g. 2019', track: 'e.g. 4' }[cur.field] || `Type the ${LABEL[cur.field]}`;
+          qa.free.inputMode = cur.field === 'year' || cur.field === 'track' ? 'numeric' : 'text';
+          qa.status.textContent = '';
+          const first = qa.options.querySelector('button') || qa.free;
+          first.focus();
+        }
+
+        function submit(value, how) {
+          const cur = session.cur;
+          if (!cur) return;
+          const n = answer(cur.key, cur.field, value, how);
+          if (n < 0) { qa.status.textContent = cur.field === 'year' ? 'Use a 4-digit year.' : 'That doesn\'t look right. Try again.'; qa.free.focus(); return; }
+          session.answered++;
+          session.list.shift();
+          showNext();
+          if (n > 0) qa.status.textContent = `Also used for ${n} related ${n === 1 ? 'song' : 'songs'}.`;
+        }
+
+        function closeQuestions() {
+          stopPreview();
+          if (qa.dialog.open) qa.dialog.close();
+        }
+
+        qa.options.addEventListener('click', (e) => {
+          const b = e.target.closest('.af-opt');
+          if (b && session.cur) submit(session.cur.q.options[+b.dataset.i], 'pick');
+        });
+        qa.form.addEventListener('submit', (e) => { e.preventDefault(); submit(qa.free.value, 'free'); });
+        qa.skip.addEventListener('click', () => {
+          const c = session.list.shift();
+          if (c && session.list.length) session.list.push(c);   // ask again at the end of this round
+          else if (c) { qa.status.textContent = 'Skipped. It stays in the list for later.'; }
+          if (c && !session.list.length) { session.cur = null; showNext(); qa.status.textContent = 'Skipped questions stay for later.'; return; }
+          showNext();
+        });
+        qa.leave.addEventListener('click', () => submit('', 'leave'));
+        qa.close.addEventListener('click', closeQuestions);
+        qa.dialog.addEventListener('close', () => {
+          stopPreview();
+          document.body.appendChild(dom.toastContainer);
+          const left = questionCount();
+          if (left && session.answered) showToast(`Saved. ${left} ${left === 1 ? 'question' : 'questions'} left for later.`);
+          updateChip();
+          if (session.opener && session.opener.isConnected) session.opener.focus();
+        });
+        qa.play.addEventListener('click', () => {
+          const track = session.cur && trackForKey(session.cur.key);
+          if (!track) return;
+          if (session.preview && !session.preview.paused) { session.preview.pause(); qa.play.textContent = 'Play preview'; qa.play.setAttribute('aria-pressed', 'false'); return; }
+          if (!session.preview) {
+            session.previewUrl = URL.createObjectURL(track.file);
+            session.preview = new Audio(session.previewUrl);
+            session.preview.volume = audio.volume;
+            if (track.duration > 60) session.preview.currentTime = Math.min(30, track.duration / 3);
+            session.preview.addEventListener('ended', () => { qa.play.textContent = 'Play preview'; qa.play.setAttribute('aria-pressed', 'false'); });
+          }
+          if (!audio.paused) audio.pause();
+          session.preview.play().catch(() => {});
+          qa.play.textContent = 'Pause preview';
+          qa.play.setAttribute('aria-pressed', 'true');
+        });
+
+        /* ---------------- Status chip, badges, toasts ---------------- */
+        const chip = { el: $('afChip'), text: $('afChipText') };
+        let chipRaf = 0;
+        function updateChip() {
+          if (chipRaf) return;
+          chipRaf = requestAnimationFrame(() => {
+            chipRaf = 0;
+            let unsorted = 0;
+            for (const t of state.tracks) if (t.afState === 'unsorted') unsorted++;
+            const qs = questionCount();
+            const parts = [];
+            let mode = 'idle';
+            if (!pref().autoFill) { chip.el.hidden = true; syncNav(0); return; }
+            if (pumping && progress.total) { parts.push(`Sorting ${Math.min(progress.done + 1, progress.total)}/${progress.total}…`); mode = 'busy'; }
+            else if (unsorted) { parts.push(`AI: ${navigator.onLine === false || reach.ok === false ? 'offline' : 'waiting'} · ${unsorted} unsorted`); mode = 'offline'; }
+            if (qs) parts.push(`${qs} ${qs === 1 ? 'question' : 'questions'}`);
+            chip.el.hidden = !parts.length;
+            chip.el.dataset.mode = qs && mode === 'idle' ? 'question' : mode;
+            chip.text.textContent = parts.join(' · ');
+            chip.el.title = qs ? 'Answer Localify\'s questions about your songs' : unsorted ? 'Show songs waiting to be sorted' : 'Filling in song details';
+            syncNav(unsorted);
+          });
+        }
+
+        function syncNav(unsorted) {
+          dom.countUnsorted.textContent = unsorted;
+          dom.navUnsorted.hidden = !unsorted && state.activeView !== 'unsorted';
+        }
+
+        chip.el.addEventListener('click', () => {
+          if (questionCount()) openQuestions();
+          else switchView('unsorted');
+        });
+
+        function badgeHTML(track) {
+          if (!track.afState || !pref().autoFill) return '';
+          if (track.afState === 'unsorted') return '<span class="af-badge af-unsorted" title="Unsorted: details will be filled in when you\'re online">Unsorted</span>';
+          if (track.afState === 'question') return `<span class="af-badge af-q" role="button" data-af-q="${track.id}" title="Localify has a question about this song">?</span>`;
+          return '<span class="af-badge af-filled" title="Details filled in by Localify. The file isn\'t changed until you apply them.">Auto</span>';
+        }
+
+        dom.tracklistBody.addEventListener('click', (e) => {
+          const b = e.target.closest('[data-af-q]');
+          if (!b) return;
+          e.stopImmediatePropagation();
+          openQuestions(state.trackMap.get(b.dataset.afQ));
+        }, true);
+
+        function notify(msg, label, fn) {
+          const toast = document.createElement('div');
+          toast.className = 'toast af-toast';
+          toast.setAttribute('role', 'status');
+          const span = document.createElement('span');
+          span.textContent = msg;
+          toast.appendChild(span);
+          if (label) {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'af-toast-btn';
+            b.textContent = label;
+            b.addEventListener('click', () => { toast.remove(); fn(); });
+            toast.appendChild(b);
+          }
+          dom.toastContainer.appendChild(toast);
+          setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 250ms ease';
+            setTimeout(() => toast.remove(), 260);
+          }, label ? 8000 : 3000);
+        }
+
+        /* ---------------- Tagger hooks ---------------- */
+        // The Tidy dialog starts from the stored details instead of the bare rules
+        Tagger.hooks.suggestion = (track) => {
+          const e = entryOf(track);
+          if (!e || !e.f) return null;
+          const fields = {}, by = {};
+          const asked = new Set((e.q || []).map(x => x.field));
+          for (const k of FIELDS) {
+            if (asked.has(k) || !e.f[k]) continue;
+            fields[k] = e.f[k];
+            if (['ai', 'mb', 'itunes', 'hint', 'user'].includes(e.src[k]) && e.f[k] !== e.orig[k]) by[k] = true;
+          }
+          return { fields, by };
+        };
+        // After Apply the file holds the details: forget the suggestion
+        Tagger.hooks.applied = (track, before) => {
+          delete details[`${before.likeKey}|${before.size}`];
+          details[keyOf(track)] = 'ok';
+          track.afState = undefined;
+          saveDetails();
+          updateChip();
+        };
+        Tagger.hooks.knownArtist = (name) => knownArtists().has(norm(name));
+        Tagger.hooks.prefsChanged = (name) => {
+          if (name === 'autoFill' && pref().autoFill) {
+            for (const t of state.tracks) if (t.enriched) onEnriched(t);   // show stored details, queue the rest
+          }
+          if (name === 'onlineOnly' || name === 'musicbrainz') resumeUnsorted();
+          refresh();
+        };
+
+        /* ---------------- Connection events ---------------- */
+        window.addEventListener('online', () => { reach.ok = null; resumeUnsorted(); updateChip(); });
+        window.addEventListener('offline', () => { reach = { ok: false, at: Date.now(), pending: null }; updateChip(); });
+        setInterval(() => {
+          if (!pumping && !queue.length && navigator.onLine !== false && state.tracks.some(t => t.afState === 'unsorted')) resumeUnsorted();
+        }, REACH_TTL);
+
+        return {
+          onEnriched, badgeHTML, updateChip, openQuestions, questionCount,
+          isOpen: () => qa.dialog.open,
+          // For tests in the console
+          _test: { details: () => details, answers: () => answers, isOnline, mbSearch, parseMB, itSearch, parseIT, knownArtists, keyOf, folderKey, resumeUnsorted,
+            reset: () => { reach.ok = null; knownCache.at = 0; } }
+        };
+      })();
+      window.LocalifyAutoFill = AutoFill._test;
+      /* [/AI Tagger] auto-fill */
+
+      /* ========================================================================
          Editor / Audacity entry points (track rows, Now Playing, player bar)
          ======================================================================== */
       function updateEditEntryPoints() {
@@ -12025,6 +15105,11 @@
       $('btnNpAudacity').addEventListener('click', (e) => {
         Audacity.open(state.trackMap.get(state.currentTrackId), e.shiftKey);
       });
+      // [AI Tagger] entry points
+      $('btnNpTidy').addEventListener('click', (e) => {
+        if (state.currentTrackId) Tagger.openForTrack(state.currentTrackId, e.currentTarget);
+      });
+      $('btnTidyHero').addEventListener('click', (e) => Tagger.openForShown(e.currentTarget));
 
 
       /* ========================================================================
