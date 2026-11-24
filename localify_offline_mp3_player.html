@@ -3825,6 +3825,17 @@
       .fs-sheet, .fs-art, .looks-menu, .looks-menu.is-sheet, .looks-menu-backdrop,
       .looks-card-play, .looks-top-progress > span, .hero-banner:not(.liked-theme) { transition: none; }
     }
+    /* Empty-state explanation: at most two lines */
+    .empty-desc {
+      max-width: 420px;
+      margin-inline: auto;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      overflow: hidden;
+      overflow-wrap: anywhere;
+    }
     /* [/Looks] visual pass */
   </style>
 </head>
@@ -4264,9 +4275,9 @@
                 <circle cx="18" cy="16" r="3"></circle>
               </svg>
             </div>
-            <h2 class="empty-title" id="emptyTitle">Your offline music player is ready</h2>
+            <h2 class="empty-title" id="emptyTitle">Your Offline Music Player Is Ready</h2>
             <p class="empty-desc" id="emptyDesc">
-              Select a local folder containing your MP3s (including subfolders) or drag and drop audio files anywhere on this window. Everything stays 100% private and offline on your device.
+              Pick a music folder or drop audio files here. Everything stays private on your device.
             </p>
             <div class="empty-actions" id="emptyActions">
               <button class="btn-primary" id="btnReconnect" hidden>
@@ -4274,7 +4285,7 @@
                   <polyline points="23 4 23 10 17 10"></polyline>
                   <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
                 </svg>
-                <span id="reconnectLabel">Reconnect folder</span>
+                <span id="reconnectLabel">Reconnect Folder</span>
               </button>
               <button class="btn-primary" id="btnSelectFolderEmpty">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -5743,7 +5754,7 @@
         if (pending.length) {
           dom.reconnectLabel.textContent = pending.length === 1
             ? `Reconnect “${pending[0].name}”`
-            : `Reconnect ${pending.length} folders`;
+            : `Reconnect ${pending.length} Folders`;
         }
         if (state.tracks.length === 0) renderTracklist();
       }
@@ -6661,18 +6672,18 @@
 
           if (!hasLibrary) {
             const reconnect = state.pendingReconnect.length > 0;
-            dom.emptyTitle.textContent = reconnect ? 'Welcome back' : 'Your offline music player is ready';
+            dom.emptyTitle.textContent = reconnect ? 'Welcome Back' : 'Your Offline Music Player Is Ready';
             dom.emptyDesc.textContent = reconnect
-              ? 'Your browser needs your OK to read your music folder again. Click Reconnect, or pick a different folder.'
-              : 'Select a local folder containing your MP3s (including subfolders) or drag and drop audio files anywhere on this window. Everything stays 100% private and offline on your device.';
+              ? 'Reconnect to your music folder, or pick a different one.'
+              : 'Pick a music folder or drop audio files here. Everything stays private on your device.';
             dom.emptyActions.style.display = 'flex';
           } else if (state.searchQuery.trim() !== '') {
-            dom.emptyTitle.textContent = 'No matching tracks';
-            dom.emptyDesc.textContent = `No songs found for "${state.searchQuery.trim()}". Try a title, artist, album, year or genre.`;
+            dom.emptyTitle.textContent = 'No Matching Tracks';
+            dom.emptyDesc.textContent = `Nothing found for "${state.searchQuery.trim()}". Try a title, artist or album.`;
             dom.emptyActions.style.display = 'none';
           } else if (state.activeView === 'liked') {
-            dom.emptyTitle.textContent = 'No liked songs yet';
-            dom.emptyDesc.textContent = 'Click the heart icon next to any song to save it to your Liked Songs collection.';
+            dom.emptyTitle.textContent = 'No Liked Songs Yet';
+            dom.emptyDesc.textContent = 'Tap the heart on any song to save it here.';
             dom.emptyActions.style.display = 'none';
           }
           looksDecorateEmpty();   // [Looks] illustration + call to action
@@ -10093,16 +10104,16 @@
         let label = '';
         looksEmptyAction = null;
         if (kind === 'liked') {
-          label = 'Browse all tracks';
+          label = 'Browse All Tracks';
           looksEmptyAction = () => switchView('all');
         } else if (kind === 'search') {
-          label = 'Clear search';
+          label = 'Clear Search';
           looksEmptyAction = () => { clearSearch(); dom.searchInput.focus(); };
         } else if (kind === 'albums' || kind === 'artists') {
-          dom.emptyTitle.textContent = kind === 'albums' ? 'This album is empty' : 'No songs by this artist';
-          dom.emptyDesc.textContent = 'Its songs are no longer in your library. Load the folder again, or pick another one.';
+          dom.emptyTitle.textContent = kind === 'albums' ? 'This Album Is Empty' : 'No Songs by This Artist';
+          dom.emptyDesc.textContent = 'Its songs left your library. Load the folder again to bring them back.';
           dom.emptyActions.style.display = 'none';
-          label = kind === 'albums' ? 'Back to albums' : 'Back to artists';
+          label = kind === 'albums' ? 'Back to Albums' : 'Back to Artists';
           looksEmptyAction = () => Browse.back();
         }
         $('looksEmptyCtaWrap').hidden = !label;
