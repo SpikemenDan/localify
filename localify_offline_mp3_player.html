@@ -976,7 +976,7 @@
 
     .tracklist-header {
       display: grid;
-      grid-template-columns: 44px minmax(180px, 2.2fr) minmax(120px, 1.3fr) 48px 64px;
+      grid-template-columns: 44px minmax(180px, 2.2fr) minmax(120px, 1.3fr) 112px 64px;
       align-items: center;
       gap: 12px;
       padding: 8px 14px;
@@ -1000,7 +1000,7 @@
 
     .track-row {
       display: grid;
-      grid-template-columns: 44px minmax(180px, 2.2fr) minmax(120px, 1.3fr) 48px 64px;
+      grid-template-columns: 44px minmax(180px, 2.2fr) minmax(120px, 1.3fr) 112px 64px;
       align-items: center;
       gap: 12px;
       padding: 8px 14px;
@@ -2463,6 +2463,502 @@
         gap: 18px;
       }
     }
+
+    /* ==========================================================================
+       Track actions (Edit / Open in Audacity) in rows and Now Playing
+       ========================================================================== */
+    .row-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 2px;
+    }
+
+    .row-actions .btn-like {
+      margin: 0;
+    }
+
+    .row-action {
+      width: 30px;
+      height: 30px;
+      border-radius: var(--radius-full);
+      display: grid;
+      place-items: center;
+      color: var(--text-secondary);
+      opacity: 0;
+      transition: opacity var(--transition-fast), color var(--transition-fast), background var(--transition-fast);
+    }
+
+    .track-row:hover .row-action,
+    .track-row.kbd-focus .row-action,
+    .row-action:focus-visible {
+      opacity: 1;
+    }
+
+    .row-action:hover {
+      color: var(--text-primary);
+      background: rgba(var(--fg-rgb), 0.1);
+    }
+
+    .track-row:hover .row-action[aria-disabled="true"] {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .row-action[aria-disabled="true"]:hover {
+      background: none;
+      color: var(--text-secondary);
+    }
+
+    @media (hover: none) {
+      .row-action.row-edit {
+        opacity: 0.8;
+      }
+    }
+
+    .np-edit-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .np-edit-actions[hidden] {
+      display: none;
+    }
+
+    .btn-secondary[aria-disabled="true"] {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 768px) {
+      .tracklist-header,
+      .track-row {
+        grid-template-columns: 32px 1fr 72px 48px;
+      }
+      .row-action.row-audacity,
+      #btnEditCurrent {
+        display: none;
+      }
+    }
+
+    /* ==========================================================================
+       Audio Editor dialog
+       ========================================================================== */
+    .ed-dialog {
+      width: min(1120px, calc(100vw - 32px));
+      max-width: none;
+      max-height: calc(100vh - 32px);
+      padding: 0;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+      overflow: hidden;
+    }
+
+    .ed-dialog[open] {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .ed-dialog::backdrop {
+      background: rgba(0, 0, 0, 0.62);
+    }
+
+    .ed-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .ed-head-text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .ed-title {
+      font-size: 17px;
+      font-weight: 800;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .ed-subtitle {
+      font-size: 12px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .ed-icon-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-full);
+      display: grid;
+      place-items: center;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+      transition: color var(--transition-fast), background var(--transition-fast);
+    }
+
+    .ed-icon-btn:hover:not(:disabled) {
+      color: var(--text-primary);
+      background: rgba(var(--fg-rgb), 0.08);
+    }
+
+    .ed-icon-btn.ed-play {
+      background: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .ed-icon-btn.ed-play:hover:not(:disabled) {
+      background: var(--accent-hover);
+      color: var(--on-accent);
+    }
+
+    .ed-body {
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .ed-transport {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 10px;
+    }
+
+    .ed-readout {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .ed-readout strong {
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    .ed-spacer {
+      flex: 1;
+    }
+
+    .ed-zoom {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .ed-wave-wrap {
+      position: relative;
+      flex: none;
+      height: 220px;
+      border-radius: var(--radius-md);
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+    }
+
+    .ed-wave-wrap canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: text;
+      touch-action: none;
+    }
+
+    .ed-wave-wrap canvas:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: -2px;
+    }
+
+    .ed-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 20px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-secondary);
+      background: rgba(var(--surface-rgb), 0.82);
+    }
+
+    .ed-overlay[hidden] {
+      display: none;
+    }
+
+    .ed-overlay.error {
+      color: var(--text-primary);
+    }
+
+    .ed-spinner {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 3px solid rgba(var(--fg-rgb), 0.15);
+      border-top-color: var(--accent);
+      animation: edSpin 0.8s linear infinite;
+    }
+
+    @keyframes edSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ed-spinner { animation-duration: 2.4s; }
+    }
+
+    .ed-scroll {
+      width: 100%;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .ed-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .ed-ops {
+      border: 0;
+      margin: 0;
+      padding: 0;
+      min-width: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 10px;
+    }
+
+    .ed-group {
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      background: rgba(var(--fg-rgb), 0.03);
+      padding: 10px 12px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .ed-group-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
+    .ed-btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .ed-btn {
+      padding: 7px 12px;
+      font-size: 12px;
+    }
+
+    .ed-dialog button:disabled,
+    .ed-dialog fieldset:disabled button {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .ed-field {
+      display: grid;
+      grid-template-columns: 56px 1fr 62px;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .ed-field output {
+      text-align: right;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+    }
+
+    .ed-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    .ed-check input {
+      accent-color: var(--accent);
+    }
+
+    .ed-foot {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px 12px;
+      padding: 12px 18px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .ed-status {
+      flex: 1;
+      min-width: 160px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .ed-dialog .toast-container,
+    .as-dialog .toast-container {
+      bottom: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .ed-dialog {
+        width: 100vw;
+        height: 100dvh;
+        max-height: 100dvh;
+        border-radius: 0;
+        border: 0;
+      }
+      .ed-head,
+      .ed-body,
+      .ed-foot {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      .ed-wave-wrap {
+        height: 160px;
+      }
+      .ed-ops {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ==========================================================================
+       [Audacity integration] Setup dialog — self-contained so it can move into
+       the Settings panel later. Uses the same tokens as the rest of the app.
+       ========================================================================== */
+    .as-dialog {
+      width: min(560px, calc(100vw - 32px));
+      max-width: none;
+      max-height: calc(100vh - 32px);
+      padding: 0;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+    }
+
+    .as-dialog::backdrop {
+      background: rgba(0, 0, 0, 0.62);
+    }
+
+    .as-form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 18px 20px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .as-form h2 {
+      font-size: 18px;
+      color: var(--text-primary);
+    }
+
+    .as-form ol {
+      padding-left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .as-form code {
+      font-family: Consolas, "Cascadia Mono", monospace;
+      font-size: 12px;
+      background: rgba(var(--fg-rgb), 0.08);
+      color: var(--text-primary);
+      padding: 1px 5px;
+      border-radius: 4px;
+      word-break: break-all;
+    }
+
+    .as-label {
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .as-input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(var(--fg-rgb), 0.2);
+      background: var(--bg-base);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-family: Consolas, "Cascadia Mono", monospace;
+    }
+
+    .as-input:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+    }
+
+    .as-error {
+      color: var(--danger);
+      font-weight: 600;
+      min-height: 1em;
+    }
+
+    .as-preview {
+      font-size: 12px;
+      color: var(--text-muted);
+      word-break: break-all;
+      white-space: pre-line;
+    }
+
+    .as-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+    /* ---- end [Audacity integration] ---- */
   </style>
 </head>
 <body>
@@ -2485,6 +2981,144 @@
 
   <!-- Toast Container -->
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- =====================================================================
+       Audio Editor dialog (built-in editor)
+       ===================================================================== -->
+  <dialog id="editorDialog" class="ed-dialog" aria-labelledby="edTitle" aria-describedby="edSubtitle">
+    <div class="ed-head">
+      <div class="ed-head-text">
+        <div class="ed-title" id="edTitle">Edit audio</div>
+        <div class="ed-subtitle" id="edSubtitle"></div>
+      </div>
+      <button type="button" class="btn-secondary ed-btn" id="edAudacity" title="Open the original file in Audacity (Shift+click to change the folder path)">Open in Audacity</button>
+      <button type="button" class="ed-icon-btn" id="edClose" aria-label="Close editor" title="Close (Esc)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+
+    <div class="ed-body">
+      <div class="ed-transport">
+        <button type="button" class="ed-icon-btn ed-play" id="edPlay" aria-label="Play preview" title="Play / pause preview (Space)" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" id="edPlayIcon"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
+        </button>
+        <button type="button" class="ed-icon-btn" id="edStop" aria-label="Stop preview" title="Stop" disabled>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="1.5"></rect></svg>
+        </button>
+        <span class="ed-readout" id="edTime"><strong>0:00.000</strong> / 0:00.000</span>
+        <span class="ed-readout" id="edSel">No selection</span>
+        <span class="ed-spacer"></span>
+        <div class="ed-zoom" role="group" aria-label="Zoom">
+          <button type="button" class="ed-icon-btn" id="edZoomOut" aria-label="Zoom out" title="Zoom out (−)" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+          </button>
+          <button type="button" class="ed-icon-btn" id="edZoomIn" aria-label="Zoom in" title="Zoom in (+, or Ctrl + mouse wheel)" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="8" y1="11" x2="14" y2="11"></line><line x1="11" y1="8" x2="11" y2="14"></line></svg>
+          </button>
+          <button type="button" class="btn-ghost ed-btn" id="edZoomFit" title="Show the whole file" disabled>Fit</button>
+          <button type="button" class="btn-ghost ed-btn" id="edZoomSel" title="Zoom to the selection" disabled>Selection</button>
+        </div>
+      </div>
+
+      <div class="ed-wave-wrap" id="edWaveWrap">
+        <canvas id="edCanvas" tabindex="0" aria-label="Waveform. Click to place the playhead, drag to select. Arrow keys move the playhead, Shift+arrows extend the selection, Ctrl+A selects all." aria-describedby="edSel"></canvas>
+        <div class="ed-overlay" id="edOverlay">
+          <div class="ed-spinner" id="edSpinner" aria-hidden="true"></div>
+          <div id="edOverlayText">Decoding audio…</div>
+        </div>
+      </div>
+      <input type="range" class="speed-range-slider ed-scroll" id="edScroll" min="0" max="1000" step="1" value="0" aria-label="Scroll waveform" disabled>
+      <div class="ed-hint" id="edScope">Edits apply to the whole file. Drag on the waveform to select a range.</div>
+
+      <fieldset class="ed-ops" id="edOps" disabled>
+        <legend class="sr-only">Edit operations</legend>
+        <div class="ed-group" role="group" aria-labelledby="edGEdit">
+          <div class="ed-group-title" id="edGEdit">Edit</div>
+          <div class="ed-btn-row">
+            <button type="button" class="btn-secondary ed-btn" data-op="trim" title="Keep only the selection">Trim to selection</button>
+            <button type="button" class="btn-secondary ed-btn" data-op="delete" title="Remove the selection (Delete)">Delete selection</button>
+            <button type="button" class="btn-secondary ed-btn" data-op="silence">Silence</button>
+            <button type="button" class="btn-secondary ed-btn" data-op="reverse">Reverse</button>
+          </div>
+        </div>
+        <div class="ed-group" role="group" aria-labelledby="edGFade">
+          <div class="ed-group-title" id="edGFade">Fades</div>
+          <div class="ed-btn-row">
+            <button type="button" class="btn-secondary ed-btn" data-op="fadeIn" title="Fade in across the selection (no selection: the first 3 seconds)">Fade in</button>
+            <button type="button" class="btn-secondary ed-btn" data-op="fadeOut" title="Fade out across the selection (no selection: the last 3 seconds)">Fade out</button>
+          </div>
+        </div>
+        <div class="ed-group" role="group" aria-labelledby="edGVol">
+          <div class="ed-group-title" id="edGVol">Volume</div>
+          <label class="ed-field"><span>Gain</span>
+            <input type="range" class="speed-range-slider" id="edGain" min="-24" max="24" step="0.5" value="0">
+            <output id="edGainOut" for="edGain">0.0 dB</output>
+          </label>
+          <div class="ed-btn-row">
+            <button type="button" class="btn-secondary ed-btn" data-op="gain">Apply gain</button>
+            <button type="button" class="btn-secondary ed-btn" data-op="normalize" title="Scale so the loudest peak is at -1 dBFS">Normalize (−1 dB)</button>
+          </div>
+        </div>
+        <div class="ed-group" role="group" aria-labelledby="edGSpeed">
+          <div class="ed-group-title" id="edGSpeed">Speed</div>
+          <label class="ed-field"><span>Speed</span>
+            <input type="range" class="speed-range-slider" id="edSpeed" min="0.5" max="2" step="0.05" value="1">
+            <output id="edSpeedOut" for="edSpeed">1.00×</output>
+          </label>
+          <div class="ed-btn-row">
+            <label class="ed-check"><input type="checkbox" id="edKeepPitch" checked> Keep pitch</label>
+            <button type="button" class="btn-secondary ed-btn" data-op="speed">Apply speed</button>
+          </div>
+        </div>
+        <div class="ed-group" role="group" aria-labelledby="edGEq">
+          <div class="ed-group-title" id="edGEq">Tone (EQ)</div>
+          <label class="ed-field"><span>Bass</span>
+            <input type="range" class="speed-range-slider" id="edBass" min="-12" max="12" step="0.5" value="0">
+            <output id="edBassOut" for="edBass">0.0 dB</output>
+          </label>
+          <label class="ed-field"><span>Treble</span>
+            <input type="range" class="speed-range-slider" id="edTreble" min="-12" max="12" step="0.5" value="0">
+            <output id="edTrebleOut" for="edTreble">0.0 dB</output>
+          </label>
+          <div class="ed-btn-row">
+            <button type="button" class="btn-secondary ed-btn" data-op="eq" title="Low shelf at 200 Hz, high shelf at 3 kHz">Apply EQ</button>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+
+    <div class="ed-foot">
+      <button type="button" class="btn-ghost" id="edUndo" title="Undo (Ctrl+Z)" disabled>Undo</button>
+      <button type="button" class="btn-ghost" id="edRedo" title="Redo (Ctrl+Shift+Z or Ctrl+Y)" disabled>Redo</button>
+      <div class="ed-status" id="edStatus" role="status" aria-live="polite"></div>
+      <label class="ed-check"><input type="checkbox" id="edAddToLibrary"> Add export to library</label>
+      <button type="button" class="btn-primary" id="edExport" disabled>Export WAV</button>
+    </div>
+  </dialog>
+
+  <!-- =====================================================================
+       [Audacity integration] Setup dialog — self-contained so it can move
+       into the Settings panel later.
+       ===================================================================== -->
+  <dialog id="audacityDialog" class="as-dialog" aria-labelledby="asTitle">
+    <form method="dialog" class="as-form" id="asForm" novalidate>
+      <h2 id="asTitle">Open in Audacity: one-time setup</h2>
+      <p>Browsers can't start programs on their own. A small helper in the <code>tools/audacity</code> folder next to this player adds a <code>localify-audacity:</code> link type. When you click "Open in Audacity", the helper checks that the file is an audio file inside your music folder and opens it in Audacity.</p>
+      <ol>
+        <li>Copy <code>localify-audacity.ps1</code> to <code>%LOCALAPPDATA%\Localify Audacity Helper\</code> and put your music folder in its <code>$MusicRoots</code> line (the line below shows the exact text).</li>
+        <li>Double-click <code>install-localify-audacity.reg</code>. It only changes your own user account and needs no admin rights.</li>
+        <li>Tell the player where the folder <strong id="asRootName"></strong> is on this PC.</li>
+      </ol>
+      <label class="as-label" for="asPath">Full path of the folder “<span id="asRootName2"></span>”</label>
+      <input class="as-input" id="asPath" type="text" placeholder="C:\Users\you\Music" spellcheck="false" autocomplete="off" aria-describedby="asPreview asError">
+      <div class="as-preview" id="asPreview"></div>
+      <div class="as-error" id="asError" role="alert"></div>
+      <div class="as-actions">
+        <button type="button" class="btn-ghost" id="asCancel">Cancel</button>
+        <button type="submit" class="btn-primary" id="asSave">Save and open</button>
+      </div>
+    </form>
+  </dialog>
 
   <!-- Mobile Sidebar Backdrop -->
   <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
@@ -2836,6 +3470,10 @@
               <div class="np-track-title" id="npTitle">No track playing</div>
               <div class="np-track-artist" id="npArtist">Select a track to start listening</div>
               <div class="np-track-album" id="npAlbum">Local Library</div>
+              <div class="np-edit-actions" id="npEditActions" hidden>
+                <button type="button" class="btn-secondary ed-btn" id="btnNpEdit" title="Open this track in the built-in editor">Edit audio</button>
+                <button type="button" class="btn-secondary ed-btn" id="btnNpAudacity" title="Open the original file in Audacity (Shift+click to change the folder path)">Open in Audacity</button>
+              </div>
             </div>
 
             <div class="np-right-col">
@@ -2982,6 +3620,10 @@
             <button class="btn-ghost speed-reset-btn" id="btnSpeedReset">Reset to Normal (1x)</button>
           </div>
         </div>
+
+        <button class="ctrl-btn" id="btnEditCurrent" aria-label="Edit current track" title="Edit current track (E in the track list)" disabled>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>
+        </button>
 
         <button class="ctrl-btn" id="btnVisualizerToggle" aria-label="Toggle Now Playing Visualizer" title="Now Playing & Visualizer">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -3166,7 +3808,8 @@
         // [Settings]
         APPEARANCE: 'localify_appearance_v1',           // { mode, accent, density }
         AUDIO_FX: 'localify_audio_fx_v1',               // { eqPreset, eq:[low,mid,high], leveling, crossfade }
-        PREFS: 'localify_prefs_v1'                      // { resumeOnStartup, confirmClearHistory }
+        PREFS: 'localify_prefs_v1',                     // { resumeOnStartup, confirmClearHistory }
+        AUDACITY_ROOTS: 'localify_audacity_roots_v1'    // [Audacity integration] { folderName: "C:\abs\path" }
       };
 
       const AUDIO_EXTENSIONS = new Set(['mp3', 'wav', 'ogg', 'm4a', 'flac', 'aac', 'opus', 'webm']);
@@ -3209,6 +3852,8 @@
         playInner: '<polygon points="6 4 20 12 6 20 6 4"></polygon>',
         folder: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>',
         close: '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>',
+        edit: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>',
+        audacity: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12h2l2-6 3 14 3-16 3 12 2-4h5"></path></svg>',
         eqBars: (paused) => `<div class="eq-bars${paused ? ' paused' : ''}" aria-hidden="true"><span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span></div>`
       };
 
@@ -4008,22 +4653,23 @@
 
       async function readAudioFilesFromHandle(dirHandle, folderName) {
         const entries = [];
-        async function recurse(handle, parentName) {
+        // `path` is "<root>/<sub dirs>/<file>" so the Audacity link can rebuild the on-disk location
+        async function recurse(handle, parentName, prefix) {
           const pending = [];
           for await (const entry of handle.values()) {
             if (entry.kind === 'file') {
               if (!AUDIO_EXTENSIONS.has(fileExt(entry.name))) continue;
               pending.push(entry.getFile().then(
-                file => entries.push({ file, folderName: parentName || folderName, path: (parentName ? parentName + '/' : '') + entry.name }),
+                file => entries.push({ file, folderName: parentName || folderName, path: prefix + entry.name }),
                 () => {}
               ));
             } else if (entry.kind === 'directory') {
-              pending.push(recurse(entry, entry.name));
+              pending.push(recurse(entry, entry.name, prefix + entry.name + '/'));
             }
           }
           await Promise.all(pending);
         }
-        await recurse(dirHandle, null);
+        await recurse(dirHandle, null, dirHandle.name + '/');
         // Directory iteration order isn't guaranteed: keep a stable, natural order
         entries.sort((a, b) => collator.compare(a.path, b.path));
         return entries;
@@ -4207,6 +4853,10 @@
           existingSig.add(sig);
 
           const meta = parseFileMeta(file, entry.folderName);
+          // Location relative to the folder the user picked ("Root/sub/file.mp3" → root + rest).
+          // Files picked one by one have no known location.
+          const fullPath = entry.path || file.webkitRelativePath || '';
+          const slash = fullPath.indexOf('/');
           const track = {
             id: `trk_${trackIdCounter++}`,
             order: ingestOrder++,
@@ -4228,7 +4878,9 @@
             thumbUrl: null,       // small object URL, generated when the row is first shown
             thumbState: null,
             duration: 0,
-            enriched: false
+            enriched: false,
+            rootName: slash > 0 ? fullPath.slice(0, slash) : null,
+            relPath: slash > 0 ? fullPath.slice(slash + 1) : null
           };
           buildSearchText(track);
           state.tracks.push(track);
@@ -5147,7 +5799,9 @@
               </div>
             </div>
             <div class="track-album" title="${escapeHtml(album)}${track.year ? ' (' + track.year + ')' : ''}">${escapeHtml(album)}</div>
-            <div>
+            <div class="row-actions">
+              <button class="row-action row-edit" data-edit-id="${track.id}" tabindex="-1" aria-label="Edit audio" title="Edit audio (E)">${SVG.edit}</button>
+              <button class="row-action row-audacity" data-audacity-id="${track.id}" tabindex="-1" aria-label="Open in Audacity"${Audacity.canOpen(track) ? ' title="Open in Audacity"' : ` aria-disabled="true" title="${escapeHtml(Audacity.UNKNOWN_LOCATION)}"`}>${SVG.audacity}</button>
               <button class="btn-like${isLiked ? ' liked' : ''}" data-like-id="${track.id}" tabindex="-1" aria-pressed="${isLiked}" aria-label="${isLiked ? 'Remove from' : 'Add to'} Liked Songs">${SVG.heart}</button>
             </div>
             <div class="track-dur">${track.duration ? formatTime(track.duration) : '--:--'}</div>`;
@@ -5335,6 +5989,7 @@
       }
 
       function updateNowPlayingUI() {
+        if (typeof updateEditEntryPoints === 'function') try { updateEditEntryPoints(); } catch (err) { /* modules not ready yet */ }
         const track = state.trackMap.get(state.currentTrackId);
         if (!track) {
           dom.npTitle.textContent = 'No track playing';
@@ -5602,6 +6257,10 @@
 
       // Track list: click, double-click and keyboard (listbox)
       dom.tracklistBody.addEventListener('click', (e) => {
+        const editBtn = e.target.closest('.row-edit');
+        if (editBtn) { e.stopPropagation(); Editor.open(editBtn.dataset.editId, editBtn); return; }
+        const audBtn = e.target.closest('.row-audacity');
+        if (audBtn) { e.stopPropagation(); Audacity.open(state.trackMap.get(audBtn.dataset.audacityId), e.shiftKey); return; }
         const likeBtn = e.target.closest('.btn-like');
         if (likeBtn) {
           e.stopPropagation();
@@ -5638,6 +6297,7 @@
           case 'End': setFocusIndex(visible.length - 1); break;
           case 'Enter': if (visible[i]) activateTrack(visible[i].id); break;
           case 'l': case 'L': if (visible[i]) toggleLikeTrack(visible[i].id); break;
+          case 'e': case 'E': if (visible[i]) { e.preventDefault(); Editor.open(visible[i].id); } break;
           default: handled = false;
         }
         if (handled) { e.preventDefault(); e.stopPropagation(); }
@@ -5793,6 +6453,7 @@
         playNextTrack(true);
       });
       onPlayers('play', () => {
+        Editor.onMainPlay();
         state.isPlaying = true;
         updatePlayStateUI();
       });
@@ -5819,6 +6480,8 @@
       }
 
       window.addEventListener('keydown', (e) => {
+        // The editor and the Audacity setup dialog handle their own keys
+        if (Editor.isOpen() || Audacity.isOpen()) return;
         if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
         const target = e.target;
         if (e.key === 'Escape') {
@@ -6017,6 +6680,7 @@
         root.dataset.accent = a.accent;
         if (a.density === 'compact') root.dataset.density = 'compact';
         else delete root.dataset.density;
+        setTimeout(() => { try { Editor.redraw(); } catch (err) { /* editor not initialised yet */ } }, 0);
         vis.gradient = null;   // canvas colors are read from the CSS tokens
         vis.lineColor = null;
         const rowHeight = a.density === 'compact' ? 44 : 58;
@@ -6519,6 +7183,1395 @@
         syncSettingsUI();
       }
       /* [/Settings] */
+
+      /* ========================================================================
+         Audio Editor (built-in)
+         Decode → waveform → edits with undo → preview → 16-bit WAV export.
+         Everything happens in this tab; the original file is never changed.
+         ======================================================================== */
+      const Editor = (() => {
+        const MAX_FILE_BYTES = 250 * 1024 * 1024;      // encoded file we are willing to read
+        const MAX_DECODED_BYTES = 512 * 1024 * 1024;   // float32 samples held in memory
+        const HISTORY_MAX_STEPS = 30;
+        const HISTORY_MAX_BYTES = 384 * 1024 * 1024;   // undo + redo snapshots together
+        const PEAK_BASE = 64;                          // finest cached peak level (samples per bin)
+        const RULER_H = 20;
+        const DEFAULT_FADE_SEC = 3;
+        const IS_LITTLE_ENDIAN = new Uint8Array(new Uint16Array([1]).buffer)[0] === 1;
+
+        const el = {
+          dialog: $('editorDialog'), title: $('edTitle'), subtitle: $('edSubtitle'),
+          audacity: $('edAudacity'), close: $('edClose'),
+          play: $('edPlay'), playIcon: $('edPlayIcon'), stop: $('edStop'),
+          time: $('edTime'), sel: $('edSel'),
+          zoomIn: $('edZoomIn'), zoomOut: $('edZoomOut'), zoomFit: $('edZoomFit'), zoomSel: $('edZoomSel'),
+          wrap: $('edWaveWrap'), canvas: $('edCanvas'),
+          overlay: $('edOverlay'), spinner: $('edSpinner'), overlayText: $('edOverlayText'),
+          scroll: $('edScroll'), scope: $('edScope'), ops: $('edOps'),
+          gain: $('edGain'), gainOut: $('edGainOut'),
+          speed: $('edSpeed'), speedOut: $('edSpeedOut'), keepPitch: $('edKeepPitch'),
+          bass: $('edBass'), bassOut: $('edBassOut'), treble: $('edTreble'), trebleOut: $('edTrebleOut'),
+          undo: $('edUndo'), redo: $('edRedo'), status: $('edStatus'),
+          addToLib: $('edAddToLibrary'), exportBtn: $('edExport')
+        };
+        const g2d = el.canvas.getContext('2d');
+
+        const ed = {
+          track: null, buffer: null, savedBuffer: null, peaks: [],
+          undo: [], redo: [],
+          viewStart: 0, spp: 1, fit: true, cssW: 1, cssH: 1,
+          sel: null, playhead: 0, anchor: 0, selFocus: 0,
+          busy: false, loadToken: 0, opener: null,
+          ctx: null, src: null, playing: false, playCtxStart: 0, playFrom: 0, playTo: 0,
+          raf: 0, drawPending: 0
+        };
+
+        const isOpen = () => el.dialog.open;
+        const sr = () => ed.buffer.sampleRate;
+        const len = () => ed.buffer.length;
+        const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+        const isDirty = () => !!ed.buffer && ed.buffer !== ed.savedBuffer;
+        const bufferBytes = (b) => (b ? b.length * b.numberOfChannels * 4 : 0);
+        const nextFrame = () => new Promise(r => requestAnimationFrame(() => setTimeout(r, 0)));
+
+        /** m:ss.mmm */
+        function fmt(sec) {
+          const ms = Math.max(0, Math.round((sec || 0) * 1000));
+          const m = Math.floor(ms / 60000);
+          const s = Math.floor((ms % 60000) / 1000);
+          return `${m}:${String(s).padStart(2, '0')}.${String(ms % 1000).padStart(3, '0')}`;
+        }
+
+        function fmtMB(bytes) {
+          return (bytes / (1024 * 1024)).toFixed(bytes >= 100 * 1024 * 1024 ? 0 : 1);
+        }
+
+        function setStatus(msg) { el.status.textContent = msg || ''; }
+
+        function showOverlay(text, { error = false } = {}) {
+          el.overlay.hidden = false;
+          el.overlay.classList.toggle('error', error);
+          el.spinner.hidden = error;
+          el.overlayText.textContent = text;
+        }
+
+        function hideOverlay() { el.overlay.hidden = true; }
+
+        function setBusy(on, text) {
+          ed.busy = on;
+          if (on) showOverlay(text || 'Working…');
+          else hideOverlay();
+          updateControls();
+        }
+
+        function setPlayIcon(playing) {
+          el.playIcon.innerHTML = playing ? SVG.pauseInner : SVG.playInner;
+          el.play.setAttribute('aria-label', playing ? 'Pause preview' : 'Play preview');
+        }
+
+        /* ---------------------------------------------------------------- UI state */
+        function updateControls() {
+          const ready = !!ed.buffer && !ed.busy;
+          el.ops.disabled = !ready;
+          [el.play, el.stop, el.zoomIn, el.zoomOut, el.zoomFit, el.exportBtn].forEach(b => { b.disabled = !ready; });
+          el.zoomSel.disabled = !ready || !ed.sel;
+          el.undo.disabled = !ready || ed.undo.length === 0;
+          el.redo.disabled = !ready || ed.redo.length === 0;
+          el.ops.querySelectorAll('[data-op="trim"], [data-op="delete"]').forEach(b => {
+            b.disabled = !ed.sel;
+          });
+          if (!ed.buffer) el.scope.textContent = '';
+          else if (ed.sel) el.scope.textContent = `Edits apply to the selection (${fmt((ed.sel.b - ed.sel.a) / sr())} long). Click the waveform to clear it.`;
+          else el.scope.textContent = 'Edits apply to the whole file. Drag on the waveform to select a range.';
+
+          const canAud = Audacity.canOpen(ed.track);
+          el.audacity.setAttribute('aria-disabled', String(!canAud));
+          el.audacity.title = canAud
+            ? 'Open the original file in Audacity (Shift+click to change the folder path)'
+            : Audacity.UNKNOWN_LOCATION;
+          syncScroll();
+        }
+
+        function updateReadouts() {
+          if (!ed.buffer) {
+            el.time.innerHTML = '<strong>0:00.000</strong> / 0:00.000';
+            el.sel.textContent = '';
+            return;
+          }
+          const pos = ed.playing ? currentPlayPos() : ed.playhead;
+          el.time.innerHTML = `<strong>${fmt(pos / sr())}</strong> / ${fmt(len() / sr())}`;
+          el.sel.textContent = ed.sel
+            ? `Selection ${fmt(ed.sel.a / sr())} – ${fmt(ed.sel.b / sr())}`
+            : 'No selection';
+        }
+
+        function updateAll() {
+          updateControls();
+          updateReadouts();
+          requestDraw();
+        }
+
+        /* ---------------------------------------------------------------- Peaks (cached per zoom level) */
+        function getLevel(c, L) {
+          const cache = ed.peaks[c] || (ed.peaks[c] = new Map());
+          let arr = cache.get(L);
+          if (arr) return arr;
+          if (L === PEAK_BASE) {
+            const data = ed.buffer.getChannelData(c);
+            const n = Math.ceil(data.length / L);
+            arr = new Float32Array(n * 2);
+            for (let i = 0, j = 0; i < n; i++) {
+              let mn = Infinity, mx = -Infinity;
+              const end = Math.min(data.length, j + L);
+              for (; j < end; j++) {
+                const v = data[j];
+                if (v < mn) mn = v;
+                if (v > mx) mx = v;
+              }
+              arr[i * 2] = mn;
+              arr[i * 2 + 1] = mx;
+            }
+          } else {
+            const prev = getLevel(c, L / 2);
+            const pn = prev.length / 2;
+            const n = Math.ceil(pn / 2);
+            arr = new Float32Array(n * 2);
+            for (let i = 0; i < n; i++) {
+              const a = i * 2, b = Math.min(pn - 1, a + 1);
+              arr[i * 2] = Math.min(prev[a * 2], prev[b * 2]);
+              arr[i * 2 + 1] = Math.max(prev[a * 2 + 1], prev[b * 2 + 1]);
+            }
+          }
+          cache.set(L, arr);
+          return arr;
+        }
+
+        function setBuffer(buf) {
+          ed.buffer = buf;
+          ed.peaks = [];
+        }
+
+        /* ---------------------------------------------------------------- View (zoom / scroll) */
+        const minSpp = () => 1 / 8;
+        const maxSpp = () => Math.max(minSpp(), len() / ed.cssW);
+        const maxViewStart = () => Math.max(0, len() - ed.cssW * ed.spp);
+
+        function syncScroll() {
+          if (!ed.buffer) { el.scroll.value = 0; el.scroll.disabled = true; return; }
+          const m = maxViewStart();
+          el.scroll.value = m > 0 ? Math.round((ed.viewStart / m) * 1000) : 0;
+          el.scroll.disabled = ed.busy || m <= 0;
+        }
+
+        function clampView() {
+          ed.spp = clamp(ed.spp, minSpp(), maxSpp());
+          ed.fit = ed.spp >= maxSpp() - 1e-9;
+          ed.viewStart = clamp(ed.viewStart, 0, maxViewStart());
+          syncScroll();
+        }
+
+        function fitAll() {
+          ed.spp = maxSpp();
+          ed.viewStart = 0;
+          ed.fit = true;
+          syncScroll();
+          requestDraw();
+        }
+
+        function zoomAt(factor, anchorX) {
+          if (!ed.buffer) return;
+          const anchorSample = ed.viewStart + anchorX * ed.spp;
+          ed.spp = clamp(ed.spp * factor, minSpp(), maxSpp());
+          ed.viewStart = anchorSample - anchorX * ed.spp;
+          clampView();
+          requestDraw();
+        }
+
+        function zoomAnchorX() {
+          const px = ((ed.playing ? currentPlayPos() : ed.playhead) - ed.viewStart) / ed.spp;
+          return px >= 0 && px <= ed.cssW ? px : ed.cssW / 2;
+        }
+
+        function zoomToSelection() {
+          if (!ed.sel) return;
+          const span = ed.sel.b - ed.sel.a;
+          ed.spp = clamp((span * 1.1) / ed.cssW, minSpp(), maxSpp());
+          ed.viewStart = ed.sel.a - span * 0.05;
+          clampView();
+          requestDraw();
+        }
+
+        function ensureVisible(sample) {
+          const span = ed.cssW * ed.spp;
+          if (sample < ed.viewStart || sample > ed.viewStart + span) {
+            ed.viewStart = sample - span / 2;
+            clampView();
+          }
+        }
+
+        function resizeCanvas() {
+          const r = el.wrap.getBoundingClientRect();
+          const dpr = window.devicePixelRatio || 1;
+          ed.cssW = Math.max(1, Math.floor(r.width));
+          ed.cssH = Math.max(1, Math.floor(r.height));
+          el.canvas.width = Math.round(ed.cssW * dpr);
+          el.canvas.height = Math.round(ed.cssH * dpr);
+          g2d.setTransform(dpr, 0, 0, dpr, 0, 0);
+          if (ed.buffer) {
+            if (ed.fit) fitAll();
+            else clampView();
+          }
+          requestDraw();
+        }
+
+        /* ---------------------------------------------------------------- Drawing */
+        function requestDraw() {
+          if (ed.drawPending) return;
+          ed.drawPending = requestAnimationFrame(() => {
+            ed.drawPending = 0;
+            draw();
+          });
+        }
+
+        function rulerLabel(t, step) {
+          const m = Math.floor(t / 60 + 1e-9);
+          const s = t - m * 60;
+          const decimals = step >= 1 ? 0 : step >= 0.1 ? 1 : step >= 0.01 ? 2 : 3;
+          const sec = s.toFixed(decimals);
+          return `${m}:${Number(sec) < 10 ? '0' : ''}${sec}`;
+        }
+
+        function draw() {
+          const W = ed.cssW, H = ed.cssH;
+          g2d.clearRect(0, 0, W, H);
+          if (!ed.buffer) return;
+
+          // Colors come from the theme tokens so every theme (and light mode) works
+          const css = getComputedStyle(document.documentElement);
+          const token = (n) => css.getPropertyValue(n).trim();
+          const accent = token('--accent');
+          const accentRgb = token('--accent-rgb');
+          const fgRgb = token('--fg-rgb');
+          const textMuted = token('--text-muted');
+          const textPrimary = token('--text-primary');
+          const font = token('--font-sans') || 'sans-serif';
+
+          const n = len();
+          const rate = sr();
+          const nch = Math.min(2, ed.buffer.numberOfChannels);
+          const laneH = (H - RULER_H) / nch;
+          const s2x = (s) => (s - ed.viewStart) / ed.spp;
+
+          // Selection
+          if (ed.sel) {
+            const x0 = clamp(s2x(ed.sel.a), 0, W);
+            const x1 = clamp(s2x(ed.sel.b), 0, W);
+            if (x1 > x0 || (x1 === x0 && x0 > 0 && x0 < W)) {
+              g2d.fillStyle = `rgba(${accentRgb}, 0.2)`;
+              g2d.fillRect(x0, 0, Math.max(1, x1 - x0), H);
+            }
+          }
+
+          // Ruler
+          const secPerPx = ed.spp / rate;
+          const steps = [0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 15, 30, 60, 120, 300, 600, 1200];
+          const step = steps.find(st => st / secPerPx >= 90) || 1800;
+          const t0 = ed.viewStart / rate;
+          const first = Math.ceil(t0 / step);
+          g2d.font = `11px ${font}`;
+          g2d.textBaseline = 'middle';
+          for (let i = first; ; i++) {
+            const t = i * step;
+            const x = Math.round((t * rate - ed.viewStart) / ed.spp);
+            if (x > W) break;
+            g2d.fillStyle = `rgba(${fgRgb}, 0.28)`;
+            g2d.fillRect(x, RULER_H - 6, 1, 6);
+            g2d.fillStyle = textMuted;
+            g2d.fillText(rulerLabel(t, step), x + 4, RULER_H / 2);
+          }
+          g2d.fillStyle = `rgba(${fgRgb}, 0.12)`;
+          g2d.fillRect(0, RULER_H - 1, W, 1);
+
+          // Waveform lanes
+          const useCache = ed.spp >= PEAK_BASE;
+          let L = PEAK_BASE;
+          while (L * 2 <= ed.spp) L *= 2;
+          for (let c = 0; c < nch; c++) {
+            const top = RULER_H + laneH * c;
+            const mid = top + laneH / 2;
+            const amp = laneH / 2 - 3;
+            g2d.fillStyle = `rgba(${fgRgb}, 0.1)`;
+            g2d.fillRect(0, Math.round(mid), W, 1);
+            if (c > 0) {
+              g2d.fillStyle = `rgba(${fgRgb}, 0.12)`;
+              g2d.fillRect(0, Math.round(top), W, 1);
+            }
+            g2d.fillStyle = accent;
+            const data = useCache ? getLevel(c, L) : ed.buffer.getChannelData(c);
+            const bins = useCache ? data.length / 2 : n;
+            for (let x = 0; x < W; x++) {
+              const s0 = ed.viewStart + x * ed.spp;
+              if (s0 >= n) break;
+              const s1 = s0 + ed.spp;
+              let mn = Infinity, mx = -Infinity;
+              if (useCache) {
+                const i0 = Math.floor(s0 / L);
+                const i1 = Math.min(bins, Math.max(i0 + 1, Math.ceil(s1 / L)));
+                for (let i = i0; i < i1; i++) {
+                  if (data[i * 2] < mn) mn = data[i * 2];
+                  if (data[i * 2 + 1] > mx) mx = data[i * 2 + 1];
+                }
+              } else {
+                const j0 = Math.floor(s0);
+                const j1 = Math.min(n, Math.max(j0 + 1, Math.ceil(s1)));
+                for (let j = j0; j < j1; j++) {
+                  const v = data[j];
+                  if (v < mn) mn = v;
+                  if (v > mx) mx = v;
+                }
+              }
+              if (mn > mx) continue;
+              const y0 = mid - clamp(mx, -1, 1) * amp;
+              const y1 = mid - clamp(mn, -1, 1) * amp;
+              g2d.fillRect(x, y0, 1, Math.max(1, y1 - y0));
+            }
+          }
+
+          // Playhead
+          const ph = ed.playing ? currentPlayPos() : ed.playhead;
+          const px = s2x(ph);
+          if (px >= -1 && px <= W + 1) {
+            g2d.fillStyle = textPrimary;
+            g2d.fillRect(Math.floor(px), 0, 2, H);
+          }
+        }
+
+        /* ---------------------------------------------------------------- Selection & playhead */
+        function setSelection(anchor, focus) {
+          anchor = clamp(Math.round(anchor), 0, len());
+          focus = clamp(Math.round(focus), 0, len());
+          const lo = Math.min(anchor, focus), hi = Math.max(anchor, focus);
+          ed.anchor = anchor;
+          ed.selFocus = focus;
+          ed.sel = hi - lo >= 1 ? { a: lo, b: hi } : null;
+          ed.playhead = lo;
+          updateAll();
+        }
+
+        function setPlayhead(sample) {
+          ed.sel = null;
+          ed.playhead = clamp(Math.round(sample), 0, len());
+          ed.anchor = ed.selFocus = ed.playhead;
+          updateAll();
+        }
+
+        function xToSample(clientX) {
+          const r = el.canvas.getBoundingClientRect();
+          const x = clamp(clientX - r.left, 0, r.width);
+          return clamp(Math.round(ed.viewStart + x * ed.spp), 0, len());
+        }
+
+        let drag = null;
+        el.canvas.addEventListener('pointerdown', (e) => {
+          if (!ed.buffer || ed.busy || e.button !== 0) return;
+          e.preventDefault();
+          el.canvas.focus();
+          el.canvas.setPointerCapture(e.pointerId);
+          const s = xToSample(e.clientX);
+          let anchor = s;
+          if (e.shiftKey) {
+            anchor = ed.sel
+              ? (Math.abs(s - ed.sel.a) < Math.abs(s - ed.sel.b) ? ed.sel.b : ed.sel.a)
+              : ed.playhead;
+            setSelection(anchor, s);
+          }
+          drag = { anchor, startX: e.clientX, moved: e.shiftKey };
+        });
+
+        el.canvas.addEventListener('pointermove', (e) => {
+          if (!drag) return;
+          if (!drag.moved && Math.abs(e.clientX - drag.startX) < 3) return;
+          drag.moved = true;
+          // Drag past an edge to scroll
+          const r = el.canvas.getBoundingClientRect();
+          if (e.clientX < r.left) ed.viewStart -= (r.left - e.clientX) * ed.spp * 0.5;
+          else if (e.clientX > r.right) ed.viewStart += (e.clientX - r.right) * ed.spp * 0.5;
+          clampView();
+          setSelection(drag.anchor, xToSample(e.clientX));
+        });
+
+        function endDrag(e) {
+          if (!drag) return;
+          const d = drag;
+          drag = null;
+          if (e.type === 'pointercancel') return;
+          if (!d.moved) {
+            setPlayhead(xToSample(e.clientX));
+            if (ed.playing) startPreview();
+          }
+        }
+        el.canvas.addEventListener('pointerup', endDrag);
+        el.canvas.addEventListener('pointercancel', endDrag);
+
+        el.canvas.addEventListener('wheel', (e) => {
+          if (!ed.buffer || ed.busy) return;
+          e.preventDefault();
+          const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? ed.cssW : 1;
+          if (e.ctrlKey || e.metaKey) {
+            const r = el.canvas.getBoundingClientRect();
+            zoomAt(Math.pow(1.0015, e.deltaY * unit), e.clientX - r.left);
+          } else {
+            const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+            ed.viewStart += d * unit * ed.spp;
+            clampView();
+            requestDraw();
+          }
+        }, { passive: false });
+
+        el.scroll.addEventListener('input', () => {
+          if (!ed.buffer) return;
+          ed.viewStart = (el.scroll.value / 1000) * maxViewStart();
+          requestDraw();
+        });
+
+        /* ---------------------------------------------------------------- Preview playback */
+        function currentPlayPos() {
+          if (!ed.playing || !ed.ctx) return ed.playhead;
+          const t = Math.max(0, ed.ctx.currentTime - ed.playCtxStart);
+          return Math.min(ed.playTo, ed.playFrom + Math.round(t * sr()));
+        }
+
+        function stopSource() {
+          const s = ed.src;
+          ed.src = null;
+          if (!s) return;
+          s.onended = null;
+          try { s.stop(); } catch (e) { /* already stopped */ }
+          s.disconnect();
+        }
+
+        async function startPreview() {
+          if (!ed.buffer || ed.busy) return;
+          pause();   // the main player and the preview never play at the same time
+          try {
+            if (!ed.ctx || ed.ctx.state === 'closed') ed.ctx = new (window.AudioContext || window.webkitAudioContext)();
+            if (ed.ctx.state === 'suspended') await ed.ctx.resume();
+          } catch (err) {
+            setStatus('Preview is not available in this browser.');
+            return;
+          }
+          stopSource();
+          let from, to;
+          if (ed.sel) {
+            from = ed.playhead > ed.sel.a && ed.playhead < ed.sel.b ? ed.playhead : ed.sel.a;
+            to = ed.sel.b;
+          } else {
+            from = ed.playhead >= len() - 1 ? 0 : ed.playhead;
+            to = len();
+          }
+          const src = ed.ctx.createBufferSource();
+          src.buffer = ed.buffer;
+          src.connect(ed.ctx.destination);
+          ed.playFrom = from;
+          ed.playTo = to;
+          ed.playCtxStart = ed.ctx.currentTime;
+          src.start(ed.playCtxStart, from / sr(), (to - from) / sr());
+          src.onended = () => {
+            if (ed.src !== src) return;
+            stopSource();
+            ed.playing = false;
+            ed.playhead = ed.playFrom;     // like most editors: return to where playback started
+            setPlayIcon(false);
+            updateReadouts();
+            requestDraw();
+          };
+          ed.src = src;
+          ed.playing = true;
+          setPlayIcon(true);
+          followPlayback();
+        }
+
+        function pausePreview() {
+          if (!ed.playing) return;
+          const pos = currentPlayPos();
+          stopSource();
+          ed.playing = false;
+          ed.playhead = pos;
+          setPlayIcon(false);
+          updateReadouts();
+          requestDraw();
+        }
+
+        function stopPreview() {
+          const wasPlaying = ed.playing;
+          stopSource();
+          ed.playing = false;
+          if (ed.buffer) ed.playhead = ed.sel ? ed.sel.a : (wasPlaying ? ed.playFrom : 0);
+          setPlayIcon(false);
+          updateReadouts();
+          requestDraw();
+        }
+
+        function togglePreview() {
+          if (ed.playing) pausePreview();
+          else startPreview();
+        }
+
+        function followPlayback() {
+          cancelAnimationFrame(ed.raf);
+          const loop = () => {
+            if (!ed.playing) return;
+            const pos = currentPlayPos();
+            const span = ed.cssW * ed.spp;
+            if (!ed.fit && pos > ed.viewStart + span) {
+              ed.viewStart = pos;
+              clampView();
+            }
+            draw();
+            updateReadouts();
+            ed.raf = requestAnimationFrame(loop);
+          };
+          ed.raf = requestAnimationFrame(loop);
+        }
+
+        /* ---------------------------------------------------------------- Buffer helpers */
+        function newBuffer(nch, length, rate) {
+          return new AudioBuffer({ numberOfChannels: nch, length: Math.max(1, length), sampleRate: rate });
+        }
+
+        function copyRange(buf, a, b) {
+          const out = [];
+          for (let c = 0; c < buf.numberOfChannels; c++) out.push(buf.getChannelData(c).slice(a, b));
+          return out;
+        }
+
+        /** New buffer with [a, b) replaced by `mid` (one Float32Array per channel, or null to cut). */
+        function spliceBuffer(buf, a, b, mid) {
+          const midLen = mid ? mid[0].length : 0;
+          const out = newBuffer(buf.numberOfChannels, buf.length - (b - a) + midLen, buf.sampleRate);
+          for (let c = 0; c < buf.numberOfChannels; c++) {
+            const src = buf.getChannelData(c);
+            const dst = out.getChannelData(c);
+            dst.set(src.subarray(0, a), 0);
+            if (midLen) dst.set(mid[c], a);
+            dst.set(src.subarray(b), a + midLen);
+          }
+          return out;
+        }
+
+        function buffersFromSegs(segs, rate) {
+          const b = newBuffer(segs.length, segs[0].length, rate);
+          segs.forEach((s, c) => b.copyToChannel(s, c));
+          return b;
+        }
+
+        function peakOf(segs) {
+          let peak = 0;
+          for (const s of segs) {
+            for (let i = 0; i < s.length; i++) {
+              const v = s[i] < 0 ? -s[i] : s[i];
+              if (v > peak) peak = v;
+            }
+          }
+          return peak;
+        }
+
+        /** Plain resample: speed and pitch change together. */
+        async function resampleSegs(segs, factor, rate) {
+          const outLen = Math.max(1, Math.round(segs[0].length / factor));
+          const octx = new OfflineAudioContext(segs.length, outLen, rate);
+          const src = octx.createBufferSource();
+          src.buffer = buffersFromSegs(segs, rate);
+          src.playbackRate.value = factor;
+          src.connect(octx.destination);
+          src.start();
+          const out = await octx.startRendering();
+          return segs.map((_, c) => out.getChannelData(c));
+        }
+
+        /** Bass (low shelf 200 Hz) and treble (high shelf 3 kHz). */
+        async function eqSegs(segs, bassDb, trebleDb, rate) {
+          const octx = new OfflineAudioContext(segs.length, segs[0].length, rate);
+          const src = octx.createBufferSource();
+          src.buffer = buffersFromSegs(segs, rate);
+          const low = octx.createBiquadFilter();
+          low.type = 'lowshelf';
+          low.frequency.value = 200;
+          low.gain.value = bassDb;
+          const high = octx.createBiquadFilter();
+          high.type = 'highshelf';
+          high.frequency.value = Math.min(3000, rate * 0.45);
+          high.gain.value = trebleDb;
+          src.connect(low).connect(high).connect(octx.destination);
+          src.start();
+          const out = await octx.startRendering();
+          return segs.map((_, c) => out.getChannelData(c));
+        }
+
+        /**
+         * Time-stretch keeping pitch (WSOLA). factor > 1 = faster/shorter.
+         * Frames of N samples are overlap-added every Hs output samples; each frame's input
+         * position is searched (±DELTA around the nominal spot) for the best match with the
+         * natural continuation of the previous frame, which avoids phasing artefacts.
+         */
+        async function wsolaStretch(segs, factor, onProgress, token) {
+          const N = 2048, Hs = N / 2, DELTA = 512, OVL = Hs;
+          const Ha = Hs * factor;
+          const inLen = segs[0].length;
+          const outLen = Math.max(1, Math.round(inLen / factor));
+          const nch = segs.length;
+
+          const win = new Float32Array(N);
+          for (let i = 0; i < N; i++) win[i] = 0.5 - 0.5 * Math.cos((2 * Math.PI * i) / N);
+
+          // Zero-padded mono mix for the similarity search
+          const PAD = 4 * N;
+          const mono = new Float32Array(inLen + PAD);
+          for (const s of segs) for (let i = 0; i < inLen; i++) mono[i] += s[i] / nch;
+
+          const acc = segs.map(() => new Float32Array(outLen + N));
+          const norm = new Float32Array(outLen + N);
+
+          const score = (p, target, step) => {
+            let num = 0, en = 0;
+            for (let i = 0; i < OVL; i += step) {
+              const x = mono[p + i];
+              num += x * mono[target + i];
+              en += x * x;
+            }
+            return num / Math.sqrt(en + 1e-9);
+          };
+
+          let prev = 0;
+          for (let k = 0; k * Hs < outLen; k++) {
+            const outPos = k * Hs;
+            let pos = 0;
+            if (k > 0) {
+              const nominal = Math.round(k * Ha);
+              const target = Math.min(prev + Hs, inLen + PAD - OVL - 1);
+              const lo = Math.max(0, nominal - DELTA);
+              const hi = Math.min(inLen - 1, nominal + DELTA);
+              if (lo > hi) {
+                pos = nominal;
+              } else {
+                let best = lo, bestScore = -Infinity;
+                for (let p = lo; p <= hi; p += 4) {
+                  const sc = score(p, target, 8);
+                  if (sc > bestScore) { bestScore = sc; best = p; }
+                }
+                const fLo = Math.max(lo, best - 3), fHi = Math.min(hi, best + 3);
+                bestScore = -Infinity;
+                for (let p = fLo; p <= fHi; p++) {
+                  const sc = score(p, target, 1);
+                  if (sc > bestScore) { bestScore = sc; pos = p; }
+                }
+              }
+            }
+            for (let i = 0; i < N; i++) {
+              // The first frame's leading half has nothing to overlap with: keep it at full level
+              const w = k === 0 && i < Hs ? 1 : win[i];
+              const src = pos + i;
+              norm[outPos + i] += w;
+              if (src >= inLen) continue;
+              for (let c = 0; c < nch; c++) acc[c][outPos + i] += w * segs[c][src];
+            }
+            prev = pos;
+            if ((k & 127) === 127) {
+              onProgress(outPos / outLen);
+              await new Promise(r => setTimeout(r, 0));
+              if (token !== ed.loadToken) throw new Error('cancelled');
+            }
+          }
+
+          return acc.map(a => {
+            const o = new Float32Array(outLen);
+            for (let i = 0; i < outLen; i++) o[i] = norm[i] > 1e-6 ? a[i] / norm[i] : 0;
+            return o;
+          });
+        }
+
+        /* ---------------------------------------------------------------- Operations */
+        function rangeFor(op) {
+          const n = len(), rate = sr();
+          if (ed.sel) return [ed.sel.a, ed.sel.b];
+          if (op === 'fadeIn') return [0, Math.min(n, Math.round(DEFAULT_FADE_SEC * rate))];
+          if (op === 'fadeOut') return [Math.max(0, n - Math.round(DEFAULT_FADE_SEC * rate)), n];
+          return [0, n];
+        }
+
+        function mapRange(a, b, fn) {
+          const segs = copyRange(ed.buffer, a, b);
+          segs.forEach(fn);
+          return { buf: spliceBuffer(ed.buffer, a, b, segs), segs };
+        }
+
+        const CLIP_NOTE = ' Some peaks are now above 0 dBFS and will clip on export; Normalize fixes that.';
+
+        async function runOp(op) {
+          if (!ed.buffer || ed.busy) return;
+          if (ed.playing) pausePreview();
+          const rate = sr();
+          const [a, b] = rangeFor(op);
+          const where = ed.sel ? 'the selection' : 'the whole file';
+          const token = ed.loadToken;
+          if (b - a < 1) { setStatus('That range is empty.'); return; }
+
+          let next = null;
+          let nextSel = ed.sel;
+          let nextPlayhead = ed.playhead;
+          let msg = '';
+
+          try {
+            switch (op) {
+              case 'trim': {
+                if (!ed.sel) { setStatus('Select the part you want to keep first.'); return; }
+                next = buffersFromSegs(copyRange(ed.buffer, a, b), rate);
+                nextSel = null;
+                nextPlayhead = 0;
+                msg = `Trimmed to the selection (${fmt((b - a) / rate)}).`;
+                break;
+              }
+              case 'delete': {
+                if (!ed.sel) { setStatus('Select the part you want to delete first.'); return; }
+                if (b - a >= len()) { setStatus("Can't delete everything. Select a shorter range, or use Silence."); return; }
+                next = spliceBuffer(ed.buffer, a, b, null);
+                nextSel = null;
+                nextPlayhead = a;
+                msg = `Deleted ${fmt((b - a) / rate)}.`;
+                break;
+              }
+              case 'silence':
+                next = mapRange(a, b, s => s.fill(0)).buf;
+                msg = `Silenced ${where}.`;
+                break;
+              case 'reverse':
+                next = mapRange(a, b, s => s.reverse()).buf;
+                msg = `Reversed ${where}.`;
+                break;
+              case 'fadeIn':
+              case 'fadeOut': {
+                const fadeIn = op === 'fadeIn';
+                next = mapRange(a, b, s => {
+                  const last = Math.max(1, s.length - 1);
+                  for (let i = 0; i < s.length; i++) s[i] *= fadeIn ? i / last : 1 - i / last;
+                }).buf;
+                const span = fmt((b - a) / rate);
+                msg = ed.sel
+                  ? `Faded ${fadeIn ? 'in' : 'out'} across the selection (${span}).`
+                  : `Faded ${fadeIn ? 'in the first' : 'out the last'} ${span}.`;
+                break;
+              }
+              case 'gain': {
+                const db = Number(el.gain.value);
+                if (db === 0) { setStatus('Move the Gain slider away from 0 dB first.'); return; }
+                const k = Math.pow(10, db / 20);
+                const r = mapRange(a, b, s => { for (let i = 0; i < s.length; i++) s[i] *= k; });
+                next = r.buf;
+                msg = `Changed the volume of ${where} by ${db > 0 ? '+' : ''}${db.toFixed(1)} dB.`;
+                if (peakOf(r.segs) > 1) msg += CLIP_NOTE;
+                break;
+              }
+              case 'normalize': {
+                const peak = peakOf(copyRange(ed.buffer, a, b));
+                if (peak < 1e-6) { setStatus('That range is silent, so there is nothing to normalize.'); return; }
+                const k = Math.pow(10, -1 / 20) / peak;
+                next = mapRange(a, b, s => { for (let i = 0; i < s.length; i++) s[i] *= k; }).buf;
+                const changeDb = 20 * Math.log10(k);
+                msg = `Normalized ${where} to −1 dBFS (${changeDb >= 0 ? '+' : ''}${changeDb.toFixed(1)} dB).`;
+                break;
+              }
+              case 'speed': {
+                const factor = Number(el.speed.value);
+                if (Math.abs(factor - 1) < 1e-3) { setStatus('Move the Speed slider away from 1.00× first.'); return; }
+                const keep = el.keepPitch.checked;
+                const outLen = Math.round((b - a) / factor);
+                if ((len() - (b - a) + outLen) * ed.buffer.numberOfChannels * 4 > MAX_DECODED_BYTES) {
+                  setStatus('The result would be too long to edit in the browser.');
+                  return;
+                }
+                setBusy(true, keep ? 'Changing speed and keeping pitch…' : 'Changing speed…');
+                await nextFrame();
+                const segs = copyRange(ed.buffer, a, b);
+                const out = keep
+                  ? await wsolaStretch(segs, factor, p => { el.overlayText.textContent = `Changing speed and keeping pitch… ${Math.round(p * 100)}%`; }, token)
+                  : await resampleSegs(segs, factor, rate);
+                if (token !== ed.loadToken) return;
+                next = spliceBuffer(ed.buffer, a, b, out);
+                nextSel = ed.sel ? { a, b: a + out[0].length } : null;
+                nextPlayhead = a;
+                msg = keep
+                  ? `Speed ${factor.toFixed(2)}× applied to ${where}; pitch kept (time-stretch).`
+                  : `Speed ${factor.toFixed(2)}× applied to ${where} as a plain resample, so the pitch changed too.`;
+                break;
+              }
+              case 'eq': {
+                const bass = Number(el.bass.value), treble = Number(el.treble.value);
+                if (bass === 0 && treble === 0) { setStatus('Move the Bass or Treble slider away from 0 dB first.'); return; }
+                setBusy(true, 'Applying EQ…');
+                await nextFrame();
+                const out = await eqSegs(copyRange(ed.buffer, a, b), bass, treble, rate);
+                if (token !== ed.loadToken) return;
+                next = spliceBuffer(ed.buffer, a, b, out);
+                msg = `EQ applied to ${where} (bass ${bass > 0 ? '+' : ''}${bass} dB, treble ${treble > 0 ? '+' : ''}${treble} dB).`;
+                if (peakOf(out) > 1) msg += CLIP_NOTE;
+                break;
+              }
+              default:
+                return;
+            }
+          } catch (err) {
+            if (token !== ed.loadToken) return;
+            if (ed.busy) setBusy(false);
+            setStatus(`That edit failed: ${(err && err.message) || err}`);
+            return;
+          }
+
+          if (ed.busy) setBusy(false);
+          commit(next, nextSel, nextPlayhead, msg);
+        }
+
+        /* ---------------------------------------------------------------- History */
+        const snapshot = () => ({ buffer: ed.buffer, sel: ed.sel, playhead: ed.playhead });
+
+        function trimHistory() {
+          while (ed.undo.length > HISTORY_MAX_STEPS) ed.undo.shift();
+          let total = bufferBytes(ed.buffer);
+          for (const h of ed.undo) total += bufferBytes(h.buffer);
+          for (const h of ed.redo) total += bufferBytes(h.buffer);
+          while (total > HISTORY_MAX_BYTES && ed.redo.length > 0) total -= bufferBytes(ed.redo.shift().buffer);
+          while (total > HISTORY_MAX_BYTES && ed.undo.length > 1) total -= bufferBytes(ed.undo.shift().buffer);
+        }
+
+        function applyState(h) {
+          setBuffer(h.buffer);
+          ed.sel = h.sel && h.sel.b <= len() ? h.sel : null;
+          ed.playhead = clamp(h.playhead, 0, len());
+          ed.anchor = ed.sel ? ed.sel.a : ed.playhead;
+          ed.selFocus = ed.sel ? ed.sel.b : ed.playhead;
+          if (ed.fit) fitAll();
+          else clampView();
+          updateAll();
+        }
+
+        function commit(next, sel, playhead, msg) {
+          ed.undo.push(snapshot());
+          ed.redo = [];
+          applyState({ buffer: next, sel, playhead });
+          trimHistory();
+          updateControls();
+          setStatus(msg);
+        }
+
+        function doUndo() {
+          if (!ed.buffer || ed.busy || ed.undo.length === 0) return;
+          if (ed.playing) pausePreview();
+          ed.redo.push(snapshot());
+          applyState(ed.undo.pop());
+          setStatus(`Undone. ${ed.undo.length} more step${ed.undo.length === 1 ? '' : 's'} to undo.`);
+        }
+
+        function doRedo() {
+          if (!ed.buffer || ed.busy || ed.redo.length === 0) return;
+          if (ed.playing) pausePreview();
+          ed.undo.push(snapshot());
+          applyState(ed.redo.pop());
+          setStatus('Redone.');
+        }
+
+        /* ---------------------------------------------------------------- Export */
+        function encodeWav(buf) {
+          const nch = buf.numberOfChannels, n = buf.length, rate = buf.sampleRate;
+          const dataBytes = n * nch * 2;
+          const ab = new ArrayBuffer(44 + dataBytes);
+          const dv = new DataView(ab);
+          const str = (o, s) => { for (let i = 0; i < s.length; i++) dv.setUint8(o + i, s.charCodeAt(i)); };
+          str(0, 'RIFF');
+          dv.setUint32(4, 36 + dataBytes, true);
+          str(8, 'WAVE');
+          str(12, 'fmt ');
+          dv.setUint32(16, 16, true);            // PCM fmt chunk size
+          dv.setUint16(20, 1, true);             // PCM
+          dv.setUint16(22, nch, true);
+          dv.setUint32(24, rate, true);
+          dv.setUint32(28, rate * nch * 2, true);
+          dv.setUint16(32, nch * 2, true);
+          dv.setUint16(34, 16, true);
+          str(36, 'data');
+          dv.setUint32(40, dataBytes, true);
+
+          const chans = [];
+          for (let c = 0; c < nch; c++) chans.push(buf.getChannelData(c));
+          const toInt = (v) => {
+            v = v > 1 ? 1 : v < -1 ? -1 : v;
+            return v < 0 ? Math.round(v * 32768) : Math.round(v * 32767);
+          };
+          if (IS_LITTLE_ENDIAN) {
+            const pcm = new Int16Array(ab, 44, n * nch);
+            for (let i = 0, j = 0; i < n; i++) for (let c = 0; c < nch; c++, j++) pcm[j] = toInt(chans[c][i]) || 0;
+          } else {
+            for (let i = 0, o = 44; i < n; i++) for (let c = 0; c < nch; c++, o += 2) dv.setInt16(o, toInt(chans[c][i]) || 0, true);
+          }
+          return new Blob([ab], { type: 'audio/wav' });
+        }
+
+        function downloadBlob(blob, name) {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = name;
+          a.style.display = 'none';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 60000);
+        }
+
+        async function exportWav() {
+          if (!ed.buffer || ed.busy) return;
+          if (ed.playing) pausePreview();
+          const base = ed.track.fileName.replace(/\.[^.]+$/, '') || 'audio';
+          const name = `${base} (edited).wav`;
+          const exported = ed.buffer;
+
+          setBusy(true, 'Encoding WAV…');
+          await nextFrame();
+          let blob;
+          try {
+            blob = encodeWav(exported);
+          } catch (err) {
+            setBusy(false);
+            setStatus(`Couldn't create the WAV: ${(err && err.message) || err}`);
+            return;
+          }
+          setBusy(false);
+
+          let done = '';
+          if (typeof window.showSaveFilePicker === 'function') {
+            try {
+              const handle = await window.showSaveFilePicker({
+                suggestedName: name,
+                types: [{ description: 'WAV audio', accept: { 'audio/wav': ['.wav'] } }]
+              });
+              const w = await handle.createWritable();
+              await w.write(blob);
+              await w.close();
+              done = `Saved “${handle.name}”.`;
+            } catch (err) {
+              if (err && err.name === 'AbortError') { setStatus('Export cancelled.'); return; }
+              // Not allowed here (e.g. a file:// page): fall back to a normal download below
+            }
+          }
+          if (!done) {
+            downloadBlob(blob, name);
+            done = `Downloaded “${name}”.`;
+          }
+          ed.savedBuffer = exported;
+
+          if (el.addToLib.checked) {
+            const file = new File([blob], name, { type: 'audio/wav', lastModified: Date.now() });
+            const added = ingestFiles([{ file, folderName: ed.track.folder }], { quiet: true });
+            done += added ? ' Added it to your library.' : ' A file with that name and size is already in your library.';
+          }
+          setStatus(done);
+          showToast(done);
+        }
+
+        /* ---------------------------------------------------------------- Open / close */
+        async function sniffSampleRate(file) {
+          try {
+            let head = new Uint8Array(await file.slice(0, 64 * 1024).arrayBuffer());
+            const tag = (o) => String.fromCharCode(head[o], head[o + 1], head[o + 2], head[o + 3]);
+            if (head.length >= 12 && tag(0) === 'RIFF' && tag(8) === 'WAVE') {
+              const dv = new DataView(head.buffer);
+              for (let o = 12; o + 16 <= head.length;) {
+                const size = dv.getUint32(o + 4, true);
+                if (tag(o) === 'fmt ') return dv.getUint32(o + 12, true);
+                o += 8 + size + (size & 1);
+              }
+            }
+            if (head.length >= 21 && tag(0) === 'fLaC') {
+              const r = (head[18] << 12) | (head[19] << 4) | (head[20] >> 4);
+              if (r) return r;
+            }
+            if (head.length >= 4 && tag(0) === 'OggS') {
+              const text = String.fromCharCode.apply(null, head.subarray(0, 512));
+              if (text.includes('OpusHead')) return 48000;
+              const v = text.indexOf('\x01vorbis');
+              if (v >= 0 && v + 16 <= head.length) return new DataView(head.buffer).getUint32(v + 12, true);
+            }
+            const ext = fileExt(file.name);
+            const isId3 = head[0] === 0x49 && head[1] === 0x44 && head[2] === 0x33;
+            if (ext === 'mp3' || isId3) {
+              if (isId3) {
+                const base = 10 + (((head[6] & 0x7f) << 21) | ((head[7] & 0x7f) << 14) | ((head[8] & 0x7f) << 7) | (head[9] & 0x7f)) + (head[5] & 0x10 ? 10 : 0);
+                head = new Uint8Array(await file.slice(base, base + 16384).arrayBuffer());
+              }
+              for (let i = 0; i + 4 < head.length; i++) {
+                if (head[i] !== 0xff) continue;
+                const h = parseFrameHeader(head, i);
+                if (!h || h.frameLength < 24) continue;
+                const next = i + h.frameLength;
+                if (next + 4 <= head.length) {
+                  const h2 = parseFrameHeader(head, next);
+                  if (!h2 || h2.sampleRate !== h.sampleRate) continue;
+                }
+                return h.sampleRate;
+              }
+            }
+            if (ext === 'opus' || ext === 'webm') return 48000;
+          } catch (e) { /* fall through */ }
+          return 44100;
+        }
+
+        function tooBig(seconds) {
+          const err = new Error('too big');
+          err.userMessage = `This track is too long to edit here (about ${Math.round(seconds / 60)} minutes). ` +
+            'The editor keeps the whole decoded song in memory, so it is limited to roughly 25 minutes of stereo audio. Use “Open in Audacity” instead.';
+          return err;
+        }
+
+        async function decode(bytes, rate) {
+          let octx;
+          try { octx = new OfflineAudioContext(1, 1, rate); }
+          catch (e) { octx = new OfflineAudioContext(1, 1, 44100); }
+          return octx.decodeAudioData(bytes);
+        }
+
+        function reset() {
+          stopSource();
+          cancelAnimationFrame(ed.raf);
+          ed.playing = false;
+          ed.busy = false;
+          setBuffer(null);
+          ed.savedBuffer = null;
+          ed.undo = [];
+          ed.redo = [];
+          ed.sel = null;
+          ed.playhead = 0;
+          ed.viewStart = 0;
+          ed.fit = true;
+          setPlayIcon(false);
+          setStatus('');
+          g2d.clearRect(0, 0, el.canvas.width, el.canvas.height);
+        }
+
+        async function open(trackId, opener) {
+          const track = state.trackMap.get(trackId);
+          if (!track) return;
+          if (isOpen()) {
+            if (ed.track === track) return;
+            if (isDirty() && !confirm(`Discard your edits to “${ed.track.title}” and open “${track.title}”?`)) return;
+          } else {
+            ed.opener = opener || document.activeElement;
+          }
+
+          const token = ++ed.loadToken;
+          reset();
+          ed.track = track;
+          el.title.textContent = track.title;
+          el.subtitle.textContent = `${track.fileName} · ${fmtMB(track.size)} MB`;
+          if (!isOpen()) {
+            el.dialog.showModal();
+            el.dialog.appendChild(dom.toastContainer);   // keep toasts above the modal backdrop
+          }
+          resizeCanvas();
+          updateAll();
+
+          if (track.size > MAX_FILE_BYTES) {
+            showOverlay(`“${track.fileName}” is ${fmtMB(track.size)} MB. The editor opens files up to 250 MB, because the whole song has to be decoded into memory. Use “Open in Audacity” for big files.`, { error: true });
+            el.close.focus();
+            return;
+          }
+
+          showOverlay('Decoding audio…');
+          setStatus('Decoding…');
+          try {
+            const rate = await sniffSampleRate(track.file);
+            if (track.duration && track.duration * rate * 2 * 4 > MAX_DECODED_BYTES) throw tooBig(track.duration);
+            const bytes = await track.file.arrayBuffer();
+            if (token !== ed.loadToken) return;
+            const buffer = await decode(bytes, rate);
+            if (token !== ed.loadToken) return;
+            if (bufferBytes(buffer) > MAX_DECODED_BYTES) throw tooBig(buffer.duration);
+
+            setBuffer(buffer);
+            ed.savedBuffer = buffer;
+            hideOverlay();
+            fitAll();
+            updateAll();
+            const ch = buffer.numberOfChannels === 1 ? 'mono' : buffer.numberOfChannels === 2 ? 'stereo' : `${buffer.numberOfChannels} channels`;
+            el.subtitle.textContent = `${track.fileName} · ${ch} · ${(buffer.sampleRate / 1000).toFixed(1).replace(/\.0$/, '')} kHz · ${fmt(buffer.duration)}`;
+            setStatus('Ready. Your original file is never changed; export a WAV to keep your edits.');
+            el.canvas.focus();
+          } catch (err) {
+            if (token !== ed.loadToken) return;
+            showOverlay((err && err.userMessage) || `Couldn't decode “${track.fileName}”. This browser may not support its format, or the file may be damaged.`, { error: true });
+            setStatus('');
+            el.close.focus();
+          }
+        }
+
+        function requestClose() {
+          if (isDirty() && !confirm(`Close the editor and discard your edits to “${ed.track.title}”? Export a WAV first if you want to keep them.`)) return;
+          el.dialog.close();
+        }
+
+        el.dialog.addEventListener('cancel', (e) => {
+          e.preventDefault();
+          requestClose();
+        });
+
+        el.dialog.addEventListener('close', () => {
+          ed.loadToken++;
+          reset();
+          ed.track = null;
+          if (ed.ctx) {
+            ed.ctx.close().catch(() => {});
+            ed.ctx = null;
+          }
+          document.body.appendChild(dom.toastContainer);
+          const opener = ed.opener;
+          ed.opener = null;
+          if (opener && opener.isConnected && typeof opener.focus === 'function') opener.focus();
+          else dom.tracklistBody.focus();
+        });
+
+        /* ---------------------------------------------------------------- Keyboard */
+        el.dialog.addEventListener('keydown', (e) => {
+          // The player's global shortcuts must not fire while the editor is open
+          e.stopPropagation();
+          const t = e.target;
+          const tag = t.tagName;
+          const textEntry = (tag === 'INPUT' && !['range', 'checkbox', 'button'].includes(t.type)) || tag === 'TEXTAREA' || tag === 'SELECT';
+          if (textEntry || e.altKey) return;
+          const ctrl = e.ctrlKey || e.metaKey;
+          const k = e.key;
+
+          if (k === ' ' && !ctrl) {
+            if (t.type === 'checkbox') return;
+            e.preventDefault();
+            togglePreview();
+            return;
+          }
+          if (!ed.buffer || ed.busy) return;
+
+          if (ctrl) {
+            const lk = k.toLowerCase();
+            if (lk === 'z') { e.preventDefault(); if (e.shiftKey) doRedo(); else doUndo(); }
+            else if (lk === 'y') { e.preventDefault(); doRedo(); }
+            else if (lk === 'a') { e.preventDefault(); setSelection(0, len()); }
+            return;
+          }
+          if ((k === 'Delete' || k === 'Backspace') && ed.sel) { e.preventDefault(); runOp('delete'); return; }
+          if (k === '+' || k === '=') { e.preventDefault(); zoomAt(0.5, zoomAnchorX()); return; }
+          if (k === '-' || k === '_') { e.preventDefault(); zoomAt(2, zoomAnchorX()); return; }
+
+          // Moving the playhead belongs to the waveform; arrows elsewhere drive the sliders
+          if (t !== el.canvas) return;
+          const step = Math.max(1, Math.round((ed.cssW * ed.spp) / 50));
+          const extend = e.shiftKey;
+          const anchor = ed.sel ? ed.anchor : ed.playhead;
+          const focusPos = ed.sel ? ed.selFocus : ed.playhead;
+          let target = null;
+          if (k === 'ArrowLeft') target = (extend ? focusPos : (ed.sel ? ed.sel.a : ed.playhead)) - step;
+          else if (k === 'ArrowRight') target = (extend ? focusPos : (ed.sel ? ed.sel.b : ed.playhead)) + step;
+          else if (k === 'Home') target = 0;
+          else if (k === 'End') target = len();
+          if (target === null) return;
+          e.preventDefault();
+          target = clamp(target, 0, len());
+          if (extend) setSelection(anchor, target);
+          else setPlayhead(target);
+          ensureVisible(target);
+          requestDraw();
+        });
+
+        /* ---------------------------------------------------------------- Wiring */
+        el.close.addEventListener('click', requestClose);
+        el.play.addEventListener('click', togglePreview);
+        el.stop.addEventListener('click', stopPreview);
+        el.zoomIn.addEventListener('click', () => zoomAt(0.5, zoomAnchorX()));
+        el.zoomOut.addEventListener('click', () => zoomAt(2, zoomAnchorX()));
+        el.zoomFit.addEventListener('click', fitAll);
+        el.zoomSel.addEventListener('click', zoomToSelection);
+        el.undo.addEventListener('click', doUndo);
+        el.redo.addEventListener('click', doRedo);
+        el.exportBtn.addEventListener('click', exportWav);
+        el.audacity.addEventListener('click', (e) => Audacity.open(ed.track, e.shiftKey));
+        el.ops.addEventListener('click', (e) => {
+          const b = e.target.closest('[data-op]');
+          if (b && !b.disabled) runOp(b.dataset.op);
+        });
+
+        const fmtDb = (v) => `${v > 0 ? '+' : ''}${Number(v).toFixed(1)} dB`;
+        const bindOutput = (input, output, format) => {
+          const sync = () => { output.textContent = format(input.value); };
+          input.addEventListener('input', sync);
+          sync();
+        };
+        bindOutput(el.gain, el.gainOut, fmtDb);
+        bindOutput(el.bass, el.bassOut, fmtDb);
+        bindOutput(el.treble, el.trebleOut, fmtDb);
+        bindOutput(el.speed, el.speedOut, (v) => `${Number(v).toFixed(2)}×`);
+
+        if (typeof ResizeObserver === 'function') {
+          new ResizeObserver(() => { if (isOpen()) resizeCanvas(); }).observe(el.wrap);
+        } else {
+          window.addEventListener('resize', () => { if (isOpen()) resizeCanvas(); });
+        }
+
+        return {
+          open,
+          isOpen,
+          /** The main player started: never play both at once. */
+          onMainPlay() { if (ed.playing) pausePreview(); },
+          /** Theme changed: the waveform reads its colors from the CSS tokens. */
+          redraw() { if (isOpen()) requestDraw(); }
+        };
+      })();
+
+      /* ========================================================================
+         [Audacity integration] — begin
+         Self-contained so it can move into the Settings panel later. It needs:
+           • STORAGE_KEYS.AUDACITY_ROOTS  { "<picked folder name>": "C:\\abs\\path" }
+           • the #audacityDialog markup and the .as-* CSS block
+           • the helper in tools/audacity, which registers the localify-audacity: link
+             and only opens existing audio files inside its configured music folders
+         ======================================================================== */
+      const Audacity = (() => {
+        const PROTOCOL = 'localify-audacity:';
+        const UNKNOWN_LOCATION = 'Location unknown. Load this track with Open Folder (or drop its folder) to open it in Audacity.';
+
+        const el = {
+          dialog: $('audacityDialog'), form: $('asForm'),
+          rootName: $('asRootName'), rootName2: $('asRootName2'),
+          path: $('asPath'), preview: $('asPreview'), error: $('asError'),
+          cancel: $('asCancel')
+        };
+        let pending = null;   // track waiting for the setup to finish
+
+        function getRoots() {
+          const r = loadJSON(STORAGE_KEYS.AUDACITY_ROOTS, {});
+          return r && typeof r === 'object' && !Array.isArray(r) ? r : {};
+        }
+
+        function setRoot(name, absPath) {
+          const r = getRoots();
+          r[name] = absPath;
+          saveJSON(STORAGE_KEYS.AUDACITY_ROOTS, r);
+        }
+
+        const canOpen = (track) => !!(track && track.rootName && track.relPath);
+
+        /** Validate the folder path the user typed. Returns { path } or { error }. */
+        function normalizeRoot(input, rootName) {
+          let p = String(input || '').trim().replace(/^"(.*)"$/, '$1').replace(/\//g, '\\');
+          if (!p) return { error: '' };
+          const isDrive = /^[A-Za-z]:(\\|$)/.test(p);
+          const isUnc = /^\\\\[^\\]+\\[^\\]+/.test(p);
+          if (!isDrive && !isUnc) return { error: 'Use a full Windows path that starts with a drive letter, like C:\\Music, or \\\\server\\share.' };
+          if (/[\x00-\x1f"*?<>|]/.test(p) || p.slice(2).includes(':')) return { error: 'That path contains characters Windows does not allow in folder names.' };
+          if (/(^|\\)\.{1,2}(\\|$)/.test(p.replace(/^\\\\/, ''))) return { error: 'Remove "." and ".." from the path.' };
+          p = p.replace(/\\+$/, '');
+          const last = p.split('\\').pop();
+          if (rootName && !/[:\\]/.test(rootName) && last.toLowerCase() !== rootName.toLowerCase()) {
+            return { error: `The path should end with the folder “${rootName}”.` };
+          }
+          return { path: p };
+        }
+
+        const filePath = (root, track) => `${root}\\${track.relPath.split('/').join('\\')}`;
+        const buildUrl = (root, track) => PROTOCOL + encodeURIComponent(filePath(root, track));
+
+        function launch(url) {
+          const a = document.createElement('a');
+          a.href = url;
+          a.style.display = 'none';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+        }
+
+        function open(track, forceSetup = false) {
+          if (!canOpen(track)) { showToast(UNKNOWN_LOCATION); return; }
+          const root = getRoots()[track.rootName];
+          if (!root || forceSetup) { showSetup(track, root || ''); return; }
+          launch(buildUrl(root, track));
+          showToast('Opening in Audacity… If nothing happens, install the helper from tools/audacity.');
+        }
+
+        function updatePreview() {
+          const r = normalizeRoot(el.path.value, pending && pending.rootName);
+          if (!r.path) { el.preview.textContent = ''; return; }
+          el.preview.textContent =
+            `Helper line: $MusicRoots = @('${r.path.replace(/'/g, "''")}')\n` +
+            `This track: ${filePath(r.path, pending)}`;
+        }
+
+        function showSetup(track, current) {
+          pending = track;
+          el.rootName.textContent = track.rootName;
+          el.rootName2.textContent = track.rootName;
+          el.path.value = current;
+          el.error.textContent = '';
+          updatePreview();
+          el.dialog.showModal();
+          el.path.focus();
+          el.path.select();
+        }
+
+        el.path.addEventListener('input', () => {
+          el.error.textContent = '';
+          updatePreview();
+        });
+
+        el.form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          if (!pending) { el.dialog.close(); return; }
+          const r = normalizeRoot(el.path.value, pending.rootName);
+          if (!r.path) {
+            el.error.textContent = r.error || 'Enter the full path of the folder.';
+            el.path.focus();
+            return;
+          }
+          const track = pending;
+          setRoot(track.rootName, r.path);
+          el.dialog.close();
+          launch(buildUrl(r.path, track));
+          showToast('Saved. Opening in Audacity…');
+        });
+
+        el.cancel.addEventListener('click', () => el.dialog.close());
+        el.dialog.addEventListener('close', () => { pending = null; });
+        el.dialog.addEventListener('keydown', (e) => e.stopPropagation());
+
+        return { open, canOpen, UNKNOWN_LOCATION, isOpen: () => el.dialog.open };
+      })();
+      /* ---- [Audacity integration] — end ---- */
+
+      /* ========================================================================
+         Editor / Audacity entry points (track rows, Now Playing, player bar)
+         ======================================================================== */
+      function updateEditEntryPoints() {
+        const track = state.trackMap.get(state.currentTrackId);
+        $('npEditActions').hidden = !track;
+        $('btnEditCurrent').disabled = !track;
+        const aud = $('btnNpAudacity');
+        const ok = Audacity.canOpen(track);
+        aud.setAttribute('aria-disabled', String(!ok));
+        aud.title = ok ? 'Open the original file in Audacity (Shift+click to change the folder path)' : Audacity.UNKNOWN_LOCATION;
+      }
+
+      $('btnNpEdit').addEventListener('click', (e) => {
+        if (state.currentTrackId) Editor.open(state.currentTrackId, e.currentTarget);
+      });
+      $('btnEditCurrent').addEventListener('click', (e) => {
+        if (state.currentTrackId) Editor.open(state.currentTrackId, e.currentTarget);
+      });
+      $('btnNpAudacity').addEventListener('click', (e) => {
+        Audacity.open(state.trackMap.get(state.currentTrackId), e.shiftKey);
+      });
+
 
       /* ========================================================================
          Init

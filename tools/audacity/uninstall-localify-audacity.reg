@@ -1,0 +1,5 @@
+Windows Registry Editor Version 5.00
+
+; Removes the localify-audacity: link registered by install-localify-audacity.reg (current user only).
+
+[-HKEY_CURRENT_USER\Software\Classes\localify-audacity]
