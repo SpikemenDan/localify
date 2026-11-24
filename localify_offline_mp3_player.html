@@ -3984,6 +3984,23 @@
           <span class="settings-hint" id="setTgModel" aria-live="polite"></span>
           <button type="button" class="btn-secondary" id="setTgRemoveModel" disabled>Remove model</button>
         </div>
+
+        <div class="settings-row">
+          <span class="settings-label" id="setAfAutoLabel">Fill in song details automatically<span class="settings-hint">New songs get a title, artist, album and more in your library. Your files aren't changed until you press Apply in Tidy.</span></span>
+          <button type="button" class="switch" id="setAfAuto" role="switch" aria-checked="true" aria-labelledby="setAfAutoLabel"></button>
+        </div>
+        <div class="settings-row">
+          <span class="settings-label" id="setAfOnlineLabel">Only run when online<span class="settings-hint">Songs added while offline are marked Unsorted and filled in once you're back online.</span></span>
+          <button type="button" class="switch" id="setAfOnline" role="switch" aria-checked="true" aria-labelledby="setAfOnlineLabel"></button>
+        </div>
+        <div class="settings-row">
+          <span class="settings-label" id="setAfMbLabel">Look up songs on MusicBrainz<span class="settings-hint">Off by default. Sends only the song's title and artist text to musicbrainz.org (and asks coverartarchive.org for album covers). No file names, folders or audio are sent. One request per second.</span></span>
+          <button type="button" class="switch" id="setAfMb" role="switch" aria-checked="false" aria-labelledby="setAfMbLabel"></button>
+        </div>
+        <div class="settings-row">
+          <span class="settings-label" id="setAfApplyLabel">Auto-apply to files<span class="settings-hint">Writes filled-in details straight into the files, only in folders you've already allowed Localify to edit. Undo from Tidy names &amp; tags.</span></span>
+          <button type="button" class="switch" id="setAfApply" role="switch" aria-checked="false" aria-labelledby="setAfApplyLabel"></button>
+        </div>
       </section>
       <!-- [/AI Tagger] -->
 
@@ -8784,7 +8801,8 @@
         const FRAME_FOR = { title: 'TIT2', artist: 'TPE1', album: 'TALB', year: 'TYER', genre: 'TCON', track: 'TRCK' };
         const TEMPLATE_PRESETS = ['{title} - {artist}', '{artist} - {title}', '{track} {title}', '{track}. {artist} - {title}'];
         // Defaults follow the library's existing "Title - Artist" file name convention (see parseFileMeta)
-        const DEFAULT_TAGGER_PREFS = { template: '{title} - {artist}', dashOrder: 'title-artist', ai: false };
+        const DEFAULT_TAGGER_PREFS = { template: '{title} - {artist}', dashOrder: 'title-artist', ai: false,
+          autoFill: true, onlineOnly: true, autoApply: false, musicbrainz: false };
         const READ_WORKERS = 4;
         const UNDO_MAX_BYTES = 256 * 1024 * 1024;   // original tag bytes kept for "Undo last batch"
         const ZIP_MAX_BYTES = 3.5 * 1024 * 1024 * 1024;
@@ -8797,11 +8815,14 @@
             if (typeof p.template === 'string' && p.template.trim()) out.template = p.template.slice(0, 120);
             if (p.dashOrder === 'artist-title' || p.dashOrder === 'title-artist') out.dashOrder = p.dashOrder;
             out.ai = p.ai === true;
+            for (const k of ['autoFill', 'onlineOnly', 'autoApply', 'musicbrainz']) if (typeof p[k] === 'boolean') out[k] = p[k];
           }
           return out;
         }
         let prefs = loadTaggerPrefs();
         const savePrefs = () => saveJSON(STORAGE_KEYS.TAGGER, prefs);
+        // Set by the auto-fill module below: stored details, after-apply cleanup, settings changes
+        const hooks = { suggestion: null, applied: null, prefsChanged: null };
 
         /* ---------------- Text rules (offline) ---------------- */
         const NOISE = [
@@ -9644,7 +9665,7 @@
           return fileExt(track.fileName) === 'mp3' || track.file.type === 'audio/mpeg';
         }
 
-        async function readItem(track) {
+        async function readItem(track, { raw } = {}) {
           const old = { title: '', artist: '', album: '', year: '', genre: '', track: '' };
           let cover = null, readError = '';
           const mp3 = isMp3(track);
@@ -9665,6 +9686,11 @@
             status: 'pending', message: '', where: null
           };
           setSuggestion(item, r.fields);
+          const stored = !raw && hooks.suggestion && hooks.suggestion(track);
+          if (stored) {
+            item.aiBy = stored.by;
+            setSuggestion(item, { ...r.fields, ...stored.fields });
+          }
           return item;
         }
 
@@ -10033,6 +10059,7 @@
         function applyToLibrary(track, item, newFile) {
           const n = item.next;
           const oldLike = track.likeKey;
+          const before = { likeKey: track.likeKey, size: track.size };
           if (item.mp3) {
             if (n.title) track.title = n.title;
             if (n.artist) track.artist = n.artist;
@@ -10050,6 +10077,7 @@
             moveLike(oldLike, track.likeKey);
           }
           buildSearchText(track);
+          if (hooks.applied) hooks.applied(track, before);
         }
 
         function moveLike(from, to) {
@@ -10302,12 +10330,60 @@
           if (input) { input.scrollIntoView({ block: 'center' }); input.focus(); }
         });
 
+        /* ---------------- Used by auto-fill ---------------- */
+        /** True when AI suggestions are on and can run without downloading anything. */
+        async function aiAvailable() {
+          if (!prefs.ai) return false;
+          if (stubEngine() || ai.generator) return true;
+          const dev = await pickDevice();
+          return await isCached(AI_MODEL_CACHE, modelFileUrl(dev.file)) && await isCached(AI_RUNTIME_CACHE, AI_LIB + 'transformers.min.js');
+        }
+
+        /**
+         * "Auto-apply to files": write details into one song without the dialog.
+         * Only for MP3s in a folder the user already allowed editing (never asks for permission).
+         * Joins "Undo last batch" in the Tidy dialog.
+         */
+        async function autoApply(track, fields) {
+          if (!isMp3(track) || ui.busy) return false;
+          const loc = await dirFor(track);
+          if (!loc || !(await hasWrite(loc.root, false))) return false;
+          const it = await readItem(track, { raw: true });
+          setSuggestion(it, { ...it.rules, ...fields });
+          if (!hasChanges(it)) return false;
+          const changed = changedFields(it);
+          const tagChange = Object.keys(changed).length > 0;
+          const res = tagChange ? await retag(track.file, it.next, changed) : null;
+          const dir = await walk(loc.root, loc.parts);
+          const before = snapshotMeta(track);
+          let fh = await dir.getFileHandle(track.fileName);
+          if (tagChange) await writeBlob(fh, res.blob);
+          if (nameChanged(it)) fh = await renameIn(dir, track.fileName, it.nextName);
+          const newFile = await fh.getFile();
+          applyToLibrary(track, it, newFile);
+          if (tagChange) await refreshCover(track);
+          track.thumbUrl = undefined; track.thumbState = undefined;
+          reloadIfCurrent(track);
+          if (!ui.lastBatch || !ui.lastBatch.auto) ui.lastBatch = { entries: [], undoable: true, bytes: 0, auto: true };
+          const entry = { track, rootName: track.rootName, parts: loc.parts, before, after: newFile.name, tagChange };
+          if (tagChange) {
+            entry.oldHead = res.oldHead; entry.oldTail = res.oldTail;
+            ui.lastBatch.bytes += res.oldHead.length;
+            if (ui.lastBatch.bytes > UNDO_MAX_BYTES) ui.lastBatch.undoable = false;
+          }
+          ui.lastBatch.entries.push(entry);
+          patchTrackEverywhere(track);
+          return true;
+        }
+
         /* ---------------- Settings section ---------------- */
         const set = {
           template: $('setTgTemplate'), presets: $('setTgPresets'), example: $('setTgExample'),
           order: $('setTgOrder'), aiSwitch: $('setTgAi'), aiHint: $('setTgAiHint'),
-          model: $('setTgModel'), remove: $('setTgRemoveModel')
+          model: $('setTgModel'), remove: $('setTgRemoveModel'),
+          autoFill: $('setAfAuto'), onlineOnly: $('setAfOnline'), musicbrainz: $('setAfMb'), autoApply: $('setAfApply')
         };
+        const AF_SWITCHES = ['autoFill', 'onlineOnly', 'musicbrainz', 'autoApply'];
         const EXAMPLE = { title: 'Blinding Lights', artist: 'The Weeknd', album: 'After Hours', year: '2020', genre: 'Pop', track: '3' };
 
         function syncSettings() {
@@ -10316,6 +10392,7 @@
           set.presets.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tpl === prefs.template)));
           setRadioGroup(set.order, prefs.dashOrder);
           setSwitch(set.aiSwitch, prefs.ai);
+          AF_SWITCHES.forEach(k => setSwitch(set[k], prefs[k]));
           if (el.template) el.template.textContent = prefs.template;
         }
 
@@ -10352,6 +10429,12 @@
             syncSettings();
             if (!prefs.ai) setAI('off', '');
           });
+          AF_SWITCHES.forEach(k => set[k].addEventListener('click', () => {
+            prefs[k] = !prefs[k];
+            savePrefs();
+            syncSettings();
+            if (hooks.prefsChanged) hooks.prefsChanged(k);
+          }));
           set.remove.addEventListener('click', async () => {
             if (!confirm('Remove the downloaded AI model from this browser? You can download it again later.')) return;
             try { await caches.delete(AI_MODEL_CACHE); await caches.delete(AI_RUNTIME_CACHE); } catch (e) { /* ignore */ }
@@ -10371,6 +10454,10 @@
           resetPrefs: () => { prefs = { ...DEFAULT_TAGGER_PREFS }; try { localStorage.removeItem(STORAGE_KEYS.TAGGER); } catch (e) { /* ignore */ } syncSettings(); },
           openForTrack: (id, opener) => open([state.trackMap.get(id)], { single: true, opener }),
           openForShown: (opener) => open(getVisibleTracks(), { opener }),
+          hooks, autoApply,
+          // Undo the songs auto-apply saved since the last manual batch
+          undoAuto: async () => { if (!ui.lastBatch || !ui.lastBatch.auto || !ui.lastBatch.undoable) return false; await undoLast(); return true; },
+          internals: { readItem, aiSuggest, mergeAI, norm, sameish, aiAvailable, prefs: () => prefs },
           // Pure helpers, exposed for testing in the console
           _test: { stripNoise, fixCase, splitFeat, parseName, suggestRules, renderTemplate, buildFileName, listFrames, retag, readLayout, validateAI, makeZip }
         };
