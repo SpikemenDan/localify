@@ -3056,9 +3056,11 @@
       --danger-rgb: 200, 16, 46;
     }
 
-    /* Settings drawer */
-    .settings-panel {
-      width: 420px;
+    /* Settings drawer (phones keep the full-width sheet) */
+    @media (min-width: 769px) {
+      .settings-panel {
+        width: 420px;
+      }
     }
 
     [data-mode="light"] .settings-panel {
@@ -4277,7 +4279,7 @@
             </div>
             <h2 class="empty-title" id="emptyTitle">Your Offline Music Player Is Ready</h2>
             <p class="empty-desc" id="emptyDesc">
-              Pick a music folder or drop audio files here. Everything stays private on your device.
+              Pick a folder or drop audio files. It all stays on your device.
             </p>
             <div class="empty-actions" id="emptyActions">
               <button class="btn-primary" id="btnReconnect" hidden>
@@ -4622,12 +4624,12 @@
         </div>
 
         <div class="settings-row stacked">
-          <span class="settings-label" id="setAccentLabel">Accent color</span>
+          <span class="settings-label" id="setAccentLabel">Accent Color</span>
           <div class="accent-swatches" id="setAccent" role="radiogroup" aria-labelledby="setAccentLabel"></div>
         </div>
 
         <div class="settings-row">
-          <span class="settings-label" id="setCompactLabel">Compact rows<span class="settings-hint">Fit more songs on screen</span></span>
+          <span class="settings-label" id="setCompactLabel">Compact Rows<span class="settings-hint">Fit more songs.</span></span>
           <button type="button" class="switch" id="setCompact" role="switch" aria-checked="false" aria-labelledby="setCompactLabel"></button>
         </div>
       </section>
@@ -4640,9 +4642,9 @@
           <span class="settings-label" id="setEqLabel">Equalizer</span>
           <div class="segmented wrap" id="setEqPreset" role="radiogroup" aria-labelledby="setEqLabel">
             <button type="button" role="radio" data-value="flat">Flat</button>
-            <button type="button" role="radio" data-value="bass">Bass boost</button>
+            <button type="button" role="radio" data-value="bass">Bass Boost</button>
             <button type="button" role="radio" data-value="vocal">Vocal</button>
-            <button type="button" role="radio" data-value="treble">Treble boost</button>
+            <button type="button" role="radio" data-value="treble">Treble Boost</button>
             <button type="button" role="radio" data-value="loudness">Loudness</button>
             <button type="button" role="radio" data-value="custom" disabled>Custom</button>
           </div>
@@ -4654,7 +4656,7 @@
         </div>
 
         <div class="settings-row">
-          <span class="settings-label" id="setLevelingLabel">Volume leveling<span class="settings-hint">Evens out loud and quiet songs. Squashes dynamics a little, so quiet passages get louder.</span></span>
+          <span class="settings-label" id="setLevelingLabel">Volume Leveling<span class="settings-hint">Evens out loud and quiet songs.</span></span>
           <button type="button" class="switch" id="setLeveling" role="switch" aria-checked="false" aria-labelledby="setLevelingLabel"></button>
         </div>
 
@@ -4667,20 +4669,20 @@
         </div>
 
         <div class="settings-row stacked">
-          <span class="settings-label" id="setSleepLabel">Sleep timer<span class="settings-hint" id="setSleepHint">Fades out over the last 10 seconds.</span></span>
+          <span class="settings-label" id="setSleepLabel">Sleep Timer<span class="settings-hint" id="setSleepHint">Fades out at the end.</span></span>
           <div class="segmented wrap" id="setSleep" role="radiogroup" aria-labelledby="setSleepLabel">
             <button type="button" role="radio" data-value="off">Off</button>
             <button type="button" role="radio" data-value="15">15 min</button>
             <button type="button" role="radio" data-value="30">30 min</button>
             <button type="button" role="radio" data-value="45">45 min</button>
             <button type="button" role="radio" data-value="60">60 min</button>
-            <button type="button" role="radio" data-value="track">End of track</button>
+            <button type="button" role="radio" data-value="track">End of Track</button>
           </div>
         </div>
 
         <div class="settings-row stacked">
           <div class="settings-row-head">
-            <label class="settings-label" for="setSpeed">Default playback speed</label>
+            <label class="settings-label" for="setSpeed">Default Playback Speed</label>
             <span class="settings-value" id="setSpeedValue">1x</span>
           </div>
           <input type="range" class="speed-range-slider" id="setSpeed" min="0.25" max="3" step="0.05" value="1">
@@ -4692,11 +4694,11 @@
         <h3 class="settings-section-title" id="setIntegrationsTitle">Integrations</h3>
 
         <div class="settings-row stacked as-block" id="setAudacity" aria-labelledby="setAudacityLabel">
-          <span class="settings-label" id="setAudacityLabel">Open in Audacity<span class="settings-hint">Windows only. Browsers can't start programs, so a small helper opens the original file in Audacity. It only opens audio files inside the folders you list.</span></span>
+          <span class="settings-label" id="setAudacityLabel">Open in Audacity<span class="settings-hint">Windows only. Needs the helper below.</span></span>
 
           <div class="as-pending" id="asPending" hidden role="status">
             <span>Enter where <strong id="asPendingRoot"></strong> is on this PC, then open <strong id="asPendingTitle"></strong>.</span>
-            <button type="button" class="btn-primary as-open-btn" id="asOpenPending">Save and open</button>
+            <button type="button" class="btn-primary as-open-btn" id="asOpenPending">Save and Open</button>
           </div>
 
           <ol class="as-steps">
@@ -4710,7 +4712,7 @@
 
           <div class="as-helper" id="asHelper" hidden>
             <div class="settings-row-head">
-              <span class="settings-label as-sub">Helper line</span>
+              <span class="settings-label as-sub">Helper Line</span>
               <button type="button" class="btn-ghost as-copy" id="asCopy">Copy</button>
             </div>
             <code class="as-preview" id="asPreview"></code>
@@ -4723,17 +4725,17 @@
         <h3 class="settings-section-title" id="setGeneralTitle">General</h3>
 
         <div class="settings-row">
-          <span class="settings-label" id="setResumeLabel">Resume last track on startup<span class="settings-hint">Cue the song you were playing, at the same spot.</span></span>
+          <span class="settings-label" id="setResumeLabel">Resume Last Track on Startup<span class="settings-hint">Pick up where you left off.</span></span>
           <button type="button" class="switch" id="setResume" role="switch" aria-checked="true" aria-labelledby="setResumeLabel"></button>
         </div>
 
         <div class="settings-row">
-          <span class="settings-label" id="setConfirmClearLabel">Confirm before clearing folder history</span>
+          <span class="settings-label" id="setConfirmClearLabel">Confirm Before Clearing Folder History</span>
           <button type="button" class="switch" id="setConfirmClear" role="switch" aria-checked="true" aria-labelledby="setConfirmClearLabel"></button>
         </div>
 
         <div class="settings-row">
-          <span class="settings-label">Reset all settings<span class="settings-hint">Your library and liked songs are kept.</span></span>
+          <span class="settings-label">Reset All Settings<span class="settings-hint">Keeps your library and likes.</span></span>
           <button type="button" class="btn-secondary settings-danger" id="btnResetSettings">Reset</button>
         </div>
       </section>
@@ -6674,16 +6676,16 @@
             const reconnect = state.pendingReconnect.length > 0;
             dom.emptyTitle.textContent = reconnect ? 'Welcome Back' : 'Your Offline Music Player Is Ready';
             dom.emptyDesc.textContent = reconnect
-              ? 'Reconnect to your music folder, or pick a different one.'
-              : 'Pick a music folder or drop audio files here. Everything stays private on your device.';
+              ? 'Reconnect your folder or pick another.'
+              : 'Pick a folder or drop audio files. It all stays on your device.';
             dom.emptyActions.style.display = 'flex';
           } else if (state.searchQuery.trim() !== '') {
             dom.emptyTitle.textContent = 'No Matching Tracks';
-            dom.emptyDesc.textContent = `Nothing found for "${state.searchQuery.trim()}". Try a title, artist or album.`;
+            dom.emptyDesc.textContent = `Nothing found for "${state.searchQuery.trim()}".`;
             dom.emptyActions.style.display = 'none';
           } else if (state.activeView === 'liked') {
             dom.emptyTitle.textContent = 'No Liked Songs Yet';
-            dom.emptyDesc.textContent = 'Tap the heart on any song to save it here.';
+            dom.emptyDesc.textContent = 'Tap the heart on a song to save it.';
             dom.emptyActions.style.display = 'none';
           }
           looksDecorateEmpty();   // [Looks] illustration + call to action
@@ -10111,7 +10113,7 @@
           looksEmptyAction = () => { clearSearch(); dom.searchInput.focus(); };
         } else if (kind === 'albums' || kind === 'artists') {
           dom.emptyTitle.textContent = kind === 'albums' ? 'This Album Is Empty' : 'No Songs by This Artist';
-          dom.emptyDesc.textContent = 'Its songs left your library. Load the folder again to bring them back.';
+          dom.emptyDesc.textContent = 'Reload the folder to bring its songs back.';
           dom.emptyActions.style.display = 'none';
           label = kind === 'albums' ? 'Back to Albums' : 'Back to Artists';
           looksEmptyAction = () => Browse.back();
