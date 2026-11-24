@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<!--
+  Entry point for the hosted site (GitHub Pages serves index.html at the root).
+  The app itself lives in localify_offline_mp3_player.html — the one file you can
+  also open straight from disk — so there is only ever one copy to edit.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Localify</title>
+  <meta name="theme-color" content="#121212">
+  <link rel="icon" href="icons/icon.svg">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta http-equiv="refresh" content="0; url=localify_offline_mp3_player.html">
+  <script>location.replace('localify_offline_mp3_player.html' + location.search + location.hash);</script>
+  <style>
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #121212; color: #b3b3b3; font: 16px system-ui, sans-serif; }
+    a { color: #1DB954; }
+  </style>
+</head>
+<body>
+  <p>Opening Localify… <a href="localify_offline_mp3_player.html">Continue</a></p>
+</body>
+</html>
