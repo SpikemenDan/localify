@@ -3091,6 +3091,65 @@
       .tg-edit { grid-template-columns: 1fr; }
       .tg-foot .btn-primary, .tg-foot .btn-secondary { flex: 1; }
     }
+
+    /* [AI Tagger] auto-fill: chip, badges, action toasts, questions */
+    .nav-item[hidden], .af-chip[hidden] { display: none; }
+    .af-chip {
+      display: inline-flex; align-items: center; gap: 6px; flex-shrink: 1; min-width: 0; max-width: 260px;
+      height: 30px; padding: 0 12px; border-radius: var(--radius-full);
+      background: var(--bg-highlight, rgba(var(--fg-rgb), 0.08)); color: var(--text-secondary);
+      font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .af-chip:hover { color: var(--text-primary); }
+    .af-chip > span:last-child { overflow: hidden; text-overflow: ellipsis; }
+    .af-chip-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; background: var(--text-muted); }
+    .af-chip[data-mode="busy"] .af-chip-dot { background: var(--accent); animation: afPulse 1.1s ease-in-out infinite; }
+    .af-chip[data-mode="question"] { background: var(--accent-dim); color: var(--accent); }
+    .af-chip[data-mode="question"] .af-chip-dot { background: var(--accent); }
+    @keyframes afPulse { 50% { opacity: 0.3; } }
+    @media (prefers-reduced-motion: reduce) { .af-chip[data-mode="busy"] .af-chip-dot { animation: none; } }
+    .af-badge {
+      display: inline-block; vertical-align: 1px; margin-right: 6px; padding: 1px 6px; border-radius: var(--radius-full);
+      font-size: 10px; font-weight: 700; letter-spacing: 0.02em; line-height: 1.5;
+    }
+    .af-unsorted { background: rgba(var(--fg-rgb), 0.1); color: var(--text-secondary); }
+    .af-filled { background: rgba(var(--fg-rgb), 0.06); color: var(--text-muted); }
+    .af-q { background: var(--accent-dim); color: var(--accent); cursor: pointer; min-width: 18px; text-align: center; }
+    .af-q:hover { background: var(--accent); color: var(--bg-base, #000); }
+    .toast.af-toast { display: flex; align-items: center; gap: 12px; pointer-events: auto; }
+    .af-toast-btn { color: var(--accent); font-weight: 700; font-size: 13px; padding: 2px 4px; border-radius: 4px; }
+    .af-toast-btn:hover { text-decoration: underline; }
+    .tg-dialog.af-qa { width: min(560px, calc(100vw - 32px)); height: fit-content; max-height: calc(100dvh - 32px); margin: auto; }
+    .af-qa .toast-container { bottom: 24px; }
+    .af-qa .toast.af-toast { display: none; }   /* "Review" / "Answer" prompts don't belong over the Q&A itself */
+    .af-qa-body { padding: 8px 20px 4px; overflow: auto; min-height: 0; }
+    .af-qa-song { display: flex; align-items: center; gap: 12px; padding: 10px 0 14px; border-bottom: 1px solid var(--border-subtle); }
+    .af-qa-meta { flex: 1; min-width: 0; }
+    .af-qa-meta .tg-sub { overflow-wrap: anywhere; }
+    .af-qa-play { flex-shrink: 0; }
+    .af-qa-q { font-size: 16px; font-weight: 700; margin: 16px 0 2px; }
+    .af-qa-opts { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+    .af-opt {
+      padding: 8px 14px; border-radius: var(--radius-full); border: 1px solid var(--border-subtle);
+      color: var(--text-primary); font-size: 13px; font-weight: 600; text-align: left; overflow-wrap: anywhere;
+    }
+    .af-opt:hover, .af-opt:focus-visible { border-color: var(--accent); color: var(--accent); }
+    .af-qa-none { font-size: 13px; color: var(--text-muted); }
+    .af-qa-free { display: flex; gap: 8px; }
+    .af-qa-free input {
+      flex: 1; min-width: 0; height: 36px; padding: 0 12px; border-radius: var(--radius-sm, 6px);
+      border: 1px solid var(--border-subtle); background: var(--bg-base); color: var(--text-primary); font: inherit; font-size: 13px;
+    }
+    .af-qa-free input:focus { outline: none; border-color: var(--accent); }
+    .af-qa-done { padding: 18px 0 6px; }
+    .af-qa-status { min-height: 1.4em; font-size: 12.5px; color: var(--accent); margin: 10px 0 0; }
+    .af-qa .tg-foot { justify-content: flex-end; }
+    @media (max-width: 640px) {
+      .af-chip { max-width: 120px; padding: 0 10px; }
+      .af-qa-body { padding: 8px 16px 4px; }
+      .af-qa-song { flex-wrap: wrap; }
+      .af-qa-play { width: 100%; }
+    }
     /* ---- end [AI Tagger] ---- */
   </style>
 </head>
@@ -3292,6 +3351,45 @@
       <button type="button" class="btn-primary" id="tgApply" disabled>Apply</button>
     </div>
   </dialog>
+
+  <!-- [AI Tagger] Questions about songs -->
+  <dialog id="qaDialog" class="tg-dialog af-qa" aria-labelledby="qaTitle" aria-describedby="qaQuestion">
+    <div class="tg-head">
+      <div>
+        <h2 id="qaTitle">Questions about your songs</h2>
+        <div class="tg-sub" id="qaCount"></div>
+      </div>
+      <button type="button" class="btn-ghost tg-close" id="qaClose">Stop for now</button>
+    </div>
+    <div class="af-qa-body">
+      <div class="af-qa-song">
+        <div class="tg-cover" id="qaCover" aria-hidden="true"></div>
+        <div class="af-qa-meta">
+          <div class="tg-fname" id="qaName"></div>
+          <div class="tg-sub" id="qaFile"></div>
+        </div>
+        <button type="button" class="btn-secondary af-qa-play" id="qaPlay" aria-pressed="false">Play preview</button>
+      </div>
+      <div id="qaAsk">
+        <h3 class="af-qa-q" id="qaQuestion"></h3>
+        <p class="tg-sub" id="qaWhy"></p>
+        <div class="af-qa-opts" id="qaOptions" role="group" aria-label="Suggested answers"></div>
+        <form class="af-qa-free" id="qaFreeForm">
+          <input type="text" id="qaFree" autocomplete="off" aria-label="Your answer" maxlength="200">
+          <button type="submit" class="btn-primary">Save</button>
+        </form>
+      </div>
+      <div class="af-qa-done" id="qaDone" hidden>
+        <strong>All done.</strong>
+        <p class="tg-sub">Thanks! Your answers are saved and used for related songs too. Press Apply in Tidy names &amp; tags to write them into the files.</p>
+      </div>
+      <p class="af-qa-status" id="qaStatus" aria-live="polite"></p>
+    </div>
+    <div class="tg-foot">
+      <button type="button" class="btn-ghost" id="qaSkip">Skip</button>
+      <button type="button" class="btn-secondary" id="qaLeave">Leave as is</button>
+    </div>
+  </dialog>
   <!-- [/AI Tagger] -->
 
   <!-- Mobile Sidebar Backdrop -->
@@ -3329,6 +3427,16 @@
             </svg>
             <span>Liked Songs</span>
             <span class="nav-count" id="countLiked">0</span>
+          </button>
+
+          <!-- [AI Tagger] songs waiting for details -->
+          <button class="nav-item" data-view="unsorted" id="navUnsorted" hidden>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+              <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+            </svg>
+            <span>Unsorted</span>
+            <span class="nav-count" id="countUnsorted">0</span>
           </button>
 
           <button class="nav-item" data-view="visualizer" id="navVisualizer">
@@ -3502,6 +3610,11 @@
           <option value="duration">Sort: Duration</option>
         </select>
 
+        <!-- [AI Tagger] auto-fill status -->
+        <button type="button" class="af-chip" id="afChip" hidden aria-live="polite">
+          <span class="af-chip-dot" aria-hidden="true"></span>
+          <span id="afChipText"></span>
+        </button>
         <!-- [Settings] Sleep-timer indicator + gear button -->
         <button type="button" class="sleep-indicator" id="sleepIndicator" hidden title="Sleep timer active (click to change)" aria-label="Sleep timer active">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
@@ -4039,7 +4152,9 @@
         AUDIO_FX: 'localify_audio_fx_v1',               // { eqPreset, eq:[low,mid,high], leveling, crossfade }
         PREFS: 'localify_prefs_v1',                     // { resumeOnStartup, confirmClearHistory }
         AUDACITY_ROOTS: 'localify_audacity_roots_v1',   // [Audacity integration] { folderName: "C:\abs\path" }
-        TAGGER: 'localify_tagger_v1'    // [AI Tagger] { template, dashOrder, ai }
+        TAGGER: 'localify_tagger_v1',    // [AI Tagger] { template, dashOrder, ai, autoFill, onlineOnly, autoApply, musicbrainz }
+        SONG_DETAILS: 'localify_song_details_v1',   // [AI Tagger] auto-fill { "likekey|size": details | 'ok' }
+        SONG_ANSWERS: 'localify_song_answers_v1'    // [AI Tagger] { artists: { name: spelling }, albums: { folder: { album, year } } }
       };
 
       const AUDIO_EXTENSIONS = new Set(['mp3', 'wav', 'ogg', 'm4a', 'flac', 'aac', 'opus', 'webm']);
@@ -4237,6 +4352,8 @@
         navVisualizer: $('navVisualizer'),
         countAll: $('countAll'),
         countLiked: $('countLiked'),
+        navUnsorted: $('navUnsorted'),     // [AI Tagger]
+        countUnsorted: $('countUnsorted'), // [AI Tagger]
         statTracks: $('statTracks'),
         statDuration: $('statDuration'),
 
@@ -5183,6 +5300,7 @@
 
         if (!state.trackMap.has(track.id)) return;
         track.enriched = true;
+        try { AutoFill.onEnriched(track); } catch (e) { /* [AI Tagger] not ready yet */ }
         buildSearchText(track);
         patchTrackEverywhere(track);
         if (track.id === state.currentTrackId) {
@@ -5262,6 +5380,8 @@
         let list = state.tracks;
         if (state.activeView === 'liked') {
           list = list.filter(t => state.likedKeys.has(t.likeKey));
+        } else if (state.activeView === 'unsorted') {   // [AI Tagger]
+          list = list.filter(t => t.afState === 'unsorted');
         }
         const q = state.searchQuery.trim().toLowerCase();
         if (q) {
@@ -5835,13 +5955,13 @@
          Views & rendering
          ======================================================================== */
       function switchView(view) {
-        if (view !== 'all' && view !== 'liked' && view !== 'visualizer') view = 'all';
+        if (view !== 'all' && view !== 'liked' && view !== 'visualizer' && view !== 'unsorted') view = 'all';   // [AI Tagger] unsorted
         const prev = state.activeView;
         state.activeView = view;
         saveJSON(STORAGE_KEYS.VIEW, view);
         closeMobileSidebar();
 
-        [dom.navAll, dom.navLiked, dom.navVisualizer].forEach(el => {
+        [dom.navAll, dom.navLiked, dom.navUnsorted, dom.navVisualizer].forEach(el => {
           const isActive = el.dataset.view === view;
           el.classList.toggle('active', isActive);
           if (isActive) el.setAttribute('aria-current', 'page'); else el.removeAttribute('aria-current');
@@ -5884,6 +6004,7 @@
         }
         dom.countAll.textContent = state.tracks.length;
         dom.countLiked.textContent = liked;
+        AutoFill.updateChip();   // [AI Tagger]
         dom.statTracks.textContent = state.tracks.length;
         dom.statDuration.textContent = formatTotalDuration(totalSec);
 
@@ -5901,6 +6022,10 @@
         dom.heroBanner.classList.toggle('liked-theme', isLiked);
         dom.heroType.textContent = isLiked ? 'Favorites' : 'Local Music Library';
         dom.heroTitle.textContent = isLiked ? 'Liked Songs' : 'All Tracks';
+        if (state.activeView === 'unsorted') {   // [AI Tagger]
+          dom.heroType.textContent = 'Waiting for details';
+          dom.heroTitle.textContent = 'Unsorted';
+        }
         dom.heroCover.innerHTML = isLiked ? SVG.heartFilled64 : SVG.note(64, '#ffffff');
       }
 
@@ -5943,6 +6068,10 @@
           } else if (state.activeView === 'liked') {
             dom.emptyTitle.textContent = 'No liked songs yet';
             dom.emptyDesc.textContent = 'Click the heart icon next to any song to save it to your Liked Songs collection.';
+            dom.emptyActions.style.display = 'none';
+          } else if (state.activeView === 'unsorted') {   // [AI Tagger]
+            dom.emptyTitle.textContent = 'Nothing unsorted';
+            dom.emptyDesc.textContent = 'Songs added while you\'re offline wait here until Localify can fill in their details.';
             dom.emptyActions.style.display = 'none';
           }
           return;
@@ -6025,7 +6154,7 @@
             <div class="track-title-cell">
               <div class="track-thumb">${artHTML(track, 18)}</div>
               <div class="track-text">
-                <div class="track-name" title="${escapeHtml(track.title)}">${escapeHtml(track.title)}</div>
+                <div class="track-name" title="${escapeHtml(track.title)}">${AutoFill.badgeHTML(track)}${escapeHtml(track.title)}</div>
                 <div class="track-artist" title="${escapeHtml(track.artist)}">${escapeHtml(track.artist)}</div>
               </div>
             </div>
@@ -6407,7 +6536,7 @@
       });
 
       // Navigation
-      [dom.navAll, dom.navLiked, dom.navVisualizer].forEach(btn => {
+      [dom.navAll, dom.navLiked, dom.navUnsorted, dom.navVisualizer].forEach(btn => {
         btn.addEventListener('click', () => switchView(btn.dataset.view));
       });
       dom.btnVisualizerToggle.addEventListener('click', () => {
@@ -6716,7 +6845,7 @@
 
       window.addEventListener('keydown', (e) => {
         // The editor and the Audacity setup dialog handle their own keys
-        if (Editor.isOpen() || Audacity.isOpen() || Tagger.isOpen()) return;   // [AI Tagger]
+        if (Editor.isOpen() || Audacity.isOpen() || Tagger.isOpen() || AutoFill.isOpen()) return;   // [AI Tagger]
         if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
         const target = e.target;
         if (e.key === 'Escape') {
@@ -10464,6 +10593,831 @@
       })();
       window.LocalifyTagger = Tagger._test;
       /* [/AI Tagger] */
+
+      /* ==========================================================================
+         [AI Tagger] auto-fill: fill in song details in the background.
+         - Details live in STORAGE_KEYS.SONG_DETAILS (per song key), shown in the
+           library only. Files change only through Apply, or "Auto-apply to files".
+         - With "Only run when online" on, songs found while offline are marked
+           Unsorted and processed when the connection comes back.
+         - When sources disagree or a value is missing, it asks instead of guessing.
+         ========================================================================== */
+      const AutoFill = (() => {
+        const T = Tagger.internals;
+        const FIELDS = ['title', 'artist', 'album', 'year', 'genre', 'track'];
+        const LABEL = { title: 'title', artist: 'artist', album: 'album', year: 'year', genre: 'genre', track: 'track number' };
+        // How much each source is trusted (0..1). MusicBrainz is scaled by its own match score.
+        const CONF = { user: 1, hint: 0.98, tag: 1, ripped: 0.85, mb: 0.95, ai: 0.7, name: 0.6, folder: 0.45 };
+        const ASK_GAP = 0.2;       // two different values closer than this → ask
+        const MIN_OPTION = 0.5;    // weaker guesses are not offered as answers
+        const BATCH = 3;           // songs processed at a time
+        const GAP_MS = 150;        // pause between batches
+        const MB_GAP_MS = 1100;    // MusicBrainz asks for at most one request per second
+        const REACH_TTL = 60000;
+        const MB_URL = 'https://musicbrainz.org/ws/2/recording/';
+        const CAA_URL = 'https://coverartarchive.org/release/';
+        const COVER_CACHE = 'localify-covers-v1';
+        const REACH_URL = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/package.json';
+
+        const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+        const pref = () => T.prefs();
+        const norm = T.norm;
+
+        /* ---------------- Storage ---------------- */
+        function loadDetails() {
+          const d = loadJSON(STORAGE_KEYS.SONG_DETAILS, {});
+          return d && typeof d === 'object' && !Array.isArray(d) ? d : {};
+        }
+        function loadAnswers() {
+          const a = loadJSON(STORAGE_KEYS.SONG_ANSWERS, {});
+          const ok = (o) => (o && typeof o === 'object' && !Array.isArray(o) ? o : {});
+          return { artists: ok(a && a.artists), albums: ok(a && a.albums) };
+        }
+        let details = loadDetails();     // key -> 'ok' | { state, f, src, conf, q, orig, mbid, at }
+        let answers = loadAnswers();     // { artists: { normName: spelling }, albums: { folderKey: { album?, year? } } }
+        let saveTimer = 0;
+        function saveDetails(now) {
+          clearTimeout(saveTimer);
+          if (now) saveJSON(STORAGE_KEYS.SONG_DETAILS, details);
+          else saveTimer = setTimeout(() => saveJSON(STORAGE_KEYS.SONG_DETAILS, details), 400);
+        }
+        const saveAnswers = () => saveJSON(STORAGE_KEYS.SONG_ANSWERS, answers);
+
+        const keyOf = (t) => `${t.likeKey}|${t.size}`;
+        const dirOf = (t) => (t.relPath && t.relPath.includes('/') ? t.relPath.split('/').slice(0, -1).join('/') : '');
+        const folderKey = (t) => (t.rootName ? `${t.rootName}/${dirOf(t)}` : `drop:${t.folder || ''}`);
+        const entryOf = (t) => { const e = details[keyOf(t)]; return e && typeof e === 'object' ? e : null; };
+        const trackForKey = (key) => state.tracks.find(t => keyOf(t) === key) || null;
+
+        /* ---------------- Library overlay ---------------- */
+        function overlay(track, e) {
+          const f = e.f || {};
+          if (f.title) track.title = f.title;
+          if (f.artist) track.artist = f.artist;
+          if (f.album) track.album = f.album;
+          if (f.year) track.year = f.year;
+          if (f.genre) track.genre = f.genre;
+          if (f.track && +f.track) track.trackNo = +f.track;
+          track.afState = e.state === 'unsorted' ? 'unsorted' : (e.q && e.q.length ? 'question' : 'filled');
+          if (e.mbid && !track.cover) loadCover(track, e.mbid);
+          buildSearchText(track);
+          patchTrackEverywhere(track);
+        }
+
+        function refresh() {
+          invalidateVisible();
+          scheduleUI({ list: true, stats: true, queue: true });
+          updateChip();
+        }
+
+        /** Called by enrichTrack once a song's own tags are read. */
+        function onEnriched(track) {
+          if (!pref().autoFill) return;
+          const e = details[keyOf(track)];
+          if (e === 'ok') return;
+          if (e && e.state !== 'unsorted') { overlay(track, e); updateChip(); return; }
+          if (e) { track.afState = 'unsorted'; patchTrackEverywhere(track); }
+          enqueue(track);
+        }
+
+        /* ---------------- Online check ---------------- */
+        let reach = { ok: null, at: 0, pending: null };
+        function isOnline(force) {
+          if (navigator.onLine === false) return Promise.resolve(false);
+          if (!force && reach.ok !== null && Date.now() - reach.at < REACH_TTL) return Promise.resolve(reach.ok);
+          if (reach.pending) return reach.pending;
+          reach.pending = (async () => {
+            let ok = false;
+            try {
+              // Test seam: window.__LOCALIFY_REACH_STUB__ = () => true | false
+              const stub = window.__LOCALIFY_REACH_STUB__;
+              if (typeof stub === 'function') ok = !!(await stub());
+              else {
+                const ctl = new AbortController();
+                const timer = setTimeout(() => ctl.abort(), 4000);
+                await fetch(REACH_URL, { method: 'HEAD', mode: 'no-cors', cache: 'no-store', credentials: 'omit', signal: ctl.signal });
+                clearTimeout(timer);
+                ok = true;
+              }
+            } catch (e) { ok = false; }
+            reach = { ok, at: Date.now(), pending: null };
+            return ok;
+          })();
+          return reach.pending;
+        }
+        const canRun = () => (pref().onlineOnly ? isOnline() : Promise.resolve(true));
+
+        /* ---------------- Queue ---------------- */
+        const queue = [];
+        const queued = new Set();
+        const progress = { done: 0, total: 0 };
+        const summary = { filled: 0, questions: 0, applied: 0, tracks: [], saved: [] };
+        let pumping = false, pumpTimer = 0;
+
+        function enqueue(track) {
+          if (queued.has(track.id)) return;
+          queued.add(track.id);
+          queue.push(track);
+          progress.total++;
+          if (!pumpTimer) pumpTimer = setTimeout(() => { pumpTimer = 0; pump(); }, 300);
+        }
+
+        function markQueuedUnsorted() {
+          for (const t of queue) {
+            const k = keyOf(t);
+            if (!details[k] || details[k] === 'ok') details[k] = { state: 'unsorted', at: Date.now() };
+            t.afState = 'unsorted';
+            patchTrackEverywhere(t);
+          }
+          queue.length = 0;
+          queued.clear();
+          progress.done = progress.total = 0;
+          saveDetails();
+          refresh();
+        }
+
+        async function pump() {
+          if (pumping || !queue.length) return;
+          pumping = true;
+          updateChip();
+          try {
+            while (queue.length) {
+              if (!pref().autoFill) { queue.length = 0; queued.clear(); break; }
+              if (!(await canRun())) { markQueuedUnsorted(); break; }
+              const batch = queue.splice(0, BATCH);
+              await Promise.all(batch.map(t => processTrack(t)
+                .catch(() => { /* leave it for next time */ })
+                .finally(() => { queued.delete(t.id); progress.done++; updateChip(); })));
+              await sleep(GAP_MS);
+            }
+          } finally {
+            pumping = false;
+          }
+          if (!queue.length) finishRun();
+        }
+
+        function finishRun() {
+          progress.done = progress.total = 0;
+          saveDetails(true);
+          refresh();
+          const s = { ...summary, tracks: summary.tracks.slice() };
+          summary.filled = summary.questions = summary.applied = 0;
+          summary.tracks = []; summary.saved = [];
+          if (s.applied) {
+            notify(`Saved details into ${s.applied} ${s.applied === 1 ? 'file' : 'files'}`, 'Undo', async () => {
+              if (!(await Tagger.undoAuto())) { showToast('Nothing to undo'); return; }
+              // Put the details back as a suggestion so the song isn't saved again on its own
+              for (const { track, entry } of s.saved) if (state.trackMap.has(track.id)) details[keyOf(track)] = entry;
+              saveDetails(true);
+              refresh();
+            });
+          }
+          if (s.filled) {
+            notify(`Filled details for ${s.filled} ${s.filled === 1 ? 'song' : 'songs'}`, 'Review',
+              () => Tagger.open(s.tracks.filter(t => state.trackMap.has(t.id))));
+          }
+          const q = questionCount();
+          if (s.questions && q) notify(`Localify has ${q} ${q === 1 ? 'question' : 'questions'} about your songs`, 'Answer', () => openQuestions());
+        }
+
+        function resumeUnsorted() {
+          if (!pref().autoFill) return;
+          for (const t of state.tracks) if (t.afState === 'unsorted') enqueue(t);
+        }
+
+        /* ---------------- Working out the details ---------------- */
+        function groupCands(list) {
+          const groups = new Map();
+          for (const c of list) {
+            const k = norm(c.v) || c.v.toLowerCase();
+            const g = groups.get(k);
+            if (!g) groups.set(k, { ...c });
+            else if (c.conf > g.conf) groups.set(k, { ...c, conf: c.conf });
+          }
+          return [...groups.values()].sort((a, b) => b.conf - a.conf);
+        }
+
+        function hintsFor(track, cands) {
+          for (const c of cands.artist.slice()) {
+            const canon = answers.artists[norm(c.v)];
+            if (canon) cands.artist.push({ v: canon, src: 'hint', conf: CONF.hint });
+          }
+          const fh = answers.albums[folderKey(track)];
+          const leave = {};
+          if (fh) {
+            for (const k of ['album', 'year']) {
+              if (!(k in fh)) continue;
+              if (fh[k]) cands[k].push({ v: fh[k], src: 'hint', conf: CONF.hint });
+              else leave[k] = true;   // the user chose to leave it as is for this folder
+            }
+          }
+          return leave;
+        }
+
+        async function processTrack(track) {
+          if (!state.trackMap.has(track.id)) return;
+          const key = keyOf(track);
+          const item = await T.readItem(track, { raw: true });
+          const orig = {};
+          for (const k of FIELDS) orig[k] = String(item.old[k] || '').trim();
+          const cands = {};
+          FIELDS.forEach(k => { cands[k] = []; });
+          const add = (k, v, src, conf, extra) => {
+            v = String(v == null ? '' : v).trim();
+            if (v) cands[k].push({ v, src, conf, ...(extra || {}) });
+          };
+
+          // 1. Rules: the song's own tags (cleaned) and its file name
+          for (const k of FIELDS) {
+            const v = item.rules[k];
+            if (!v) continue;
+            const s = item.ruleSrc[k];
+            if (s === 'tag') add(k, v, 'tag', String(v).trim() === orig[k] ? CONF.tag : CONF.ripped);
+            else add(k, v, 'name', CONF.name);
+          }
+          if (track.rootName && dirOf(track)) add('album', track.folder, 'folder', CONF.folder);
+
+          // 2. The in-browser AI, only if it's on and already downloaded (never downloads by itself)
+          if (item.mp3 && await T.aiAvailable()) {
+            try {
+              const sug = await T.aiSuggest(item);
+              if (sug) {
+                const m = T.mergeAI(item, sug);
+                for (const k of Object.keys(m.by)) add(k, m.fields[k], 'ai', CONF.ai);
+              }
+            } catch (e) { /* rules only */ }
+          }
+
+          // 3. MusicBrainz (opt-in): only the title and artist text are sent
+          if (pref().musicbrainz) {
+            const ti = groupCands(cands.title)[0], ar = groupCands(cands.artist)[0];
+            if (ti) {
+              const recs = await mbSearch(ti.v, ar ? ar.v : '');
+              for (const r of recs.slice(0, 3)) {
+                if (r.score < 60) continue;
+                let c = (r.score / 100) * CONF.mb;
+                if (!T.sameish(r.title, ti.v)) c *= 0.5;
+                if (ar && r.artist && !T.sameish(r.artist, ar.v)) c *= 0.8;
+                add('title', r.title, 'mb', c);
+                add('artist', r.artist, 'mb', c);
+                add('album', r.album, 'mb', c, { mbid: r.mbid });
+                add('year', r.year, 'mb', c * 0.9);
+                add('track', r.track, 'mb', c * 0.8);
+              }
+            }
+          }
+
+          // 4. Earlier answers from the user
+          const leave = hintsFor(track, cands);
+
+          const f = {}, src = {}, conf = {}, q = [];
+          let mbid = '';
+          for (const k of FIELDS) {
+            if (leave[k]) { f[k] = orig[k]; src[k] = 'user'; continue; }
+            const groups = groupCands(cands[k]);
+            const top = groups[0], alt = groups[1];
+            if (!top) {
+              f[k] = orig[k];
+              if (k === 'title' || k === 'artist') {
+                q.push({ field: k, options: [], why: `Couldn't work out the ${LABEL[k]} from the file name or tags.` });
+              }
+              continue;
+            }
+            const sure = top.src === 'hint' || top.src === 'user' || (top.src === 'tag' && top.conf >= CONF.tag);
+            const options = groups.filter(g => g.conf >= MIN_OPTION).slice(0, 3);
+            if (!sure && alt && alt.conf >= MIN_OPTION && top.conf - alt.conf < ASK_GAP) {
+              f[k] = orig[k];
+              q.push({ field: k, options: options.map(g => g.v), why: whyDisagree(k, options) });
+              continue;
+            }
+            if (!sure && (k === 'album' || k === 'year') && !orig[k] && top.conf < MIN_OPTION) {
+              f[k] = orig[k];
+              q.push({ field: k, options: [top.v], why: k === 'album'
+                ? `No album in the tags. The folder is called “${top.v}”.`
+                : 'No year in the tags.' });
+              continue;
+            }
+            if (top.conf < MIN_OPTION && !orig[k]) { f[k] = ''; continue; }
+            f[k] = top.v;
+            src[k] = top.src;
+            conf[k] = Math.round(top.conf * 100) / 100;
+            if (k === 'album' && top.mbid) mbid = top.mbid;
+          }
+
+          if (!state.trackMap.has(track.id) || keyOf(track) !== key) return;
+          const changed = FIELDS.some(k => (f[k] || '') !== orig[k]);
+          if (!q.length && !changed) {
+            details[key] = 'ok';
+            if (track.afState) { track.afState = undefined; patchTrackEverywhere(track); }
+            saveDetails();
+            return;
+          }
+          const e = { state: q.length ? 'question' : 'filled', f, src, conf, q, orig, at: Date.now() };
+          if (mbid) e.mbid = mbid;
+          details[key] = e;
+          saveDetails();
+          overlay(track, e);
+          if (changed) { summary.filled++; summary.tracks.push(track); }
+          summary.questions += q.length;
+          if (e.state === 'filled') await maybeAutoApply(track);
+        }
+
+        function whyDisagree(k, options) {
+          const srcName = { tag: 'the tags', ripped: 'the tags', name: 'the file name', ai: 'the AI', mb: 'MusicBrainz', folder: 'the folder name', hint: 'an earlier answer' };
+          const from = [...new Set(options.map(o => srcName[o.src] || o.src))];
+          return from.length > 1
+            ? `${from.slice(0, -1).join(', ')} and ${from[from.length - 1]} don't agree on the ${LABEL[k]}.`
+            : `Not sure which ${LABEL[k]} is right.`;
+        }
+
+        async function maybeAutoApply(track) {
+          if (!pref().autoApply) return;
+          const e = entryOf(track);
+          if (!e || e.state !== 'filled') return;
+          try {
+            const entry = JSON.parse(JSON.stringify(e));
+            if (await Tagger.autoApply(track, e.f)) {
+              summary.applied++;
+              summary.saved.push({ track, entry });
+              const i = summary.tracks.indexOf(track);   // saved, so not "filled, waiting for review"
+              if (i >= 0) { summary.tracks.splice(i, 1); summary.filled--; }
+            }
+          } catch (err) { /* stays as a suggestion */ }
+        }
+
+        /* ---------------- MusicBrainz (opt-in) ---------------- */
+        let mbChain = Promise.resolve();
+        let mbNext = 0;
+        const luceneEscape = (s) => String(s).replace(/([+\-&|!(){}[\]^"~*?:\\/])/g, '\\$1');
+
+        function mbSearch(title, artist) {
+          const run = async () => {
+            const wait = mbNext - Date.now();
+            if (wait > 0) await sleep(wait);
+            mbNext = Date.now() + MB_GAP_MS;
+            const query = `recording:"${luceneEscape(title)}"` + (artist ? ` AND artist:"${luceneEscape(artist)}"` : '');
+            // Test seam: window.__LOCALIFY_MB_STUB__ = async ({ title, artist, query }) => MusicBrainz JSON
+            const stub = window.__LOCALIFY_MB_STUB__;
+            let json;
+            if (typeof stub === 'function') json = await stub({ title, artist, query });
+            else {
+              const ctl = new AbortController();
+              const timer = setTimeout(() => ctl.abort(), 8000);
+              // Browsers don't let a page replace its User-Agent, so the browser's own generic one is sent.
+              // No cookies, no referrer, and nothing but the title/artist text.
+              const res = await fetch(`${MB_URL}?query=${encodeURIComponent(query)}&fmt=json&limit=5`,
+                { headers: { Accept: 'application/json' }, credentials: 'omit', referrerPolicy: 'no-referrer', signal: ctl.signal });
+              clearTimeout(timer);
+              if (res.status === 503 || res.status === 429) { mbNext = Date.now() + 3000; return []; }
+              if (!res.ok) return [];
+              json = await res.json();
+            }
+            return parseMB(json);
+          };
+          const p = mbChain.then(run, run);
+          mbChain = p.catch(() => {});
+          return p.catch(() => []);
+        }
+
+        function releaseRank(r) {
+          const rg = r['release-group'] || {};
+          let n = 0;
+          if (rg['primary-type'] !== 'Album') n += 2;
+          if ((rg['secondary-types'] || []).length) n += 3;   // compilations, live, soundtracks…
+          if (r.status && r.status !== 'Official') n += 1;
+          return n;
+        }
+
+        function parseMB(json) {
+          const recs = (json && Array.isArray(json.recordings)) ? json.recordings : [];
+          return recs.slice(0, 5).map(r => {
+            const artist = (r['artist-credit'] || []).map(c => (c.name || (c.artist && c.artist.name) || '') + (c.joinphrase || '')).join('').trim();
+            const rels = (r.releases || []).filter(x => x && x.title)
+              .sort((a, b) => releaseRank(a) - releaseRank(b) || String(a.date || '9999').localeCompare(String(b.date || '9999')));
+            const rel = rels[0] || null;
+            const year = String(r['first-release-date'] || (rel && rel.date) || '').slice(0, 4);
+            const m = rel && rel.media && rel.media[0];
+            const trk = m && m.track && m.track[0] ? String(m.track[0].number || '') : '';
+            return {
+              score: +r.score || 0, title: String(r.title || ''), artist,
+              album: rel ? String(rel.title) : '', mbid: rel && /^[0-9a-f-]{36}$/i.test(rel.id || '') ? rel.id : '',
+              year: /^(19|20)\d{2}$/.test(year) ? year : '', track: /^\d{1,3}$/.test(trk) ? trk : ''
+            };
+          });
+        }
+
+        /** Album cover from the Cover Art Archive, kept in Cache Storage. Shown in the library only. */
+        async function loadCover(track, mbid) {
+          if (!mbid || track.cover || track.afCoverTried) return;
+          track.afCoverTried = true;
+          const url = `${CAA_URL}${mbid}/front-250`;
+          try {
+            const cache = 'caches' in window ? await caches.open(COVER_CACHE) : null;
+            let blob = null;
+            const hit = cache && await cache.match(url);
+            if (hit) blob = await hit.blob();
+            else {
+              if (!pref().musicbrainz || !(await canRun())) { track.afCoverTried = false; return; }
+              if (typeof window.__LOCALIFY_MB_STUB__ === 'function') {
+                // Tests: never reach the real archive. Optional window.__LOCALIFY_COVER_STUB__ = async (mbid) => Blob
+                const cs = window.__LOCALIFY_COVER_STUB__;
+                if (typeof cs !== 'function') return;
+                blob = await cs(mbid);
+              } else {
+                const res = await fetch(url, { credentials: 'omit', referrerPolicy: 'no-referrer' });
+                if (!res.ok) return;
+                blob = await res.blob();
+              }
+              if (!blob || !blob.size || !/^image\//.test(blob.type)) return;
+              if (cache) await cache.put(url, new Response(blob, { headers: { 'Content-Type': blob.type } }));
+            }
+            if (track.cover || !state.trackMap.has(track.id)) return;
+            track.cover = blob;
+            track.thumbState = undefined;
+            patchTrackEverywhere(track);
+            if (track.id === state.currentTrackId) updateCurrentTrackUI();
+          } catch (e) { /* no cover */ }
+        }
+
+        /* ---------------- Questions ---------------- */
+        function questionCount() {
+          let n = 0;
+          for (const t of state.tracks) {
+            const e = entryOf(t);
+            if (e && e.q) n += e.q.length;
+          }
+          return n;
+        }
+
+        function finishEntry(key, e) {
+          const changed = FIELDS.some(k => (e.f[k] || '') !== (e.orig[k] || ''));
+          if (!e.q.length && !changed) { details[key] = 'ok'; return 'ok'; }
+          e.state = e.q.length ? 'question' : 'filled';
+          return e.state;
+        }
+
+        function resolve(key, field, value, src) {
+          const e = details[key];
+          if (!e || typeof e !== 'object' || !e.q) return false;
+          e.q = e.q.filter(x => x.field !== field);
+          e.f[field] = value;
+          e.src[field] = src;
+          if (src !== 'leave') e.conf[field] = 1;
+          const st = finishEntry(key, e);
+          const track = trackForKey(key);
+          if (track) {
+            if (st === 'ok') { track.afState = undefined; patchTrackEverywhere(track); }
+            else overlay(track, e);
+            if (st === 'filled') maybeAutoApply(track);
+          }
+          return true;
+        }
+
+        function cleanAnswer(field, v) {
+          v = String(v || '').replace(/\s+/g, ' ').trim().slice(0, 200);
+          if (field === 'year') return /^\d{4}$/.test(v) ? v : '';
+          if (field === 'track') return /^\d{1,3}$/.test(v) ? String(+v) : '';
+          if (field === 'genre') {
+            const known = ID3_GENRES.find(g => g.toLowerCase() === v.toLowerCase());
+            return known || v;
+          }
+          return v;
+        }
+
+        /** Save one answer and pass it on to related songs. Returns how many other songs it filled. */
+        function answer(key, field, value, how) {
+          const e = details[key];
+          if (!e || typeof e !== 'object') return 0;
+          const q = (e.q || []).find(x => x.field === field);
+          const track = trackForKey(key);
+          let spread = 0;
+          if (how === 'leave') {
+            resolve(key, field, e.orig[field] || '', 'leave');
+            if (track && (field === 'album' || field === 'year')) spread += spreadFolder(track, field, '', key);
+          } else {
+            const v = cleanAnswer(field, value);
+            if (!v) return -1;
+            resolve(key, field, v, 'user');
+            if (field === 'artist') {
+              // Only exact spelling variants (case, accents, punctuation) count as the same artist:
+              // "Daft Punk feat. Pharrell Williams" stays its own credit.
+              const names = new Set([norm(v)]);
+              names.forEach(n => { if (n) answers.artists[n] = v; });
+              const asked = new Set([...(q ? q.options : []).map(o => norm(o)), ...names]);
+              spread += spreadArtist(names, asked, v, key);
+            }
+            if (track && (field === 'album' || field === 'year')) spread += spreadFolder(track, field, v, key);
+          }
+          saveAnswers();
+          saveDetails(true);
+          refresh();
+          return spread;
+        }
+
+        /** names: spellings of the confirmed artist. asked: every option the user chose between. */
+        function spreadArtist(names, asked, v, skipKey) {
+          let n = 0;
+          for (const t of state.tracks) {
+            const k = keyOf(t);
+            if (k === skipKey) continue;
+            const e = entryOf(t);
+            // Same dilemma elsewhere (its options are among the ones just decided on): same answer
+            if (e && e.q && e.q.some(x => x.field === 'artist' && x.options.some(o => names.has(norm(o))) && x.options.every(o => asked.has(norm(o))))) {
+              resolve(k, 'artist', v, 'hint'); n++;
+              continue;
+            }
+            // Same artist spelled differently elsewhere: use the confirmed spelling (library only)
+            if (names.has(norm(t.artist)) && t.artist !== v) {
+              if (e && e.f) { e.f.artist = v; e.src.artist = 'hint'; finishEntry(k, e); overlay(t, e); n++; }
+              else if (details[k] === 'ok' || !details[k]) {
+                const orig = { title: t.title || '', artist: t.artist || '', album: '', year: '', genre: '', track: '' };
+                const ne = { state: 'filled', f: { ...orig, artist: v }, src: { artist: 'hint' }, conf: { artist: 1 }, q: [], orig, at: Date.now() };
+                details[k] = ne; overlay(t, ne); n++;
+              }
+            }
+          }
+          return n;
+        }
+
+        function spreadFolder(track, field, v, skipKey) {
+          const fk = folderKey(track);
+          answers.albums[fk] = { ...(answers.albums[fk] || {}), [field]: v };
+          let n = 0;
+          for (const t of state.tracks) {
+            const k = keyOf(t);
+            if (k === skipKey || folderKey(t) !== fk) continue;
+            const e = entryOf(t);
+            if (!e || !e.q) continue;
+            if (e.q.some(x => x.field === field)) {
+              resolve(k, field, v || e.orig[field] || '', v ? 'hint' : 'leave'); n++;
+            } else if (v && !e.f[field]) {
+              e.f[field] = v; e.src[field] = 'hint'; finishEntry(k, e); overlay(t, e); n++;
+            }
+          }
+          return n;
+        }
+
+        /* ---------------- Q&A dialog ---------------- */
+        const qa = {
+          dialog: $('qaDialog'), count: $('qaCount'), close: $('qaClose'), cover: $('qaCover'), name: $('qaName'), file: $('qaFile'),
+          play: $('qaPlay'), question: $('qaQuestion'), why: $('qaWhy'), options: $('qaOptions'), form: $('qaFreeForm'),
+          free: $('qaFree'), done: $('qaDone'), ask: $('qaAsk'), status: $('qaStatus'), skip: $('qaSkip'), leave: $('qaLeave')
+        };
+        const session = { list: [], answered: 0, cur: null, preview: null, previewUrl: '', opener: null };
+
+        function buildSessionList(firstKey) {
+          const list = [];
+          for (const t of state.tracks) {
+            const e = entryOf(t);
+            if (!e || !e.q) continue;
+            for (const q of e.q) list.push({ key: keyOf(t), field: q.field });
+          }
+          if (firstKey) list.sort((a, b) => (b.key === firstKey) - (a.key === firstKey));
+          return list;
+        }
+
+        function openQuestions(firstTrack) {
+          if (!questionCount()) { showToast('No questions right now'); return; }
+          session.list = buildSessionList(firstTrack ? keyOf(firstTrack) : '');
+          session.answered = 0;
+          session.opener = document.activeElement;
+          if (!qa.dialog.open) {
+            qa.dialog.showModal();
+            qa.dialog.appendChild(dom.toastContainer);
+          }
+          showNext();
+        }
+
+        function currentQuestion() {
+          // Drop questions answered meanwhile (directly or through a related song)
+          while (session.list.length) {
+            const c = session.list[0];
+            const e = details[c.key];
+            const q = e && typeof e === 'object' && e.q && e.q.find(x => x.field === c.field);
+            if (q && trackForKey(c.key)) return { ...c, q, e };
+            session.list.shift();
+          }
+          return null;
+        }
+
+        function stopPreview() {
+          if (session.preview) { session.preview.pause(); session.preview.removeAttribute('src'); session.preview.load(); }
+          if (session.previewUrl) URL.revokeObjectURL(session.previewUrl);
+          session.preview = null; session.previewUrl = '';
+          qa.play.textContent = 'Play preview';
+          qa.play.setAttribute('aria-pressed', 'false');
+        }
+
+        function showNext() {
+          const cur = currentQuestion();
+          const prevKey = session.cur && session.cur.key;
+          session.cur = cur;
+          // Count only questions still open (some may have been answered through a related song)
+          session.list = session.list.filter(c => {
+            const e = details[c.key];
+            return e && typeof e === 'object' && e.q && e.q.some(x => x.field === c.field);
+          });
+          const left = session.list.length;
+          qa.count.textContent = cur
+            ? `${left} ${left === 1 ? 'question' : 'questions'} left${session.answered ? ` · ${session.answered} answered` : ''}`
+            : `${session.answered} answered`;
+          qa.done.hidden = !!cur;
+          qa.ask.hidden = !cur;
+          qa.skip.disabled = qa.leave.disabled = !cur;
+          if (!cur) { stopPreview(); qa.status.textContent = ''; qa.close.textContent = 'Done'; qa.close.focus(); return; }
+          qa.close.textContent = 'Stop for now';
+          const track = trackForKey(cur.key);
+          if (cur.key !== prevKey) stopPreview();
+          qa.cover.innerHTML = artHTML(track, 28);
+          qa.name.textContent = `${cur.e.f.title || track.title}${cur.e.f.artist ? ' · ' + cur.e.f.artist : ''}`;
+          qa.file.textContent = track.relPath || track.fileName;
+          qa.question.textContent = `What's the ${LABEL[cur.field]} of this song?`;
+          qa.why.textContent = cur.q.why || '';
+          const now = cur.e.orig[cur.field];
+          qa.leave.textContent = now ? `Leave as “${now.length > 24 ? now.slice(0, 23) + '…' : now}”` : 'Leave it blank';
+          qa.options.innerHTML = cur.q.options.map((o, i) =>
+            `<button type="button" class="af-opt" data-i="${i}">${escapeHtml(o)}</button>`).join('') ||
+            '<span class="af-qa-none">No suggestions. Type it below, or skip.</span>';
+          qa.free.value = '';
+          qa.free.placeholder = { year: 'e.g. 2019', track: 'e.g. 4' }[cur.field] || `Type the ${LABEL[cur.field]}`;
+          qa.free.inputMode = cur.field === 'year' || cur.field === 'track' ? 'numeric' : 'text';
+          qa.status.textContent = '';
+          const first = qa.options.querySelector('button') || qa.free;
+          first.focus();
+        }
+
+        function submit(value, how) {
+          const cur = session.cur;
+          if (!cur) return;
+          const n = answer(cur.key, cur.field, value, how);
+          if (n < 0) { qa.status.textContent = cur.field === 'year' ? 'Use a 4-digit year.' : 'That doesn\'t look right. Try again.'; qa.free.focus(); return; }
+          session.answered++;
+          session.list.shift();
+          showNext();
+          if (n > 0) qa.status.textContent = `Also used for ${n} related ${n === 1 ? 'song' : 'songs'}.`;
+        }
+
+        function closeQuestions() {
+          stopPreview();
+          if (qa.dialog.open) qa.dialog.close();
+        }
+
+        qa.options.addEventListener('click', (e) => {
+          const b = e.target.closest('.af-opt');
+          if (b && session.cur) submit(session.cur.q.options[+b.dataset.i], 'pick');
+        });
+        qa.form.addEventListener('submit', (e) => { e.preventDefault(); submit(qa.free.value, 'free'); });
+        qa.skip.addEventListener('click', () => {
+          const c = session.list.shift();
+          if (c && session.list.length) session.list.push(c);   // ask again at the end of this round
+          else if (c) { qa.status.textContent = 'Skipped. It stays in the list for later.'; }
+          if (c && !session.list.length) { session.cur = null; showNext(); qa.status.textContent = 'Skipped questions stay for later.'; return; }
+          showNext();
+        });
+        qa.leave.addEventListener('click', () => submit('', 'leave'));
+        qa.close.addEventListener('click', closeQuestions);
+        qa.dialog.addEventListener('close', () => {
+          stopPreview();
+          document.body.appendChild(dom.toastContainer);
+          const left = questionCount();
+          if (left && session.answered) showToast(`Saved. ${left} ${left === 1 ? 'question' : 'questions'} left for later.`);
+          updateChip();
+          if (session.opener && session.opener.isConnected) session.opener.focus();
+        });
+        qa.play.addEventListener('click', () => {
+          const track = session.cur && trackForKey(session.cur.key);
+          if (!track) return;
+          if (session.preview && !session.preview.paused) { session.preview.pause(); qa.play.textContent = 'Play preview'; qa.play.setAttribute('aria-pressed', 'false'); return; }
+          if (!session.preview) {
+            session.previewUrl = URL.createObjectURL(track.file);
+            session.preview = new Audio(session.previewUrl);
+            session.preview.volume = audio.volume;
+            if (track.duration > 60) session.preview.currentTime = Math.min(30, track.duration / 3);
+            session.preview.addEventListener('ended', () => { qa.play.textContent = 'Play preview'; qa.play.setAttribute('aria-pressed', 'false'); });
+          }
+          if (!audio.paused) audio.pause();
+          session.preview.play().catch(() => {});
+          qa.play.textContent = 'Pause preview';
+          qa.play.setAttribute('aria-pressed', 'true');
+        });
+
+        /* ---------------- Status chip, badges, toasts ---------------- */
+        const chip = { el: $('afChip'), text: $('afChipText') };
+        let chipRaf = 0;
+        function updateChip() {
+          if (chipRaf) return;
+          chipRaf = requestAnimationFrame(() => {
+            chipRaf = 0;
+            let unsorted = 0;
+            for (const t of state.tracks) if (t.afState === 'unsorted') unsorted++;
+            const qs = questionCount();
+            const parts = [];
+            let mode = 'idle';
+            if (!pref().autoFill) { chip.el.hidden = true; syncNav(0); return; }
+            if (pumping && progress.total) { parts.push(`Sorting ${Math.min(progress.done + 1, progress.total)}/${progress.total}…`); mode = 'busy'; }
+            else if (unsorted) { parts.push(`AI: ${navigator.onLine === false || reach.ok === false ? 'offline' : 'waiting'} · ${unsorted} unsorted`); mode = 'offline'; }
+            if (qs) parts.push(`${qs} ${qs === 1 ? 'question' : 'questions'}`);
+            chip.el.hidden = !parts.length;
+            chip.el.dataset.mode = qs && mode === 'idle' ? 'question' : mode;
+            chip.text.textContent = parts.join(' · ');
+            chip.el.title = qs ? 'Answer Localify\'s questions about your songs' : unsorted ? 'Show songs waiting to be sorted' : 'Filling in song details';
+            syncNav(unsorted);
+          });
+        }
+
+        function syncNav(unsorted) {
+          dom.countUnsorted.textContent = unsorted;
+          dom.navUnsorted.hidden = !unsorted && state.activeView !== 'unsorted';
+        }
+
+        chip.el.addEventListener('click', () => {
+          if (questionCount()) openQuestions();
+          else switchView('unsorted');
+        });
+
+        function badgeHTML(track) {
+          if (!track.afState || !pref().autoFill) return '';
+          if (track.afState === 'unsorted') return '<span class="af-badge af-unsorted" title="Unsorted: details will be filled in when you\'re online">Unsorted</span>';
+          if (track.afState === 'question') return `<span class="af-badge af-q" role="button" data-af-q="${track.id}" title="Localify has a question about this song">?</span>`;
+          return '<span class="af-badge af-filled" title="Details filled in by Localify. The file isn\'t changed until you apply them.">Auto</span>';
+        }
+
+        dom.tracklistBody.addEventListener('click', (e) => {
+          const b = e.target.closest('[data-af-q]');
+          if (!b) return;
+          e.stopImmediatePropagation();
+          openQuestions(state.trackMap.get(b.dataset.afQ));
+        }, true);
+
+        function notify(msg, label, fn) {
+          const toast = document.createElement('div');
+          toast.className = 'toast af-toast';
+          toast.setAttribute('role', 'status');
+          const span = document.createElement('span');
+          span.textContent = msg;
+          toast.appendChild(span);
+          if (label) {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'af-toast-btn';
+            b.textContent = label;
+            b.addEventListener('click', () => { toast.remove(); fn(); });
+            toast.appendChild(b);
+          }
+          dom.toastContainer.appendChild(toast);
+          setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 250ms ease';
+            setTimeout(() => toast.remove(), 260);
+          }, label ? 8000 : 3000);
+        }
+
+        /* ---------------- Tagger hooks ---------------- */
+        // The Tidy dialog starts from the stored details instead of the bare rules
+        Tagger.hooks.suggestion = (track) => {
+          const e = entryOf(track);
+          if (!e || !e.f) return null;
+          const fields = {}, by = {};
+          const asked = new Set((e.q || []).map(x => x.field));
+          for (const k of FIELDS) {
+            if (asked.has(k) || !e.f[k]) continue;
+            fields[k] = e.f[k];
+            if (['ai', 'mb', 'hint', 'user'].includes(e.src[k]) && e.f[k] !== e.orig[k]) by[k] = true;
+          }
+          return { fields, by };
+        };
+        // After Apply the file holds the details: forget the suggestion
+        Tagger.hooks.applied = (track, before) => {
+          delete details[`${before.likeKey}|${before.size}`];
+          details[keyOf(track)] = 'ok';
+          track.afState = undefined;
+          saveDetails();
+          updateChip();
+        };
+        Tagger.hooks.prefsChanged = (name) => {
+          if (name === 'autoFill' && pref().autoFill) {
+            for (const t of state.tracks) if (t.enriched) onEnriched(t);   // show stored details, queue the rest
+          }
+          if (name === 'onlineOnly' || name === 'musicbrainz') resumeUnsorted();
+          refresh();
+        };
+
+        /* ---------------- Connection events ---------------- */
+        window.addEventListener('online', () => { reach.ok = null; resumeUnsorted(); updateChip(); });
+        window.addEventListener('offline', () => { reach = { ok: false, at: Date.now(), pending: null }; updateChip(); });
+        setInterval(() => {
+          if (!pumping && !queue.length && navigator.onLine !== false && state.tracks.some(t => t.afState === 'unsorted')) resumeUnsorted();
+        }, REACH_TTL);
+
+        return {
+          onEnriched, badgeHTML, updateChip, openQuestions, questionCount,
+          isOpen: () => qa.dialog.open,
+          // For tests in the console
+          _test: { details: () => details, answers: () => answers, isOnline, mbSearch, parseMB, keyOf, folderKey, resumeUnsorted, reset: () => { reach.ok = null; } }
+        };
+      })();
+      window.LocalifyAutoFill = AutoFill._test;
+      /* [/AI Tagger] auto-fill */
 
       /* ========================================================================
          Editor / Audacity entry points (track rows, Now Playing, player bar)
