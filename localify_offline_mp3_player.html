@@ -2325,6 +2325,507 @@
     /* [/Settings] panel */
 
     /* ==========================================================================
+       [Pitch] Nightcore / daycore presets in the speed popover
+       ========================================================================== */
+    .speed-popover {
+      width: 264px;
+    }
+
+    .pitch-readout {
+      align-self: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .pitch-presets {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .pitch-preset-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1px;
+      padding: 7px 4px;
+      border-radius: var(--radius-sm);
+      background: rgba(var(--fg-rgb), 0.05);
+      border: 1px solid var(--border-subtle);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .pitch-preset-btn small {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .pitch-preset-btn:hover {
+      background: var(--bg-highlight);
+      border-color: rgba(var(--fg-rgb), 0.2);
+    }
+
+    .pitch-preset-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .pitch-preset-btn.active small {
+      color: var(--on-accent);
+      opacity: 0.8;
+    }
+
+    .pitch-toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .speed-btn.pitch-named {
+      width: auto;
+      padding: 0 10px;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 768px) {
+      .speed-popover {
+        width: min(264px, calc(100vw - 24px));
+      }
+    }
+    /* [/Pitch] */
+
+    /* ==========================================================================
+       [Focus] Lock-in timer: top-bar chip, popover, time's-up alert, settings
+       ========================================================================== */
+    .focus-btn {
+      height: 38px;
+      min-width: 38px;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 0 10px;
+      border-radius: var(--radius-full);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .focus-btn:hover,
+    .focus-btn[aria-expanded="true"] {
+      color: var(--text-primary);
+      background: var(--bg-highlight);
+      border-color: rgba(var(--fg-rgb), 0.25);
+    }
+
+    .focus-btn-text:empty {
+      display: none;
+    }
+
+    .focus-btn.is-running {
+      background: var(--accent-dim);
+      border-color: transparent;
+      color: var(--accent);
+    }
+
+    .focus-btn.is-paused {
+      opacity: 0.75;
+    }
+
+    .focus-btn.is-ringing {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+      animation: focusPulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes focusPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0.55); }
+      50% { box-shadow: 0 0 0 6px rgba(var(--accent-rgb), 0); }
+    }
+
+    .focus-pop {
+      position: fixed;
+      top: 64px;
+      right: 16px;
+      z-index: 88;
+      width: 280px;
+      max-width: calc(100vw - 24px);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: rgba(var(--surface-rgb), 0.97);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+      animation: popoverIn 180ms ease forwards;
+    }
+
+    .focus-pop[hidden] {
+      display: none;
+    }
+
+    .focus-pop-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .focus-pop-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .focus-pop-close {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-full);
+      color: var(--text-muted);
+    }
+
+    .focus-pop-close:hover {
+      color: var(--text-primary);
+      background: var(--bg-highlight);
+    }
+
+    .focus-setup,
+    .focus-running {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .focus-setup[hidden],
+    .focus-running[hidden] {
+      display: none;
+    }
+
+    .focus-presets {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+    }
+
+    .focus-presets button {
+      height: 42px;
+      border-radius: var(--radius-sm);
+      background: rgba(var(--fg-rgb), 0.05);
+      border: 1px solid var(--border-subtle);
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+      transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+    }
+
+    .focus-presets button:hover,
+    .focus-presets button.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .focus-unit {
+      margin: -4px 0 0;
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .focus-custom {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .focus-custom input {
+      width: 72px;
+      height: 34px;
+      padding: 0 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      background: rgba(var(--fg-rgb), 0.06);
+      color: var(--text-primary);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .focus-custom input:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 0;
+    }
+
+    .focus-custom .btn-primary {
+      margin-left: auto;
+    }
+
+    .focus-link {
+      align-self: flex-start;
+      font-size: 12px;
+      color: var(--text-muted);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .focus-link:hover {
+      color: var(--text-primary);
+    }
+
+    .focus-big {
+      text-align: center;
+      font-size: 44px;
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .focus-state {
+      margin-top: -6px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .focus-progress {
+      height: 5px;
+      border-radius: var(--radius-full);
+      background: rgba(var(--fg-rgb), 0.15);
+      overflow: hidden;
+    }
+
+    .focus-progress-bar {
+      height: 100%;
+      width: 0;
+      background: var(--accent);
+      border-radius: inherit;
+      transition: width 1s linear;
+    }
+
+    .focus-actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .focus-actions button {
+      padding-left: 6px;
+      padding-right: 6px;
+    }
+
+    .focus-alert {
+      position: fixed;
+      inset: 0;
+      z-index: 95;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.55);
+      animation: focusFade 200ms ease;
+    }
+
+    .focus-alert[hidden] {
+      display: none;
+    }
+
+    @keyframes focusFade {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .focus-alert-card {
+      width: 100%;
+      max-width: 340px;
+      padding: 24px 20px 20px;
+      text-align: center;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg, 16px);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .focus-alert-icon {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--accent-dim);
+      color: var(--accent);
+      animation: focusRing 1.4s ease-in-out infinite;
+    }
+
+    @keyframes focusRing {
+      0%, 100% { transform: rotate(0); }
+      10% { transform: rotate(14deg); }
+      20% { transform: rotate(-12deg); }
+      30% { transform: rotate(8deg); }
+      40% { transform: rotate(0); }
+    }
+
+    .focus-alert-card h2 {
+      margin: 0 0 6px;
+      font-size: 22px;
+      color: var(--text-primary);
+    }
+
+    .focus-alert-card p {
+      margin: 0 0 18px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .focus-alert-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    /* Settings: alarm sound list */
+    .focus-sound-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .focus-sound {
+      display: flex;
+      align-items: stretch;
+      min-width: 0;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      background: rgba(var(--fg-rgb), 0.04);
+      overflow: hidden;
+    }
+
+    .focus-sound-custom {
+      grid-column: 1 / -1;
+    }
+
+    .focus-sound [role="radio"] {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 8px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-align: left;
+    }
+
+    .focus-sound [role="radio"] small {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .focus-sound [role="radio"][aria-checked="true"] {
+      color: var(--on-accent);
+      background: var(--accent);
+    }
+
+    .focus-sound [role="radio"][aria-checked="true"] small {
+      color: var(--on-accent);
+      opacity: 0.8;
+    }
+
+    .focus-sound [role="radio"]:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .focus-preview {
+      width: 34px;
+      flex-shrink: 0;
+      font-size: 11px;
+      color: var(--text-secondary);
+      border-left: 1px solid var(--border-subtle);
+    }
+
+    .focus-preview:hover,
+    .focus-preview.playing {
+      color: var(--accent);
+      background: var(--bg-highlight);
+    }
+
+    .focus-custom-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .focus-custom-actions [hidden] {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .focus-btn {
+        margin-left: auto;
+      }
+
+      .sleep-indicator:not([hidden]) ~ .focus-btn,
+      .focus-btn + .settings-btn {
+        margin-left: 0;
+      }
+
+      .focus-pop {
+        right: 12px;
+        left: 12px;
+        width: auto;
+        max-width: none;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .focus-btn.is-ringing,
+      .focus-alert-icon,
+      .focus-alert {
+        animation: none;
+      }
+    }
+    /* [/Focus] */
+
+    /* ==========================================================================
        Responsive Breakpoints (Tablet & Mobile)
        ========================================================================== */
     @media (max-width: 960px) {
@@ -4156,6 +4657,10 @@
                 <span>Settings</span>
                 <div class="shortcut-keys"><span class="kbd">,</span></div>
               </div>
+              <div class="shortcut-row"><!-- [Focus] -->
+                <span>Lock-in focus timer</span>
+                <div class="shortcut-keys"><span class="kbd">T</span></div>
+              </div>
               <div class="shortcut-row">
                 <span>Move in list / play</span>
                 <div class="shortcut-keys"><span class="kbd">↑</span><span class="kbd">↓</span><span class="kbd">Enter</span></div>
@@ -4206,6 +4711,11 @@
         <button type="button" class="sleep-indicator" id="sleepIndicator" hidden title="Sleep timer active (click to change)" aria-label="Sleep timer active">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
           <span id="sleepIndicatorText">30:00</span>
+        </button>
+        <!-- [Focus] Lock-in timer button / countdown chip -->
+        <button type="button" class="focus-btn" id="focusBtn" title="Lock-in focus timer (T)" aria-label="Lock-in focus timer" aria-haspopup="dialog" aria-expanded="false" aria-controls="focusPop">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"></circle><path d="M12 9v4l2.5 2.5"></path><path d="M9.5 2.5h5"></path><path d="M12 2.5V5"></path></svg>
+          <span class="focus-btn-text" id="focusBtnText"></span>
         </button>
         <button type="button" class="settings-btn" id="btnSettings" title="Settings ( , )" aria-label="Open settings" aria-haspopup="dialog" aria-expanded="false" aria-controls="settingsPanel">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -4488,7 +4998,25 @@
                 <span>1.0x</span>
                 <span>3.0x</span>
               </div>
+              <div class="pitch-readout" id="pitchReadout" aria-live="polite">0.0 st</div><!-- [Pitch] -->
             </div>
+
+            <!-- [Pitch] one-tap vibes + pitch/reverb toggles -->
+            <div class="pitch-presets" id="pitchPresets" role="group" aria-label="Speed presets">
+              <button type="button" class="pitch-preset-btn" data-preset="normal">Normal<small>1.0×</small></button>
+              <button type="button" class="pitch-preset-btn" data-preset="nightcore">Nightcore<small>1.25×</small></button>
+              <button type="button" class="pitch-preset-btn" data-preset="daycore">Daycore<small>0.8×</small></button>
+              <button type="button" class="pitch-preset-btn" data-preset="slowedrev">Slowed + reverb<small>0.85×</small></button>
+            </div>
+            <div class="pitch-toggle-row">
+              <span id="pitchToggleLabel">Change pitch with speed</span>
+              <button type="button" class="switch" id="pitchToggle" role="switch" aria-checked="true" aria-labelledby="pitchToggleLabel"></button>
+            </div>
+            <div class="pitch-toggle-row">
+              <span id="reverbToggleLabel">Reverb</span>
+              <button type="button" class="switch" id="reverbToggle" role="switch" aria-checked="false" aria-labelledby="reverbToggleLabel"></button>
+            </div>
+            <!-- [/Pitch] -->
 
             <div class="speed-presets-grid" id="speedPresetsGrid">
               <button class="speed-preset-btn" data-speed="0.5">0.5x</button>
@@ -4687,6 +5215,12 @@
           </div>
           <input type="range" class="speed-range-slider" id="setSpeed" min="0.25" max="3" step="0.05" value="1">
         </div>
+
+        <!-- [Pitch] mirror of the speed-popover toggle -->
+        <div class="settings-row">
+          <span class="settings-label" id="setPitchLabel">Change pitch with speed<span class="settings-hint">On: faster sounds higher (nightcore), slower sounds deeper (daycore). Off: keeps the original key.</span></span>
+          <button type="button" class="switch" id="setPitch" role="switch" aria-checked="true" aria-labelledby="setPitchLabel"></button>
+        </div>
       </section>
 
       <!-- [Looks] Integrations → Audacity (was a separate setup dialog) -->
@@ -4719,6 +5253,62 @@
           </div>
         </div>
       </section>
+      <!-- [Focus] Lock-in timer -->
+      <section class="settings-section" aria-labelledby="setFocusTitle">
+        <h3 class="settings-section-title" id="setFocusTitle">Lock-In Timer</h3>
+
+        <div class="settings-row">
+          <span class="settings-label">Focus Timer<span class="settings-hint" id="setFocusStatus">Music dips and an alarm rings when time's up.</span></span>
+          <button type="button" class="btn-secondary" id="setFocusOpen">Open</button>
+        </div>
+
+        <div class="settings-row stacked">
+          <span class="settings-label" id="setFocusSoundLabel">Alarm Sound</span>
+          <div class="focus-sound-list" id="setFocusSound" role="radiogroup" aria-labelledby="setFocusSoundLabel">
+            <div class="focus-sound"><button type="button" role="radio" data-value="chime">Soft Chime</button><button type="button" class="focus-preview" data-preview="chime" aria-label="Preview Soft chime">▶</button></div>
+            <div class="focus-sound"><button type="button" role="radio" data-value="bell">Bell</button><button type="button" class="focus-preview" data-preview="bell" aria-label="Preview Bell">▶</button></div>
+            <div class="focus-sound"><button type="button" role="radio" data-value="marimba">Marimba</button><button type="button" class="focus-preview" data-preview="marimba" aria-label="Preview Marimba">▶</button></div>
+            <div class="focus-sound"><button type="button" role="radio" data-value="beep">Digital Beep</button><button type="button" class="focus-preview" data-preview="beep" aria-label="Preview Digital beep">▶</button></div>
+            <div class="focus-sound"><button type="button" role="radio" data-value="rise">Gentle Rise</button><button type="button" class="focus-preview" data-preview="rise" aria-label="Preview Gentle rise">▶</button></div>
+            <div class="focus-sound"><button type="button" role="radio" data-value="gong">Gong</button><button type="button" class="focus-preview" data-preview="gong" aria-label="Preview Gong">▶</button></div>
+            <div class="focus-sound focus-sound-custom"><button type="button" role="radio" data-value="custom" id="setFocusCustomRadio">My Own Sound<small id="setFocusCustomName">No file chosen</small></button><button type="button" class="focus-preview" data-preview="custom" aria-label="Preview my own sound">▶</button></div>
+          </div>
+          <div class="focus-custom-actions">
+            <button type="button" class="btn-secondary" id="setFocusPickFile">Choose Sound File…</button>
+            <button type="button" class="btn-ghost" id="setFocusClearFile" hidden>Remove</button>
+            <input type="file" id="setFocusFile" accept="audio/*" hidden>
+          </div>
+        </div>
+
+        <div class="settings-row stacked">
+          <div class="settings-row-head">
+            <label class="settings-label" for="setFocusAlarmVol">Alarm Volume</label>
+            <span class="settings-value" id="setFocusAlarmVolValue">80%</span>
+          </div>
+          <input type="range" class="speed-range-slider" id="setFocusAlarmVol" min="0" max="100" step="5" value="80">
+        </div>
+
+        <div class="settings-row stacked">
+          <div class="settings-row-head">
+            <label class="settings-label" for="setFocusDuck">Music Volume While Ringing<span class="settings-hint">Fades back up when you stop the alarm.</span></label>
+            <span class="settings-value" id="setFocusDuckValue">15%</span>
+          </div>
+          <input type="range" class="speed-range-slider" id="setFocusDuck" min="0" max="100" step="5" value="15">
+        </div>
+
+        <div class="settings-row">
+          <span class="settings-label" id="setFocusNotifyLabel">Desktop Notification<span class="settings-hint" id="setFocusNotifyHint">Alerts you even in the background.</span></span>
+          <button type="button" class="switch" id="setFocusNotify" role="switch" aria-checked="false" aria-labelledby="setFocusNotifyLabel"></button>
+        </div>
+
+        <div class="settings-row">
+          <span class="settings-label" id="setFocusVibrateLabel">Vibrate<span class="settings-hint">On phones that support it.</span></span>
+          <button type="button" class="switch" id="setFocusVibrate" role="switch" aria-checked="true" aria-labelledby="setFocusVibrateLabel"></button>
+        </div>
+      </section>
+      <!-- [/Focus] -->
+
+
 
       <!-- General -->
       <section class="settings-section" aria-labelledby="setGeneralTitle">
@@ -4744,6 +5334,59 @@
     </div>
   </aside>
   <!-- [/Settings] panel -->
+
+  <!-- [Focus] Lock-in timer popover + time's-up alert -->
+  <div class="focus-pop" id="focusPop" role="dialog" aria-label="Lock-in focus timer" hidden>
+    <div class="focus-pop-head">
+      <span class="focus-pop-title">Lock-in timer</span>
+      <button type="button" class="focus-pop-close" id="focusPopClose" aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+      </button>
+    </div>
+
+    <div class="focus-setup" id="focusSetup">
+      <div class="focus-presets" id="focusPresets">
+        <button type="button" data-min="15">15</button>
+        <button type="button" data-min="25">25</button>
+        <button type="button" data-min="45">45</button>
+        <button type="button" data-min="60">60</button>
+        <button type="button" data-min="90">90</button>
+      </div>
+      <p class="focus-unit">minutes · tap to start</p>
+      <div class="focus-custom">
+        <input type="number" id="focusCustomMin" min="0.1" max="600" step="any" value="25" aria-label="Custom minutes">
+        <span>min</span>
+        <button type="button" class="btn-primary" id="focusStart">Start</button>
+      </div>
+      <button type="button" class="focus-link" id="focusAlarmLink">Alarm: <span id="focusAlarmName">Soft chime</span> · change</button>
+    </div>
+
+    <div class="focus-running" id="focusRunning" hidden>
+      <div class="focus-big" id="focusBig">25:00</div>
+      <div class="focus-state" id="focusState">Locked in</div>
+      <div class="focus-progress"><div class="focus-progress-bar" id="focusProgress"></div></div>
+      <div class="focus-actions">
+        <button type="button" class="btn-secondary" id="focusPause">Pause</button>
+        <button type="button" class="btn-secondary" id="focusAdd">+5 min</button>
+        <button type="button" class="btn-secondary focus-stop" id="focusStop">Stop</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="focus-alert" id="focusAlert" role="alertdialog" aria-modal="true" aria-labelledby="focusAlertTitle" aria-describedby="focusAlertText" hidden>
+    <div class="focus-alert-card">
+      <div class="focus-alert-icon" aria-hidden="true">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>
+      </div>
+      <h2 id="focusAlertTitle">Time's up</h2>
+      <p id="focusAlertText">Your 25-minute lock-in is done.</p>
+      <div class="focus-alert-actions">
+        <button type="button" class="btn-secondary" id="focusSnooze">Snooze +5 min</button>
+        <button type="button" class="btn-primary" id="focusAlertStop">Stop alarm</button>
+      </div>
+    </div>
+  </div>
+  <!-- [/Focus] -->
 
   <script>
     /**
@@ -4774,7 +5417,11 @@
         APPEARANCE: 'localify_appearance_v1',           // { mode, accent, density }
         AUDIO_FX: 'localify_audio_fx_v1',               // { eqPreset, eq:[low,mid,high], leveling, crossfade }
         PREFS: 'localify_prefs_v1',                     // { resumeOnStartup, confirmClearHistory }
-        AUDACITY_ROOTS: 'localify_audacity_roots_v1'    // [Audacity integration] { folderName: "C:\abs\path" }
+        AUDACITY_ROOTS: 'localify_audacity_roots_v1',   // [Audacity integration] { folderName: "C:\abs\path" }
+        // [Pitch] / [Focus]
+        PITCH: 'localify_pitch_v1',                     // { pitchWithSpeed, reverb }
+        FOCUS: 'localify_focus_v1',                     // { minutes, sound, alarmVolume, duck, notify, vibrate }
+        FOCUS_RUN: 'localify_focus_run_v1'              // { endAt, pausedLeft, total, ringing } (survives reloads)
       };
 
       const AUDIO_EXTENSIONS = new Set(['mp3', 'wav', 'ogg', 'm4a', 'flac', 'aac', 'opus', 'webm']);
@@ -5059,8 +5706,7 @@
         el.preload = 'metadata';
         el.volume = state.muted ? 0 : state.volume;
         el.playbackRate = state.playbackRate;
-        if ('preservesPitch' in el) el.preservesPitch = true;
-        else if ('webkitPreservesPitch' in el) el.webkitPreservesPitch = true;
+        setPreservesPitch(el, !loadPitchSettings().pitchWithSpeed);   // [Pitch]
         return el;
       }
       const players = [createPlayer(), createPlayer()];
@@ -6087,6 +6733,7 @@
         currentAudioUrl = URL.createObjectURL(track.file);
         audio.src = currentAudioUrl;
         audio.playbackRate = state.playbackRate;
+        applyPitchToPlayers();   // [Pitch] a new src can reset rate/pitch handling; reapply on both players
         audio.volume = state.muted ? 0 : state.volume;
 
         prepareCurrentArtwork(track);
@@ -6224,7 +6871,7 @@
         const val = Math.round(Math.max(0.25, Math.min(3.0, Number(speed))) * 100) / 100;
         if (!Number.isFinite(val)) return;
         state.playbackRate = val;
-        players.forEach(p => { p.playbackRate = val; });
+        applyPitchToPlayers();   // [Pitch] rate + preservesPitch on both players
         // [Settings] The popover changes this session only; the saved default lives in Settings
         updateSpeedUI();
         if (showNotification) showToast(`Speed: ${val}x`);
@@ -6251,6 +6898,7 @@
             btn.classList.toggle('active', Math.abs(parseFloat(btn.dataset.speed) - val) < 0.01);
           });
         }
+        pitchUpdateUI();   // [Pitch] preset name on the badge, semitone readout
       }
 
       function clearLibrary() {
@@ -7468,6 +8116,7 @@
           toggleSpeedPopover(false);
           closeMobileSidebar();
           closeSettings();   // [Settings]
+          closeFocusPop();   // [Focus]
           return;
         }
         if (isTypingTarget(target)) return;
@@ -7507,6 +8156,7 @@
           case '[': e.preventDefault(); setPlaybackSpeed(state.playbackRate - 0.1, true); break;
           case ']': e.preventDefault(); setPlaybackSpeed(state.playbackRate + 0.1, true); break;
           case ',': e.preventDefault(); openSettings(); break;   // [Settings]
+          case 't': case 'T': e.preventDefault(); toggleFocusPop(); break;   // [Focus]
           default: break;
         }
       });
@@ -7711,7 +8361,7 @@
         fx.eq[1].connect(fx.eq[2]);
         fx.eq[2].connect(fx.trim);
         fx.comp.connect(fx.makeup);
-        fx.sleep.connect(output);
+        fx.sleep.connect(buildPitchFocusChain(ctx, fx, output));   // [Pitch]/[Focus] reverb wet/dry -> focus duck -> output
         state.fx = fx;
         applyEq();
         applyLevelingRoute();
@@ -7972,6 +8622,7 @@
         applyEq();
         applyLevelingRoute();
         if (sleep.mode !== 'off') setSleepTimer('off');
+        resetPitchFocusSettings();   // [Pitch]/[Focus]
         setPlaybackSpeed(1);
         syncSettingsUI();
         showToast('Settings reset');
@@ -8016,6 +8667,7 @@
         setDom.speedValue.textContent = `${+Number(def).toFixed(2)}x`;
         setSwitch(setDom.resume, prefs.resumeOnStartup);
         setSwitch(setDom.confirmClear, prefs.confirmClearHistory);
+        syncPitchFocusSettingsUI();   // [Pitch]/[Focus]
       }
 
       /** Radiogroup behaviour: click picks, arrow keys move + pick. */
@@ -8175,6 +8827,1023 @@
         syncSettingsUI();
       }
       /* [/Settings] */
+
+      /* ========================================================================
+         [Pitch] Speed that changes pitch (nightcore / daycore) + slowed reverb
+         - "Change pitch with speed" = preservesPitch off on both players.
+         - Presets set rate (+ reverb). Reverb is a ConvolverNode wet/dry mix that
+           sits after the sleep-fade gain: fx.sleep -> revIn -> dry/wet -> duck.
+         - No independent pitch shift: that needs an AudioWorklet phase vocoder /
+           granular shifter, which is a lot of code and adds audible artifacts.
+         Functions here are hoisted and touch no block-level const before init,
+         because createPlayer() calls setPreservesPitch/loadPitchSettings early.
+         ======================================================================== */
+      var PITCH_PRESETS = {
+        normal:    { name: 'Normal',          short: '1x',         rate: 1,    reverb: false },
+        nightcore: { name: 'Nightcore',       short: 'Nightcore',  rate: 1.25, reverb: false },
+        daycore:   { name: 'Daycore',         short: 'Daycore',    rate: 0.8,  reverb: false },
+        slowedrev: { name: 'Slowed + reverb', short: 'Slowed+rev', rate: 0.85, reverb: true }
+      };
+      var PITCH_REV_WET = 0.42;
+      var PITCH_REV_DRY = 0.78;
+      var pitchCfg = null;   // { pitchWithSpeed, reverb }
+      var pitchFx = null;    // { ctx, revIn, dry, wet, duck, conv, convTimer }
+      var pitchIR = null;    // cached impulse response { rate, buffer }
+      var pitchDom = null;
+
+      function loadPitchSettings() {
+        const s = loadJSON(STORAGE_KEYS.PITCH, null) || {};
+        return { pitchWithSpeed: s.pitchWithSpeed !== false, reverb: !!s.reverb };
+      }
+
+      function pitchSettings() {
+        if (!pitchCfg) pitchCfg = loadPitchSettings();
+        return pitchCfg;
+      }
+
+      function savePitchSettings() {
+        saveJSON(STORAGE_KEYS.PITCH, pitchSettings());
+      }
+
+      function setPreservesPitch(el, keep) {
+        if ('preservesPitch' in el) el.preservesPitch = keep;
+        else {
+          if ('mozPreservesPitch' in el) el.mozPreservesPitch = keep;
+          if ('webkitPreservesPitch' in el) el.webkitPreservesPitch = keep;
+        }
+      }
+
+      /** Rate + pitch handling on BOTH players (the idle one is next in a crossfade). */
+      function applyPitchToPlayers() {
+        const keep = !pitchSettings().pitchWithSpeed;
+        const rate = state.playbackRate;
+        players.forEach(p => {
+          setPreservesPitch(p, keep);
+          p.defaultPlaybackRate = rate;
+          if (p.playbackRate !== rate) p.playbackRate = rate;
+        });
+      }
+
+      function pitchSemitones(rate) {
+        return 12 * Math.log2(rate);
+      }
+
+      function activePitchPreset() {
+        const cfg = pitchSettings();
+        const rate = state.playbackRate;
+        for (const id of Object.keys(PITCH_PRESETS)) {
+          const p = PITCH_PRESETS[id];
+          if (Math.abs(p.rate - rate) < 0.005 && p.reverb === cfg.reverb &&
+              (id === 'normal' || cfg.pitchWithSpeed)) return id;
+        }
+        return null;
+      }
+
+      function pitchUpdateUI() {
+        if (!pitchDom) return;
+        const cfg = pitchSettings();
+        const rate = state.playbackRate;
+        const st = pitchSemitones(rate);
+        let readout;
+        if (!cfg.pitchWithSpeed) readout = 'Pitch kept (original key)';
+        else if (Math.abs(st) < 0.05) readout = '0.0 st · original pitch';
+        else readout = `${st > 0 ? '+' : '−'}${Math.abs(st).toFixed(1)} st · ${st > 0 ? 'higher' : 'lower'}`;
+        pitchDom.readout.textContent = readout;
+
+        const active = activePitchPreset();
+        pitchDom.presets.querySelectorAll('.pitch-preset-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.preset === active);
+          btn.setAttribute('aria-pressed', String(btn.dataset.preset === active));
+        });
+        setSwitch(pitchDom.toggle, cfg.pitchWithSpeed);
+        setSwitch(pitchDom.reverb, cfg.reverb);
+
+        // Speed button shows the preset name when one is active (or "+rev" when reverb is on)
+        const named = active && active !== 'normal' ? PITCH_PRESETS[active].short : null;
+        const btn = dom.btnSpeed;
+        if (named) btn.textContent = named;
+        else if (cfg.reverb) btn.textContent = `${+rate.toFixed(2)}x+rev`;
+        btn.classList.toggle('pitch-named', !!named || cfg.reverb);
+        btn.classList.toggle('modified', rate !== 1 || cfg.reverb);
+        btn.setAttribute('aria-label', `Playback speed ${+rate.toFixed(2)}x${named ? ` (${PITCH_PRESETS[active].name})` : ''}${cfg.reverb ? ', reverb on' : ''}`);
+      }
+
+      function setPitchWithSpeed(on) {
+        pitchSettings().pitchWithSpeed = !!on;
+        savePitchSettings();
+        applyPitchToPlayers();
+        updateSpeedUI();
+        syncPitchFocusSettingsUI();
+      }
+
+      function setPitchReverb(on) {
+        pitchSettings().reverb = !!on;
+        savePitchSettings();
+        applyPitchReverb();
+        updateSpeedUI();
+      }
+
+      function applyPitchPreset(id) {
+        const p = PITCH_PRESETS[id];
+        if (!p) return;
+        const cfg = pitchSettings();
+        cfg.reverb = p.reverb;
+        if (id !== 'normal') cfg.pitchWithSpeed = true;   // the vibe needs the pitch shift
+        savePitchSettings();
+        applyPitchReverb();
+        setPlaybackSpeed(p.rate);   // -> applyPitchToPlayers + updateSpeedUI
+        syncPitchFocusSettingsUI();
+        showToast(id === 'normal' ? 'Speed: Normal' : `${p.name} on`);
+      }
+
+      /* ---- Audio graph: reverb wet/dry + focus duck ---- */
+      function pfRamp(ctx, param, value, secs) {
+        const t = ctx.currentTime;
+        const cur = param.value;
+        param.cancelScheduledValues(t);
+        param.setValueAtTime(cur, t);
+        param.linearRampToValueAtTime(value, t + Math.max(0.01, secs));
+      }
+
+      /** Called from buildAudioGraph (state.fx isn't assigned yet). Returns the chain input. */
+      function buildPitchFocusChain(ctx, fx, output) {
+        const revIn = ctx.createGain();
+        const dry = ctx.createGain();
+        const wet = ctx.createGain();
+        const duck = ctx.createGain();
+        revIn.connect(dry);
+        dry.connect(duck);
+        wet.connect(duck);
+        duck.connect(output);
+        pitchFx = { ctx, revIn, dry, wet, duck, conv: null, convTimer: 0 };
+        fx.revIn = revIn;
+        fx.duck = duck;
+
+        const on = pitchSettings().reverb;
+        dry.gain.value = on ? PITCH_REV_DRY : 1;
+        wet.gain.value = on ? PITCH_REV_WET : 0;
+        if (on) pitchEnsureConvolver();
+        if (focusRun && focusRun.ringing) duck.gain.value = focusSettings().duck / 100;
+        return revIn;
+      }
+
+      /** ~2.6 s stereo plate-ish tail: decaying noise that darkens over time. */
+      function pitchImpulse(ctx) {
+        if (pitchIR && pitchIR.rate === ctx.sampleRate) return pitchIR.buffer;
+        const rate = ctx.sampleRate;
+        const len = Math.floor(rate * 2.6);
+        const pre = Math.floor(rate * 0.018);
+        const buf = ctx.createBuffer(2, len, rate);
+        for (let ch = 0; ch < 2; ch++) {
+          const data = buf.getChannelData(ch);
+          let lp = 0;
+          for (let i = pre; i < len; i++) {
+            const t = (i - pre) / (len - pre);
+            const noise = Math.random() * 2 - 1;
+            const a = 0.85 - 0.75 * t;              // low-pass coefficient: bright -> dark
+            lp += a * (noise - lp);
+            data[i] = lp * Math.pow(1 - t, 2.4) * Math.exp(-t * 2.2);
+          }
+        }
+        pitchIR = { rate, buffer: buf };
+        return buf;
+      }
+
+      function pitchEnsureConvolver() {
+        if (!pitchFx) return;
+        clearTimeout(pitchFx.convTimer);
+        if (pitchFx.conv) return;
+        const conv = pitchFx.ctx.createConvolver();
+        conv.normalize = true;
+        conv.buffer = pitchImpulse(pitchFx.ctx);
+        pitchFx.revIn.connect(conv);
+        conv.connect(pitchFx.wet);
+        pitchFx.conv = conv;
+      }
+
+      function applyPitchReverb() {
+        if (!pitchFx) return;   // graph not built yet: buildPitchFocusChain reads the setting
+        const { ctx, dry, wet } = pitchFx;
+        if (pitchSettings().reverb) {
+          pitchEnsureConvolver();
+          pfRamp(ctx, wet.gain, PITCH_REV_WET, 0.25);
+          pfRamp(ctx, dry.gain, PITCH_REV_DRY, 0.25);
+        } else {
+          pfRamp(ctx, wet.gain, 0, 0.25);
+          pfRamp(ctx, dry.gain, 1, 0.25);
+          clearTimeout(pitchFx.convTimer);
+          pitchFx.convTimer = setTimeout(() => {   // let the tail ring out, then free the convolver
+            if (!pitchFx.conv || pitchSettings().reverb) return;
+            try { pitchFx.revIn.disconnect(pitchFx.conv); pitchFx.conv.disconnect(); } catch (e) {}
+            pitchFx.conv = null;
+          }, 4000);
+        }
+      }
+      /* [/Pitch] */
+
+      /* ========================================================================
+         [Focus] Lock-in focus timer
+         - One setTimeout to the stored end time fires time's up (Chrome throttles
+           chained timers in background tabs); a 1 s interval only redraws.
+         - Time's up: music keeps playing but the duck gain fades to ~15 % over 3 s;
+           the alarm loops on its own AudioContext (not the EQ'd/ducked path) until
+           Stop/Snooze, which fade the music back.
+         - Run state is saved with an absolute end time so a reload resumes it.
+         - Independent of the sleep timer (separate gain node and indicator).
+         ======================================================================== */
+      var DEFAULT_FOCUS = { minutes: 25, sound: 'chime', alarmVolume: 0.8, duck: 15, notify: false, vibrate: true };
+      var FOCUS_SOUNDS = {
+        chime:   'Soft chime',
+        bell:    'Bell',
+        marimba: 'Marimba',
+        beep:    'Digital beep',
+        rise:    'Gentle rise',
+        gong:    'Gong',
+        custom:  'My own sound'
+      };
+      var focusCfg = null;        // persisted settings
+      var focusRun = null;        // { total, endAt, pausedLeft, ringing }
+      var focusDom = null;
+      var focusEndTimer = 0;
+      var focusTicker = 0;
+      var focusNotification = null;
+      var focusReturnFocus = null;
+      var alarmCtx = null;
+      var alarmOut = null;
+      var alarmLoop = null;       // { token, timer, current }
+      var alarmPreview = null;    // { handle, btn, timer }
+      var alarmCustom = null;     // { name, blob, buffer }
+
+      function focusSettings() {
+        if (!focusCfg) {
+          const s = loadJSON(STORAGE_KEYS.FOCUS, null) || {};
+          focusCfg = { ...DEFAULT_FOCUS, ...s };
+          if (!FOCUS_SOUNDS[focusCfg.sound]) focusCfg.sound = 'chime';
+          focusCfg.alarmVolume = clampNum(focusCfg.alarmVolume, 0, 1, 0.8);
+          focusCfg.duck = clampNum(focusCfg.duck, 0, 100, 15);
+        }
+        return focusCfg;
+      }
+
+      function saveFocusSettings() {
+        saveJSON(STORAGE_KEYS.FOCUS, focusSettings());
+      }
+
+      function saveFocusRun() {
+        if (focusRun) saveJSON(STORAGE_KEYS.FOCUS_RUN, focusRun);
+        else { try { localStorage.removeItem(STORAGE_KEYS.FOCUS_RUN); } catch (e) {} }
+      }
+
+      function focusLeft() {
+        if (!focusRun) return 0;
+        if (focusRun.ringing) return 0;
+        if (focusRun.pausedLeft != null) return focusRun.pausedLeft;
+        return Math.max(0, (focusRun.endAt - Date.now()) / 1000);
+      }
+
+      function focusFmtMinutes(min) {
+        if (min >= 1 && Math.abs(min - Math.round(min)) < 0.01) return `${Math.round(min)}-minute`;
+        if (min >= 1) return `${+min.toFixed(1)}-minute`;
+        return `${Math.round(min * 60)}-second`;
+      }
+
+      /* ---- Scheduling ---- */
+      function focusSchedule() {
+        clearTimeout(focusEndTimer);
+        clearInterval(focusTicker);
+        focusEndTimer = 0;
+        focusTicker = 0;
+        if (!focusRun || focusRun.ringing || focusRun.pausedLeft != null) return;
+        focusEndTimer = setTimeout(focusCheck, Math.max(0, focusRun.endAt - Date.now()));
+        focusTicker = setInterval(() => { focusCheck(); updateFocusUI(); }, 1000);
+      }
+
+      function focusCheck() {
+        if (!focusRun || focusRun.ringing || focusRun.pausedLeft != null) return;
+        if (Date.now() >= focusRun.endAt - 30) focusTimesUp();
+        else if (!focusEndTimer) focusSchedule();
+      }
+
+      function focusStart(minutes) {
+        const min = clampNum(minutes, 0.1, 600, 25);
+        ensureAlarmCtx();   // unlock audio on this click so the alarm can play later
+        if (focusRun && focusRun.ringing) focusStopRinging();
+        focusRun = { total: Math.round(min * 60), endAt: Date.now() + min * 60000, pausedLeft: null, ringing: false };
+        focusSettings().minutes = min;
+        saveFocusSettings();
+        saveFocusRun();
+        focusSchedule();
+        closeFocusPop();
+        updateFocusUI();
+        showToast(`Locked in for ${min >= 1 ? `${+min.toFixed(1)} min` : `${Math.round(min * 60)} s`}`);
+      }
+
+      function focusTogglePause() {
+        if (!focusRun || focusRun.ringing) return;
+        if (focusRun.pausedLeft != null) {
+          focusRun.endAt = Date.now() + focusRun.pausedLeft * 1000;
+          focusRun.pausedLeft = null;
+        } else {
+          focusRun.pausedLeft = focusLeft();
+          focusRun.endAt = null;
+        }
+        saveFocusRun();
+        focusSchedule();
+        updateFocusUI();
+      }
+
+      function focusAddFive() {
+        if (!focusRun) return;
+        if (focusRun.ringing) { focusSnooze(); return; }
+        if (focusRun.pausedLeft != null) focusRun.pausedLeft += 300;
+        else focusRun.endAt += 300000;
+        focusRun.total += 300;
+        saveFocusRun();
+        focusSchedule();
+        updateFocusUI();
+      }
+
+      function focusStop() {
+        if (!focusRun) return;
+        const wasRinging = focusRun.ringing;
+        if (wasRinging) focusStopRinging();
+        focusRun = null;
+        saveFocusRun();
+        focusSchedule();
+        updateFocusUI();
+        if (!wasRinging) showToast('Focus timer stopped');
+      }
+
+      function focusSnooze() {
+        if (focusRun && focusRun.ringing) focusStopRinging();
+        focusRun = { total: 300, endAt: Date.now() + 300000, pausedLeft: null, ringing: false };
+        saveFocusRun();
+        focusSchedule();
+        updateFocusUI();
+        showToast('Snoozed for 5 minutes');
+      }
+
+      /* ---- Time's up ---- */
+      function focusTimesUp() {
+        if (!focusRun) return;
+        focusRun.ringing = true;
+        focusRun.endAt = null;
+        focusRun.pausedLeft = null;
+        saveFocusRun();
+        focusSchedule();
+        focusStartRinging(true);
+      }
+
+      function focusStartRinging(fresh) {
+        focusDuck(true);
+        startAlarmLoop();
+        showFocusAlert();
+        if (fresh) focusSendNotification();
+        updateFocusUI();
+      }
+
+      function focusStopRinging() {
+        if (focusRun) focusRun.ringing = false;
+        stopAlarmLoop();
+        focusDuck(false);
+        hideFocusAlert();
+        if (focusNotification) { try { focusNotification.close(); } catch (e) {} focusNotification = null; }
+        if (focusVibrated) { focusVibrated = false; try { navigator.vibrate(0); } catch (e) {} }
+      }
+
+      function focusDuck(on) {
+        const duck = state.fx && state.fx.duck;
+        if (!duck || !state.audioCtx) return;   // no graph yet = nothing is playing through it
+        pfRamp(state.audioCtx, duck.gain, on ? focusSettings().duck / 100 : 1, on ? 3 : 1.5);
+      }
+
+      function focusVibrate() {
+        if (!focusSettings().vibrate || !navigator.vibrate) return;
+        const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+        const activated = !navigator.userActivation || navigator.userActivation.hasBeenActive;
+        if (!coarse || !activated) return;
+        try { focusVibrated = navigator.vibrate([300, 150, 300, 150, 600]) !== false; } catch (e) {}
+      }
+      var focusVibrated = false;   // only cancel a vibration we actually started
+
+      function focusSendNotification() {
+        if (!focusSettings().notify || !('Notification' in window) || Notification.permission !== 'granted') return;
+        try {
+          focusNotification = new Notification("Time's up", {
+            body: 'Your lock-in session is done. Take a break.',
+            tag: 'localify-focus',
+            requireInteraction: true,
+            silent: true
+          });
+          focusNotification.onclick = () => { window.focus(); if (focusDom) focusDom.alertStop.focus(); };
+        } catch (e) { focusNotification = null; }   // e.g. Android Chrome needs a service worker
+      }
+
+      async function setFocusNotify(on) {
+        const cfg = focusSettings();
+        if (!on) { cfg.notify = false; saveFocusSettings(); syncPitchFocusSettingsUI(); return; }
+        if (!('Notification' in window)) { showToast('Notifications are not supported in this browser'); syncPitchFocusSettingsUI(); return; }
+        let perm = Notification.permission;
+        if (perm === 'default') {
+          try { perm = await Notification.requestPermission(); } catch (e) { perm = 'denied'; }
+        }
+        if (perm !== 'granted') {
+          showToast(perm === 'denied' ? 'Notifications are blocked for this page in your browser settings' : 'Notification permission not given');
+          cfg.notify = false;
+        } else cfg.notify = true;
+        saveFocusSettings();
+        syncPitchFocusSettingsUI();
+      }
+
+      /* ---- Alarm audio: its own AudioContext -> volume -> limiter -> speakers ---- */
+      function ensureAlarmCtx() {
+        if (!alarmCtx) {
+          const Ctx = window.AudioContext || window.webkitAudioContext;
+          if (!Ctx) return null;
+          alarmCtx = new Ctx();
+          const limiter = alarmCtx.createDynamicsCompressor();
+          limiter.threshold.value = -6;
+          limiter.knee.value = 0;
+          limiter.ratio.value = 12;
+          limiter.attack.value = 0.002;
+          limiter.release.value = 0.2;
+          alarmOut = alarmCtx.createGain();
+          alarmOut.gain.value = alarmVolumeGain();
+          alarmOut.connect(limiter);
+          limiter.connect(alarmCtx.destination);
+        }
+        if (alarmCtx.state === 'suspended') alarmCtx.resume().catch(() => {});
+        return alarmCtx;
+      }
+
+      function alarmVolumeGain() {
+        const v = focusSettings().alarmVolume;
+        return v * v;   // perceptual-ish curve
+      }
+
+      /** Envelope'd oscillator into `dest`. */
+      function alarmTone(ctx, dest, t, freq, dur, peak, type, attack) {
+        const o = ctx.createOscillator();
+        o.type = type || 'sine';
+        o.frequency.value = freq;
+        const g = ctx.createGain();
+        const a = attack || 0.005;
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(peak, t + a);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + a + dur);
+        o.connect(g);
+        g.connect(dest);
+        o.start(t);
+        o.stop(t + a + dur + 0.05);
+        return o;
+      }
+
+      /** Each recipe schedules notes on `bus` from time t and returns its length in seconds. */
+      var ALARM_RECIPES = {
+        chime(ctx, bus, t) {
+          [783.99, 1046.5, 1318.51].forEach((f, i) => {
+            const s = t + i * 0.2;
+            alarmTone(ctx, bus, s, f, 1.6, 0.22);
+            alarmTone(ctx, bus, s, f * 2, 0.8, 0.05);
+            alarmTone(ctx, bus, s, f * 3.01, 0.4, 0.025);
+          });
+          return 2.1;
+        },
+        bell(ctx, bus, t) {
+          const ratios = [1, 2, 2.76, 5.4, 8.93];
+          const amps = [0.3, 0.14, 0.11, 0.05, 0.025];
+          const decays = [2.6, 1.8, 1.4, 0.8, 0.5];
+          [0, 1.0].forEach(off => ratios.forEach((r, i) =>
+            alarmTone(ctx, bus, t + off, 523.25 * r, decays[i], amps[i] * (off ? 0.8 : 1), 'sine', 0.002)));
+          return 3.7;
+        },
+        marimba(ctx, bus, t) {
+          [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5].forEach((f, i) => {
+            const s = t + i * 0.15 + (i >= 4 ? 0.15 : 0);
+            alarmTone(ctx, bus, s, f, 0.45, 0.3, 'sine', 0.003);
+            alarmTone(ctx, bus, s, f * 4, 0.08, 0.07, 'sine', 0.002);
+          });
+          return 1.6;
+        },
+        beep(ctx, bus, t) {
+          const lp = ctx.createBiquadFilter();
+          lp.type = 'lowpass';
+          lp.frequency.value = 3200;
+          lp.connect(bus);
+          [0, 0.16, 0.55, 0.71].forEach(off => {
+            const o = ctx.createOscillator();
+            o.type = 'square';
+            o.frequency.value = 1000;
+            const g = ctx.createGain();
+            const s = t + off;
+            g.gain.setValueAtTime(0, s);
+            g.gain.linearRampToValueAtTime(0.09, s + 0.005);
+            g.gain.setValueAtTime(0.09, s + 0.095);
+            g.gain.linearRampToValueAtTime(0, s + 0.1);
+            o.connect(g);
+            g.connect(lp);
+            o.start(s);
+            o.stop(s + 0.12);
+          });
+          return 0.9;
+        },
+        rise(ctx, bus, t) {
+          [392, 493.88, 587.33, 783.99].forEach((f, i) => {
+            const s = t + i * 0.38;
+            const peak = 0.12 + i * 0.04;
+            alarmTone(ctx, bus, s, f, 1.4, peak, 'sine', 0.25);
+            alarmTone(ctx, bus, s, f * 2, 0.9, peak * 0.2, 'triangle', 0.3);
+          });
+          return 3.0;
+        },
+        gong(ctx, bus, t) {
+          const base = 98;
+          const ratios = [1, 1.47, 2.09, 2.56, 3.1, 4.2, 5.3];
+          const amps = [0.32, 0.2, 0.16, 0.1, 0.08, 0.05, 0.03];
+          ratios.forEach((r, i) => {
+            const o = alarmTone(ctx, bus, t, base * r, 5 - i * 0.5, amps[i], 'sine', 0.01 + i * 0.01);
+            o.frequency.setValueAtTime(base * r * 1.004, t);
+            o.frequency.exponentialRampToValueAtTime(base * r, t + 1.5);   // slight pitch settle
+          });
+          // mallet thump
+          const len = Math.floor(ctx.sampleRate * 0.12);
+          const nb = ctx.createBuffer(1, len, ctx.sampleRate);
+          const d = nb.getChannelData(0);
+          for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+          const src = ctx.createBufferSource();
+          src.buffer = nb;
+          const bp = ctx.createBiquadFilter();
+          bp.type = 'bandpass';
+          bp.frequency.value = 380;
+          bp.Q.value = 1.2;
+          const g = ctx.createGain();
+          g.gain.value = 0.5;
+          src.connect(bp);
+          bp.connect(g);
+          g.connect(bus);
+          src.start(t);
+          return 5.2;
+        }
+      };
+
+      async function alarmCustomBuffer(ctx) {
+        if (!alarmCustom) return null;
+        if (alarmCustom.buffer && alarmCustom.buffer.sampleRate === ctx.sampleRate) return alarmCustom.buffer;
+        try {
+          const data = await alarmCustom.blob.arrayBuffer();
+          alarmCustom.buffer = await ctx.decodeAudioData(data);
+          return alarmCustom.buffer;
+        } catch (e) {
+          return null;
+        }
+      }
+
+      /** Plays one round of a sound; resolves to { stop(), duration }. */
+      async function playAlarmSound(id, level) {
+        const ctx = ensureAlarmCtx();
+        if (!ctx) return { stop() {}, duration: 2 };
+        const bus = ctx.createGain();
+        bus.gain.value = level == null ? 1 : level;
+        bus.connect(alarmOut);
+        const t = ctx.currentTime + 0.03;
+        let duration;
+        if (id === 'custom') {
+          const buf = await alarmCustomBuffer(ctx);
+          if (buf) {
+            const src = ctx.createBufferSource();
+            src.buffer = buf;
+            src.connect(bus);
+            duration = Math.min(buf.duration, 10);
+            if (buf.duration > 10) {   // clip long files with a short fade
+              bus.gain.setValueAtTime(bus.gain.value, t + duration - 0.4);
+              bus.gain.linearRampToValueAtTime(0, t + duration);
+            }
+            src.start(t, 0, duration);
+          } else {
+            duration = ALARM_RECIPES.chime(ctx, bus, t);   // file missing/unreadable: fall back
+          }
+        } else {
+          duration = (ALARM_RECIPES[id] || ALARM_RECIPES.chime)(ctx, bus, t);
+        }
+        let stopped = false;
+        return {
+          duration,
+          stop() {
+            if (stopped) return;
+            stopped = true;
+            const now = ctx.currentTime;
+            bus.gain.cancelScheduledValues(now);
+            bus.gain.setValueAtTime(bus.gain.value, now);
+            bus.gain.linearRampToValueAtTime(0, now + 0.06);
+            setTimeout(() => { try { bus.disconnect(); } catch (e) {} }, 120);
+          }
+        };
+      }
+
+      function startAlarmLoop() {
+        stopAlarmLoop();
+        const loop = { token: {}, timer: 0, current: null, n: 0 };
+        alarmLoop = loop;
+        const step = async () => {
+          if (alarmLoop !== loop || !focusRun || !focusRun.ringing) return;
+          const ctx = ensureAlarmCtx();
+          if (ctx && ctx.state !== 'running') {   // waiting for a gesture after a reload: don't pile up rounds
+            loop.timer = setTimeout(step, 500);
+            return;
+          }
+          const level = Math.min(1, 0.7 + 0.1 * loop.n++);   // escalate gently
+          const handle = await playAlarmSound(focusSettings().sound, level);
+          if (alarmLoop !== loop) { handle.stop(); return; }
+          loop.current = handle;
+          focusVibrate();
+          loop.timer = setTimeout(step, Math.max(4, handle.duration + 2) * 1000);
+        };
+        step();
+      }
+
+      function stopAlarmLoop() {
+        if (!alarmLoop) return;
+        clearTimeout(alarmLoop.timer);
+        if (alarmLoop.current) alarmLoop.current.stop();
+        alarmLoop = null;
+      }
+
+      async function previewAlarm(id, btn) {
+        const wasSame = alarmPreview && alarmPreview.btn === btn;
+        stopAlarmPreview();
+        if (wasSame) return;   // second click = stop
+        if (id === 'custom' && !alarmCustom) { focusDom.file.click(); return; }
+        const entry = { btn, handle: null, timer: 0 };
+        alarmPreview = entry;
+        btn.classList.add('playing');
+        btn.textContent = '■';
+        const handle = await playAlarmSound(id, 1);
+        if (alarmPreview !== entry) { handle.stop(); return; }
+        entry.handle = handle;
+        entry.timer = setTimeout(stopAlarmPreview, (handle.duration + 0.3) * 1000);
+      }
+
+      function stopAlarmPreview() {
+        if (!alarmPreview) return;
+        const p = alarmPreview;
+        alarmPreview = null;
+        clearTimeout(p.timer);
+        if (p.handle) p.handle.stop();
+        p.btn.classList.remove('playing');
+        p.btn.textContent = '▶';
+      }
+
+      /* ---- Custom sound file in IndexedDB ---- */
+      function focusDB() {
+        return new Promise((resolve, reject) => {
+          const req = indexedDB.open('localify_focus', 1);
+          req.onupgradeneeded = () => req.result.createObjectStore('sounds', { keyPath: 'id' });
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      }
+
+      async function focusIdb(mode, fn) {
+        const db = await focusDB();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction('sounds', mode);
+          const req = fn(tx.objectStore('sounds'));
+          tx.oncomplete = () => { db.close(); resolve(req ? req.result : undefined); };
+          tx.onerror = tx.onabort = () => { db.close(); reject(tx.error); };
+        });
+      }
+
+      async function loadCustomAlarm() {
+        try {
+          const rec = await focusIdb('readonly', s => s.get('alarm'));
+          alarmCustom = rec && rec.blob ? { name: rec.name, blob: rec.blob, buffer: null } : null;
+        } catch (e) {
+          alarmCustom = null;
+        }
+        if (!alarmCustom && focusSettings().sound === 'custom') { focusCfg.sound = 'chime'; saveFocusSettings(); }
+        syncPitchFocusSettingsUI();
+        updateFocusUI();
+      }
+
+      async function setCustomAlarmFile(file) {
+        if (!file) return;
+        if (file.size > 25 * 1024 * 1024) { showToast('That file is too big for an alarm (max 25 MB)'); return; }
+        const ctx = ensureAlarmCtx();
+        let buffer = null;
+        try { buffer = await ctx.decodeAudioData(await file.arrayBuffer()); } catch (e) { buffer = null; }
+        if (!buffer) { showToast("Couldn't read that audio file"); return; }
+        try {
+          await focusIdb('readwrite', s => s.put({ id: 'alarm', name: file.name, blob: file }));
+        } catch (e) {
+          showToast("Couldn't save the sound on this device");
+          return;
+        }
+        alarmCustom = { name: file.name, blob: file, buffer };
+        focusSettings().sound = 'custom';
+        saveFocusSettings();
+        syncPitchFocusSettingsUI();
+        updateFocusUI();
+        showToast(`Alarm sound: ${file.name}`);
+      }
+
+      async function clearCustomAlarm() {
+        try { await focusIdb('readwrite', s => s.delete('alarm')); } catch (e) {}
+        alarmCustom = null;
+        if (focusSettings().sound === 'custom') { focusCfg.sound = 'chime'; saveFocusSettings(); }
+        syncPitchFocusSettingsUI();
+        updateFocusUI();
+      }
+
+      /* ---- UI ---- */
+      function updateFocusUI() {
+        if (!focusDom) return;
+        const d = focusDom;
+        const run = focusRun;
+        const left = focusLeft();
+        const paused = !!run && run.pausedLeft != null;
+        const ringing = !!run && run.ringing;
+        const clock = formatClock(left);
+
+        d.btn.classList.toggle('is-running', !!run && !ringing);
+        d.btn.classList.toggle('is-paused', paused);
+        d.btn.classList.toggle('is-ringing', ringing);
+        const chip = !run ? '' : ringing ? "Time's up" : clock;
+        if (d.btnText.textContent !== chip) d.btnText.textContent = chip;
+        d.btn.setAttribute('aria-label', !run ? 'Lock-in focus timer'
+          : ringing ? "Focus timer: time's up" : `Focus timer: ${clock} left${paused ? ', paused' : ''}`);
+
+        d.setup.hidden = !!run;
+        d.running.hidden = !run;
+        if (run) {
+          d.big.textContent = clock;
+          d.state.textContent = ringing ? "Time's up" : paused ? 'Paused' : 'Locked in';
+          d.progress.style.width = `${run.total ? Math.min(100, (1 - left / run.total) * 100) : 100}%`;
+          d.pause.textContent = paused ? 'Resume' : 'Pause';
+          d.pause.disabled = ringing;
+          d.add.textContent = ringing ? 'Snooze' : '+5 min';
+        }
+        const cfg = focusSettings();
+        d.presets.querySelectorAll('button').forEach(b =>
+          b.classList.toggle('active', Number(b.dataset.min) === cfg.minutes));
+        d.alarmName.textContent = cfg.sound === 'custom' && alarmCustom ? alarmCustom.name : FOCUS_SOUNDS[cfg.sound];
+        d.setStatus.textContent = !run
+          ? "Music dips and an alarm rings when time's up."
+          : ringing ? "Time's up: alarm ringing." : `${paused ? 'Paused' : 'Running'}: ${clock} left.`;
+        d.setOpen.textContent = run ? 'Show' : 'Start…';
+      }
+
+      function isFocusPopOpen() {
+        return !!focusDom && !focusDom.pop.hidden;
+      }
+
+      function positionFocusPop() {
+        const r = focusDom.btn.getBoundingClientRect();
+        const pop = focusDom.pop;
+        pop.style.top = `${Math.round(r.bottom + 8)}px`;
+        pop.style.right = window.innerWidth <= 768 ? '' : `${Math.max(12, Math.round(window.innerWidth - r.right))}px`;
+      }
+
+      function openFocusPop() {
+        if (!focusDom || isFocusPopOpen()) return;
+        if (focusRun && focusRun.ringing) { showFocusAlert(); return; }
+        toggleSpeedPopover(false);
+        focusReturnFocus = document.activeElement;
+        focusDom.custom.value = focusSettings().minutes;
+        updateFocusUI();
+        focusDom.pop.hidden = false;
+        positionFocusPop();
+        focusDom.btn.setAttribute('aria-expanded', 'true');
+        const first = focusRun ? focusDom.pause : focusDom.presets.querySelector('button');
+        first.focus();
+      }
+
+      function closeFocusPop(restoreFocus) {
+        if (!isFocusPopOpen()) return;
+        focusDom.pop.hidden = true;
+        focusDom.btn.setAttribute('aria-expanded', 'false');
+        if (restoreFocus !== false && focusDom.pop.contains(document.activeElement)) {
+          const r = focusReturnFocus;
+          (r && r !== document.body && document.contains(r) ? r : focusDom.btn).focus();
+        }
+        focusReturnFocus = null;
+      }
+
+      function toggleFocusPop() {
+        if (focusRun && focusRun.ringing) { showFocusAlert(); return; }
+        if (isFocusPopOpen()) closeFocusPop();
+        else openFocusPop();
+      }
+
+      function showFocusAlert() {
+        if (!focusDom) return;
+        closeFocusPop(false);
+        const total = focusRun ? focusRun.total : 0;
+        focusDom.alertText.textContent = total
+          ? `Your ${focusFmtMinutes(total / 60)} lock-in is done.`
+          : 'Your lock-in is done.';
+        focusDom.alert.hidden = false;
+        focusDom.alertStop.focus();
+      }
+
+      function hideFocusAlert() {
+        if (!focusDom || focusDom.alert.hidden) return;
+        const hadFocus = focusDom.alert.contains(document.activeElement);
+        focusDom.alert.hidden = true;
+        if (hadFocus) focusDom.btn.focus();
+      }
+
+      function syncPitchFocusSettingsUI() {
+        if (!pitchDom || !focusDom) return;   // before initPitchFocus
+        setSwitch(pitchDom.setPitch, pitchSettings().pitchWithSpeed);
+        const cfg = focusSettings();
+        const d = focusDom;
+        setRadioGroup(d.sound, cfg.sound);
+        d.customName.textContent = alarmCustom ? alarmCustom.name : 'No file chosen';
+        d.clearFile.hidden = !alarmCustom;
+        d.pickFile.textContent = alarmCustom ? 'Replace file…' : 'Choose sound file…';
+        d.alarmVol.value = Math.round(cfg.alarmVolume * 100);
+        d.alarmVolValue.textContent = `${Math.round(cfg.alarmVolume * 100)}%`;
+        d.duck.value = cfg.duck;
+        d.duckValue.textContent = `${cfg.duck}%`;
+        setSwitch(d.notify, cfg.notify);
+        setSwitch(d.vibrate, cfg.vibrate);
+        const blocked = 'Notification' in window && Notification.permission === 'denied';
+        d.notifyHint.textContent = !('Notification' in window) ? 'Not supported in this browser.'
+          : blocked ? 'Blocked for this page in your browser settings.'
+          : 'Shows an alert even if Localify is in the background.';
+      }
+
+      function resetPitchFocusSettings() {
+        [STORAGE_KEYS.PITCH, STORAGE_KEYS.FOCUS].forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
+        pitchCfg = null;
+        focusCfg = null;
+        if (alarmCustom) { focusSettings().sound = 'chime'; }
+        applyPitchReverb();
+        applyPitchToPlayers();
+        if (alarmOut) alarmOut.gain.value = alarmVolumeGain();
+      }
+
+      function initPitchFocus() {
+        const g = (id) => document.getElementById(id);
+        pitchDom = {
+          readout: g('pitchReadout'),
+          presets: g('pitchPresets'),
+          toggle: g('pitchToggle'),
+          reverb: g('reverbToggle'),
+          setPitch: g('setPitch')
+        };
+        focusDom = {
+          btn: g('focusBtn'), btnText: g('focusBtnText'),
+          pop: g('focusPop'), popClose: g('focusPopClose'),
+          setup: g('focusSetup'), running: g('focusRunning'),
+          presets: g('focusPresets'), custom: g('focusCustomMin'), start: g('focusStart'),
+          alarmLink: g('focusAlarmLink'), alarmName: g('focusAlarmName'),
+          big: g('focusBig'), state: g('focusState'), progress: g('focusProgress'),
+          pause: g('focusPause'), add: g('focusAdd'), stop: g('focusStop'),
+          alert: g('focusAlert'), alertText: g('focusAlertText'),
+          snooze: g('focusSnooze'), alertStop: g('focusAlertStop'),
+          setOpen: g('setFocusOpen'), setStatus: g('setFocusStatus'),
+          sound: g('setFocusSound'), customName: g('setFocusCustomName'),
+          pickFile: g('setFocusPickFile'), clearFile: g('setFocusClearFile'), file: g('setFocusFile'),
+          alarmVol: g('setFocusAlarmVol'), alarmVolValue: g('setFocusAlarmVolValue'),
+          duck: g('setFocusDuck'), duckValue: g('setFocusDuckValue'),
+          notify: g('setFocusNotify'), notifyHint: g('setFocusNotifyHint'),
+          vibrate: g('setFocusVibrate')
+        };
+        const d = focusDom;
+
+        /* Pitch controls (speed popover + Settings mirror) */
+        pitchDom.presets.addEventListener('click', (e) => {
+          const b = e.target.closest('.pitch-preset-btn');
+          if (b) applyPitchPreset(b.dataset.preset);
+        });
+        pitchDom.toggle.addEventListener('click', () => setPitchWithSpeed(!pitchSettings().pitchWithSpeed));
+        pitchDom.reverb.addEventListener('click', () => setPitchReverb(!pitchSettings().reverb));
+        pitchDom.setPitch.addEventListener('click', () => setPitchWithSpeed(!pitchSettings().pitchWithSpeed));
+
+        /* Focus popover */
+        d.btn.addEventListener('click', toggleFocusPop);
+        d.popClose.addEventListener('click', () => closeFocusPop());
+        d.presets.addEventListener('click', (e) => {
+          const b = e.target.closest('button[data-min]');
+          if (b) focusStart(Number(b.dataset.min));
+        });
+        d.start.addEventListener('click', () => {
+          const v = parseFloat(d.custom.value);
+          if (!Number.isFinite(v) || v <= 0) { d.custom.focus(); showToast('Enter how many minutes'); return; }
+          focusStart(v);
+        });
+        d.custom.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); d.start.click(); } });
+        d.alarmLink.addEventListener('click', () => {
+          closeFocusPop(false);
+          openSettings();
+          const title = g('setFocusTitle');
+          if (title) title.scrollIntoView({ block: 'start' });
+        });
+        d.pause.addEventListener('click', focusTogglePause);
+        d.add.addEventListener('click', focusAddFive);
+        d.stop.addEventListener('click', () => { focusStop(); closeFocusPop(); });
+        d.pop.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') { e.stopPropagation(); closeFocusPop(); }
+        });
+        document.addEventListener('pointerdown', (e) => {
+          if (isFocusPopOpen() && !d.pop.contains(e.target) && !d.btn.contains(e.target)) closeFocusPop(false);
+        });
+        window.addEventListener('resize', () => { if (isFocusPopOpen()) positionFocusPop(); });
+
+        /* Time's-up alert: Esc = stop; keys stay inside the dialog */
+        d.alertStop.addEventListener('click', focusStop);
+        d.snooze.addEventListener('click', focusSnooze);
+        d.alert.addEventListener('keydown', (e) => {
+          e.stopPropagation();
+          if (e.key === 'Escape') { e.preventDefault(); focusStop(); }
+          else if (e.key === 'Tab') {
+            e.preventDefault();
+            (document.activeElement === d.alertStop ? d.snooze : d.alertStop).focus();
+          }
+        });
+
+        /* Settings section */
+        d.setOpen.addEventListener('click', () => { closeSettings(); openFocusPop(); });
+        wireRadioGroup(d.sound, (v) => {
+          if (v === 'custom' && !alarmCustom) { d.file.click(); return; }
+          focusSettings().sound = v;
+          saveFocusSettings();
+          syncPitchFocusSettingsUI();
+          updateFocusUI();
+        });
+        d.sound.addEventListener('click', (e) => {
+          const b = e.target.closest('.focus-preview');
+          if (b) previewAlarm(b.dataset.preview, b);
+        });
+        d.pickFile.addEventListener('click', () => d.file.click());
+        d.file.addEventListener('change', () => {
+          const f = d.file.files && d.file.files[0];
+          d.file.value = '';
+          setCustomAlarmFile(f);
+        });
+        d.clearFile.addEventListener('click', clearCustomAlarm);
+        d.alarmVol.addEventListener('input', () => {
+          focusSettings().alarmVolume = Number(d.alarmVol.value) / 100;
+          d.alarmVolValue.textContent = `${d.alarmVol.value}%`;
+          if (alarmOut) alarmOut.gain.setTargetAtTime(alarmVolumeGain(), alarmCtx.currentTime, 0.03);
+        });
+        d.alarmVol.addEventListener('change', saveFocusSettings);
+        d.duck.addEventListener('input', () => {
+          focusSettings().duck = Number(d.duck.value);
+          d.duckValue.textContent = `${d.duck.value}%`;
+          if (focusRun && focusRun.ringing && state.fx && state.fx.duck) {
+            pfRamp(state.audioCtx, state.fx.duck.gain, focusCfg.duck / 100, 0.2);
+          }
+        });
+        d.duck.addEventListener('change', saveFocusSettings);
+        d.notify.addEventListener('click', () => setFocusNotify(!focusSettings().notify));
+        d.vibrate.addEventListener('click', () => {
+          focusSettings().vibrate = !focusCfg.vibrate;
+          saveFocusSettings();
+          syncPitchFocusSettingsUI();
+        });
+
+        /* Catch up when the tab wakes (background timers can be late) */
+        document.addEventListener('visibilitychange', () => {
+          if (!document.hidden) { focusCheck(); updateFocusUI(); }
+        });
+
+        /* Restore a run that survived a reload */
+        const saved = loadJSON(STORAGE_KEYS.FOCUS_RUN, null);
+        if (saved && Number(saved.total) > 0) {
+          focusRun = {
+            total: Number(saved.total),
+            endAt: Number.isFinite(saved.endAt) ? saved.endAt : null,
+            pausedLeft: Number.isFinite(saved.pausedLeft) ? saved.pausedLeft : null,
+            ringing: !!saved.ringing
+          };
+          if (!focusRun.ringing && focusRun.pausedLeft == null && focusRun.endAt == null) focusRun = null;
+        }
+        if (focusRun) {
+          if (focusRun.ringing || (focusRun.pausedLeft == null && focusRun.endAt <= Date.now())) {
+            // Audio can't start until the page gets a gesture; ring as soon as it does
+            const unlock = () => {
+              window.removeEventListener('pointerdown', unlock, true);
+              window.removeEventListener('keydown', unlock, true);
+              ensureAlarmCtx();
+            };
+            window.addEventListener('pointerdown', unlock, true);
+            window.addEventListener('keydown', unlock, true);
+            if (focusRun.ringing) focusStartRinging(false);
+            else focusTimesUp();
+          } else {
+            focusSchedule();
+          }
+        }
+
+        applyPitchToPlayers();
+        updateSpeedUI();
+        syncPitchFocusSettingsUI();
+        updateFocusUI();
+        if ('indexedDB' in window) loadCustomAlarm();
+      }
+      /* [/Focus] */
 
       /* ========================================================================
          Audio Editor (built-in)
@@ -10498,6 +12167,7 @@
          ======================================================================== */
       ensureRoundRectPolyfill();
       initSettings();   // [Settings]
+      initPitchFocus();   // [Pitch]/[Focus]
       setupMediaSessionHandlers();
 
       dom.tracklistBody.setAttribute('role', 'listbox');
