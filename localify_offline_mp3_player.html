@@ -2271,14 +2271,9 @@
       text-align: right;
     }
 
-    .settings-danger {
-      color: #ff6b6b;
-      border-color: rgba(255, 107, 107, 0.4);
-    }
-
-    [data-mode="light"] .settings-danger {
-      color: #c62828;
-      border-color: rgba(198, 40, 40, 0.35);
+    .settings-danger {   /* [Looks] token instead of hardcoded reds */
+      color: var(--danger);
+      border-color: rgba(var(--danger-rgb), 0.4);
     }
 
     .settings-footer-note {
@@ -2839,8 +2834,7 @@
       color: var(--text-secondary);
     }
 
-    .ed-dialog .toast-container,
-    .as-dialog .toast-container {
+    .ed-dialog .toast-container {
       bottom: 24px;
     }
 
@@ -2867,49 +2861,24 @@
     }
 
     /* ==========================================================================
-       [Audacity integration] Setup dialog — self-contained so it can move into
-       the Settings panel later. Uses the same tokens as the rest of the app.
+       [Audacity integration] [Looks] Settings → Integrations → Audacity
+       (was a separate setup dialog). Uses the same tokens as the rest of the app.
        ========================================================================== */
-    .as-dialog {
-      width: min(560px, calc(100vw - 32px));
-      max-width: none;
-      max-height: calc(100vh - 32px);
-      padding: 0;
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      background: var(--bg-elevated);
-      color: var(--text-primary);
-      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
-    }
-
-    .as-dialog::backdrop {
-      background: rgba(0, 0, 0, 0.62);
-    }
-
-    .as-form {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      padding: 18px 20px;
+    .as-block {
       font-size: 13px;
       color: var(--text-secondary);
       line-height: 1.5;
     }
 
-    .as-form h2 {
-      font-size: 18px;
-      color: var(--text-primary);
-    }
-
-    .as-form ol {
+    .as-steps {
       padding-left: 20px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 4px;
     }
 
-    .as-form code {
-      font-family: Consolas, "Cascadia Mono", monospace;
+    .as-block code {
+      font-family: "Cascadia Mono", Consolas, monospace;
       font-size: 12px;
       background: rgba(var(--fg-rgb), 0.08);
       color: var(--text-primary);
@@ -2918,20 +2887,80 @@
       word-break: break-all;
     }
 
+    .as-link {
+      align-self: flex-start;
+      color: var(--accent);
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+
+    .as-link:hover {
+      text-decoration: underline;
+    }
+
+    .as-link:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .as-roots {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .as-root {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      background: rgba(var(--fg-rgb), 0.04);
+      border: 1px solid var(--border-subtle);
+      transition: border-color var(--transition-med), background var(--transition-med);
+    }
+
+    .as-root.highlight {
+      border-color: rgba(var(--accent-rgb), 0.6);
+      background: var(--accent-dim);
+    }
+
     .as-label {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
       font-weight: 700;
       color: var(--text-primary);
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .as-state {
+      flex-shrink: 0;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .as-input-row {
+      display: flex;
+      gap: 6px;
     }
 
     .as-input {
-      width: 100%;
-      padding: 10px 12px;
+      flex: 1;
+      min-width: 0;
+      min-height: 38px;
+      padding: 8px 10px;
       border-radius: var(--radius-sm);
       border: 1px solid rgba(var(--fg-rgb), 0.2);
       background: var(--bg-base);
       color: var(--text-primary);
       font-size: 13px;
-      font-family: Consolas, "Cascadia Mono", monospace;
+      font-family: "Cascadia Mono", Consolas, monospace;
+      user-select: text;
     }
 
     .as-input:focus-visible {
@@ -2941,24 +2970,293 @@
 
     .as-error {
       color: var(--danger);
+      font-size: 12px;
       font-weight: 600;
-      min-height: 1em;
     }
 
-    .as-preview {
+    .as-error:empty {
+      display: none;
+    }
+
+    .as-empty {
       font-size: 12px;
       color: var(--text-muted);
-      word-break: break-all;
-      white-space: pre-line;
     }
 
-    .as-actions {
+    .as-helper {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .as-helper[hidden],
+    .as-pending[hidden] {
+      display: none;
+    }
+
+    .as-sub {
+      font-size: 13px;
+    }
+
+    .as-block .as-preview {
+      display: block;
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      white-space: pre-wrap;
+      user-select: all;
+    }
+
+    .as-copy,
+    .as-remove {
+      flex-shrink: 0;
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    .as-pending {
       display: flex;
       flex-wrap: wrap;
-      justify-content: flex-end;
-      gap: 8px;
+      align-items: center;
+      gap: 8px 12px;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      background: var(--accent-dim);
+      color: var(--text-primary);
+    }
+
+    .as-pending span {
+      flex: 1 1 180px;
+    }
+
+    .as-open-btn {
+      padding: 8px 16px;
+      font-size: 13px;
     }
     /* ---- end [Audacity integration] ---- */
+
+    /* ==========================================================================
+       [Looks] Polish pass — Settings drawer + audio editor
+       Everything for the look-and-feel pass lives in [Looks] blocks like this
+       one (CSS) and the [Looks] script block before Init. Colors are tokens.
+       ========================================================================== */
+    :root {
+      --danger-rgb: 233, 20, 41;
+      --tint-rgb: var(--accent-rgb);      /* album-art tint, set from JS; accent fallback */
+      --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+      --tap: 44px;
+    }
+
+    :root[data-mode="light"] {
+      --text-muted: #6b6b75;              /* 5:1 on white; small labels stay readable */
+      --danger: #c8102e;
+      --danger-rgb: 200, 16, 46;
+    }
+
+    /* Settings drawer */
+    .settings-panel {
+      width: 420px;
+    }
+
+    [data-mode="light"] .settings-panel {
+      box-shadow: 0 16px 48px rgba(var(--fg-rgb), 0.16);
+    }
+
+    .settings-header h2 {
+      font-size: 20px;
+      letter-spacing: -0.01em;
+    }
+
+    .settings-close,
+    .ed-icon-btn {
+      width: 40px;
+      height: 40px;
+    }
+
+    .settings-section {
+      padding: 18px 0 8px;
+      scroll-margin-top: 8px;
+      border-radius: var(--radius-md);
+    }
+
+    .settings-section-title {
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .settings-section.flash {
+      animation: looksFlash 1.6s var(--ease-out);
+    }
+
+    .settings-row.flash {
+      animation: looksFlash 1.6s var(--ease-out);
+      border-radius: var(--radius-md);
+    }
+
+    @keyframes looksFlash {
+      0%, 30% { box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.55); background: var(--accent-dim); }
+      100% { box-shadow: 0 0 0 2px transparent; background: transparent; }
+    }
+
+    .settings-row {
+      padding: 12px 0;
+    }
+
+    .settings-label {
+      line-height: 1.35;
+    }
+
+    [data-mode="light"] .segmented button[aria-checked="true"] {
+      background: var(--bg-surface);
+      box-shadow: 0 1px 3px rgba(var(--fg-rgb), 0.18);
+    }
+
+    .segmented button {
+      min-height: 34px;
+    }
+
+    .switch {
+      width: 44px;
+      height: 26px;
+    }
+
+    .switch::after {
+      width: 20px;
+      height: 20px;
+    }
+
+    .switch[aria-checked="true"]::after {
+      transform: translateX(18px);
+    }
+
+    .switch:focus-visible {
+      outline-offset: 3px;
+    }
+
+    .settings-footer-note {
+      margin-top: 22px;
+    }
+
+    /* Audio editor */
+    [data-mode="light"] .ed-dialog {
+      box-shadow: 0 24px 64px rgba(var(--fg-rgb), 0.22);
+    }
+
+    .ed-head {
+      padding: 14px 14px 14px 20px;
+    }
+
+    .ed-title {
+      font-size: 18px;
+      letter-spacing: -0.01em;
+    }
+
+    .ed-subtitle {
+      margin-top: 2px;
+      color: var(--text-muted);
+    }
+
+    .ed-body {
+      padding: 16px 20px;
+      gap: 14px;
+    }
+
+    .ed-foot {
+      padding: 12px 20px;
+      background: rgba(var(--fg-rgb), 0.02);
+    }
+
+    .ed-btn {
+      min-height: 34px;
+    }
+
+    .ed-group-title {
+      color: var(--text-primary);
+      opacity: 0.8;
+    }
+
+    .ed-overlay {
+      backdrop-filter: blur(2px);
+    }
+
+    @media (max-width: 768px) {
+      .ed-dialog {
+        max-width: 100vw;
+      }
+
+      .ed-head {
+        padding-top: max(12px, var(--safe-top));
+        padding-left: max(16px, var(--safe-left));
+        padding-right: max(10px, var(--safe-right));
+      }
+
+      .ed-foot {
+        padding-bottom: max(12px, var(--safe-bottom));
+      }
+
+      .ed-foot .btn-primary {
+        flex: 1 1 100%;
+      }
+
+      .settings-body {
+        padding-left: max(20px, var(--safe-left));
+        padding-right: max(20px, var(--safe-right));
+      }
+    }
+
+    /* Touch screens: every control at least 44px tall/wide */
+    @media (pointer: coarse) {
+      .settings-close,
+      .ed-icon-btn,
+      .accent-swatch {
+        width: var(--tap);
+        height: var(--tap);
+      }
+
+      .segmented button,
+      .ed-btn,
+      .btn-ghost,
+      .btn-secondary,
+      .as-input {
+        min-height: var(--tap);
+      }
+
+      .switch {
+        width: 52px;
+        height: 30px;
+      }
+
+      .switch::after {
+        width: 24px;
+        height: 24px;
+      }
+
+      .switch[aria-checked="true"]::after {
+        transform: translateX(22px);
+      }
+
+      /* bigger range thumbs (the 5px track stays; margin widens the hit area) */
+      .speed-range-slider {
+        margin: 10px 0;
+      }
+
+      .speed-range-slider::-webkit-slider-thumb {
+        width: 24px;
+        height: 24px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .settings-section.flash,
+      .settings-row.flash {
+        animation: none;
+        box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.55);
+      }
+    }
+    /* [/Looks] Settings + editor */
   </style>
 </head>
 <body>
@@ -3094,30 +3392,6 @@
       <label class="ed-check"><input type="checkbox" id="edAddToLibrary"> Add export to library</label>
       <button type="button" class="btn-primary" id="edExport" disabled>Export WAV</button>
     </div>
-  </dialog>
-
-  <!-- =====================================================================
-       [Audacity integration] Setup dialog — self-contained so it can move
-       into the Settings panel later.
-       ===================================================================== -->
-  <dialog id="audacityDialog" class="as-dialog" aria-labelledby="asTitle">
-    <form method="dialog" class="as-form" id="asForm" novalidate>
-      <h2 id="asTitle">Open in Audacity: one-time setup</h2>
-      <p>Browsers can't start programs on their own. A small helper in the <code>tools/audacity</code> folder next to this player adds a <code>localify-audacity:</code> link type. When you click "Open in Audacity", the helper checks that the file is an audio file inside your music folder and opens it in Audacity.</p>
-      <ol>
-        <li>Copy <code>localify-audacity.ps1</code> to <code>%LOCALAPPDATA%\Localify Audacity Helper\</code> and put your music folder in its <code>$MusicRoots</code> line (the line below shows the exact text).</li>
-        <li>Double-click <code>install-localify-audacity.reg</code>. It only changes your own user account and needs no admin rights.</li>
-        <li>Tell the player where the folder <strong id="asRootName"></strong> is on this PC.</li>
-      </ol>
-      <label class="as-label" for="asPath">Full path of the folder “<span id="asRootName2"></span>”</label>
-      <input class="as-input" id="asPath" type="text" placeholder="C:\Users\you\Music" spellcheck="false" autocomplete="off" aria-describedby="asPreview asError">
-      <div class="as-preview" id="asPreview"></div>
-      <div class="as-error" id="asError" role="alert"></div>
-      <div class="as-actions">
-        <button type="button" class="btn-ghost" id="asCancel">Cancel</button>
-        <button type="submit" class="btn-primary" id="asSave">Save and open</button>
-      </div>
-    </form>
   </dialog>
 
   <!-- Mobile Sidebar Backdrop -->
@@ -3752,6 +4026,37 @@
             <span class="settings-value" id="setSpeedValue">1x</span>
           </div>
           <input type="range" class="speed-range-slider" id="setSpeed" min="0.25" max="3" step="0.05" value="1">
+        </div>
+      </section>
+
+      <!-- [Looks] Integrations → Audacity (was a separate setup dialog) -->
+      <section class="settings-section" id="setIntegrations" aria-labelledby="setIntegrationsTitle">
+        <h3 class="settings-section-title" id="setIntegrationsTitle">Integrations</h3>
+
+        <div class="settings-row stacked as-block" id="setAudacity" aria-labelledby="setAudacityLabel">
+          <span class="settings-label" id="setAudacityLabel">Open in Audacity<span class="settings-hint">Windows only. Browsers can't start programs, so a small helper opens the original file in Audacity. It only opens audio files inside the folders you list.</span></span>
+
+          <div class="as-pending" id="asPending" hidden role="status">
+            <span>Enter where <strong id="asPendingRoot"></strong> is on this PC, then open <strong id="asPendingTitle"></strong>.</span>
+            <button type="button" class="btn-primary as-open-btn" id="asOpenPending">Save and open</button>
+          </div>
+
+          <ol class="as-steps">
+            <li>Copy <code>localify-audacity.ps1</code> to <code>%LOCALAPPDATA%\Localify Audacity Helper\</code>.</li>
+            <li>Paste the <em>helper line</em> below into its <code>$MusicRoots</code> line.</li>
+            <li>Double-click <code>install-localify-audacity.reg</code>. Your account only, no admin needed.</li>
+          </ol>
+          <a class="as-link" href="tools/audacity/README.md" target="_blank" rel="noopener">Helper install steps (tools/audacity/README.md)</a>
+
+          <div class="as-roots" id="asRoots"></div>
+
+          <div class="as-helper" id="asHelper" hidden>
+            <div class="settings-row-head">
+              <span class="settings-label as-sub">Helper line</span>
+              <button type="button" class="btn-ghost as-copy" id="asCopy">Copy</button>
+            </div>
+            <code class="as-preview" id="asPreview"></code>
+          </div>
         </div>
       </section>
 
@@ -6481,7 +6786,7 @@
 
       window.addEventListener('keydown', (e) => {
         // The editor and the Audacity setup dialog handle their own keys
-        if (Editor.isOpen() || Audacity.isOpen()) return;
+        if (Editor.isOpen()) return;   // [Looks] Audacity setup moved into Settings
         if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
         const target = e.target;
         if (e.key === 'Escape') {
@@ -7062,18 +7367,29 @@
         return document.body.classList.contains('settings-open');
       }
 
-      function openSettings() {
-        if (isSettingsOpen()) return;
-        toggleSpeedPopover(false);
-        closeMobileSidebar();
-        settingsReturnFocus = document.activeElement;
-        syncSettingsUI();
-        updateSleepUI();
-        setDom.panel.inert = false;
-        if (setDom.appShell) setDom.appShell.inert = true;
-        document.body.classList.add('settings-open');
-        setDom.btn.setAttribute('aria-expanded', 'true');
-        setDom.close.focus();
+      /** [Looks] opts (optional): { section: element id to scroll to, focus: selector to focus }. */
+      function openSettings(opts) {
+        const section = opts && opts.section ? document.getElementById(opts.section) : null;
+        if (!isSettingsOpen()) {
+          toggleSpeedPopover(false);
+          closeMobileSidebar();
+          settingsReturnFocus = document.activeElement;
+          syncSettingsUI();
+          updateSleepUI();
+          if (typeof Audacity !== 'undefined') Audacity.renderSettings();   // [Looks]
+          setDom.panel.inert = false;
+          if (setDom.appShell) setDom.appShell.inert = true;
+          document.body.classList.add('settings-open');
+          setDom.btn.setAttribute('aria-expanded', 'true');
+        }
+        const focusEl = opts && opts.focus ? setDom.panel.querySelector(opts.focus) : null;
+        (focusEl || setDom.close).focus({ preventScroll: !!section });
+        if (section) {   // [Looks] jump to a section and flash it
+          section.scrollIntoView({ block: 'start', behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+          section.classList.remove('flash');
+          void section.offsetWidth;
+          section.classList.add('flash');
+        }
       }
 
       function closeSettings() {
@@ -7082,6 +7398,7 @@
         setDom.panel.inert = true;
         if (setDom.appShell) setDom.appShell.inert = false;
         setDom.btn.setAttribute('aria-expanded', 'false');
+        if (typeof Audacity !== 'undefined') Audacity.onSettingsClosed();   // [Looks]
         const r = settingsReturnFocus;
         const back = r && r !== document.body && document.contains(r) ? r : setDom.btn;
         settingsReturnFocus = null;
@@ -8423,6 +8740,8 @@
         return {
           open,
           isOpen,
+          /** [Looks] Ask to close (confirms when there are unsaved edits). True if it closed. */
+          close() { if (isOpen()) requestClose(); return !isOpen(); },
           /** The main player started: never play both at once. */
           onMainPlay() { if (ed.playing) pausePreview(); },
           /** Theme changed: the waveform reads its colors from the CSS tokens. */
@@ -8432,9 +8751,10 @@
 
       /* ========================================================================
          [Audacity integration] — begin
-         Self-contained so it can move into the Settings panel later. It needs:
+         [Looks] The setup now lives in Settings → Integrations → Audacity.
+         It needs:
            • STORAGE_KEYS.AUDACITY_ROOTS  { "<picked folder name>": "C:\\abs\\path" }
-           • the #audacityDialog markup and the .as-* CSS block
+           • the #setAudacity markup in the Settings panel and the .as-* CSS block
            • the helper in tools/audacity, which registers the localify-audacity: link
              and only opens existing audio files inside its configured music folders
          ======================================================================== */
@@ -8443,12 +8763,11 @@
         const UNKNOWN_LOCATION = 'Location unknown. Load this track with Open Folder (or drop its folder) to open it in Audacity.';
 
         const el = {
-          dialog: $('audacityDialog'), form: $('asForm'),
-          rootName: $('asRootName'), rootName2: $('asRootName2'),
-          path: $('asPath'), preview: $('asPreview'), error: $('asError'),
-          cancel: $('asCancel')
+          roots: $('asRoots'), helper: $('asHelper'), preview: $('asPreview'), copy: $('asCopy'),
+          pending: $('asPending'), pendingRoot: $('asPendingRoot'), pendingTitle: $('asPendingTitle'),
+          openPending: $('asOpenPending')
         };
-        let pending = null;   // track waiting for the setup to finish
+        let pending = null;   // track waiting for its folder path
 
         function getRoots() {
           const r = loadJSON(STORAGE_KEYS.AUDACITY_ROOTS, {});
@@ -8457,7 +8776,7 @@
 
         function setRoot(name, absPath) {
           const r = getRoots();
-          r[name] = absPath;
+          if (absPath) r[name] = absPath; else delete r[name];
           saveJSON(STORAGE_KEYS.AUDACITY_ROOTS, r);
         }
 
@@ -8492,60 +8811,156 @@
           a.remove();
         }
 
+        /** Folder names to show: saved ones plus folders loaded this session. */
+        function knownRootNames() {
+          const names = new Set(Object.keys(getRoots()));
+          for (const t of state.tracks) if (canOpen(t)) names.add(t.rootName);
+          return [...names].sort((a, b) => collator.compare(a, b));
+        }
+
+        function rootId(name) { return 'asRoot_' + hashString(name).toString(36); }
+
+        /** Render the folder rows inside Settings. Keeps typed text for rows that stay. */
+        function renderSettings() {
+          const roots = getRoots();
+          const names = knownRootNames();
+          if (pending && !names.includes(pending.rootName)) names.unshift(pending.rootName);
+          if (names.length === 0) {
+            el.roots.innerHTML = '<p class="as-empty">Load a music folder with <strong>Open Folder</strong> (or drop a folder) and it shows up here.</p>';
+          } else {
+            el.roots.innerHTML = names.map(name => {
+              const id = rootId(name);
+              const saved = roots[name] || '';
+              return `<div class="as-root${pending && pending.rootName === name ? ' highlight' : ''}" data-root="${escapeHtml(name)}">
+                  <label class="as-label" for="${id}">Folder “${escapeHtml(name)}”<span class="as-state">${saved ? 'Saved' : 'Not set'}</span></label>
+                  <div class="as-input-row">
+                    <input class="as-input" id="${id}" type="text" value="${escapeHtml(saved)}" placeholder="C:\\Users\\you\\Music\\${escapeHtml(name)}" spellcheck="false" autocomplete="off" aria-describedby="${id}_err">
+                    ${saved ? `<button type="button" class="btn-ghost as-remove" data-remove-root="${escapeHtml(name)}" aria-label="Forget the path of ${escapeHtml(name)}">Forget</button>` : ''}
+                  </div>
+                  <div class="as-error" id="${id}_err" role="alert"></div>
+                </div>`;
+            }).join('');
+          }
+          updateHelperLine();
+          updatePending();
+        }
+
+        function updateHelperLine() {
+          const paths = Object.values(getRoots()).filter(Boolean);
+          el.helper.hidden = paths.length === 0;
+          el.preview.textContent = `$MusicRoots = @(${paths.map(p => `'${p.replace(/'/g, "''")}'`).join(', ')})`;
+        }
+
+        function updatePending() {
+          el.pending.hidden = !pending;
+          if (!pending) return;
+          el.pendingRoot.textContent = `“${pending.rootName}”`;
+          el.pendingTitle.textContent = `“${pending.title}”`;
+        }
+
+        /** Validate + save one row. Returns the saved path, '' if cleared, or null on error. */
+        function commitRow(row) {
+          const name = row.dataset.root;
+          const input = row.querySelector('.as-input');
+          const err = row.querySelector('.as-error');
+          const r = normalizeRoot(input.value, name);
+          if (!r.path) {
+            if (r.error) { err.textContent = r.error; return null; }
+            err.textContent = '';
+            if (getRoots()[name]) { setRoot(name, ''); renderSettings(); }
+            return '';
+          }
+          err.textContent = '';
+          if (getRoots()[name] !== r.path) {
+            setRoot(name, r.path);
+            input.value = r.path;
+            const badge = row.querySelector('.as-state');
+            if (badge) badge.textContent = 'Saved';
+            updateHelperLine();
+          }
+          return r.path;
+        }
+
         function open(track, forceSetup = false) {
           if (!canOpen(track)) { showToast(UNKNOWN_LOCATION); return; }
           const root = getRoots()[track.rootName];
-          if (!root || forceSetup) { showSetup(track, root || ''); return; }
+          if (!root || forceSetup) { showSetup(track); return; }
           launch(buildUrl(root, track));
-          showToast('Opening in Audacity… If nothing happens, install the helper from tools/audacity.');
+          showToast('Opening in Audacity… If nothing happens, install the helper (Settings → Integrations).');
         }
 
-        function updatePreview() {
-          const r = normalizeRoot(el.path.value, pending && pending.rootName);
-          if (!r.path) { el.preview.textContent = ''; return; }
-          el.preview.textContent =
-            `Helper line: $MusicRoots = @('${r.path.replace(/'/g, "''")}')\n` +
-            `This track: ${filePath(r.path, pending)}`;
-        }
-
-        function showSetup(track, current) {
+        /** First use (or Shift+click): open Settings at the Audacity section. */
+        function showSetup(track) {
+          const fromEditor = Editor.isOpen();
+          if (fromEditor && !Editor.close()) return;   // Settings sits under the modal editor
           pending = track;
-          el.rootName.textContent = track.rootName;
-          el.rootName2.textContent = track.rootName;
-          el.path.value = current;
-          el.error.textContent = '';
-          updatePreview();
-          el.dialog.showModal();
-          el.path.focus();
-          el.path.select();
+          renderSettings();
+          const show = () => openSettings({ section: 'setAudacity', focus: '#' + rootId(track.rootName) });
+          // The editor's close handler restores focus first; open Settings after it
+          if (fromEditor) setTimeout(show, 60); else show();
         }
 
-        el.path.addEventListener('input', () => {
-          el.error.textContent = '';
-          updatePreview();
+        el.roots.addEventListener('input', (e) => {
+          const row = e.target.closest('.as-root');
+          if (row) row.querySelector('.as-error').textContent = '';
         });
-
-        el.form.addEventListener('submit', (e) => {
+        el.roots.addEventListener('change', (e) => {
+          const row = e.target.closest('.as-root');
+          if (row && e.target.classList.contains('as-input')) commitRow(row);
+        });
+        el.roots.addEventListener('keydown', (e) => {
+          if (e.key !== 'Enter' || !e.target.classList.contains('as-input')) return;
           e.preventDefault();
-          if (!pending) { el.dialog.close(); return; }
-          const r = normalizeRoot(el.path.value, pending.rootName);
-          if (!r.path) {
-            el.error.textContent = r.error || 'Enter the full path of the folder.';
-            el.path.focus();
+          const row = e.target.closest('.as-root');
+          if (pending && row.dataset.root === pending.rootName) el.openPending.click();
+          else commitRow(row);
+        });
+        el.roots.addEventListener('click', (e) => {
+          const btn = e.target.closest('[data-remove-root]');
+          if (!btn) return;
+          setRoot(btn.dataset.removeRoot, '');
+          renderSettings();
+          showToast(`Forgot the path of “${btn.dataset.removeRoot}”.`);
+        });
+        el.openPending.addEventListener('click', () => {
+          if (!pending) return;
+          const row = [...el.roots.querySelectorAll('.as-root')].find(r => r.dataset.root === pending.rootName);
+          const path = row ? commitRow(row) : null;
+          if (!path) {
+            if (row) {
+              const err = row.querySelector('.as-error');
+              if (!err.textContent) err.textContent = 'Enter the full path of the folder.';
+              row.querySelector('.as-input').focus();
+            }
             return;
           }
           const track = pending;
-          setRoot(track.rootName, r.path);
-          el.dialog.close();
-          launch(buildUrl(r.path, track));
+          pending = null;
+          updatePending();
+          renderSettings();
+          closeSettings();
+          launch(buildUrl(path, track));
           showToast('Saved. Opening in Audacity…');
         });
+        el.copy.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(el.preview.textContent);
+            showToast('Helper line copied');
+          } catch (err) {
+            const range = document.createRange();
+            range.selectNodeContents(el.preview);
+            const sel = getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+            showToast('Press Ctrl+C to copy the selected line');
+          }
+        });
 
-        el.cancel.addEventListener('click', () => el.dialog.close());
-        el.dialog.addEventListener('close', () => { pending = null; });
-        el.dialog.addEventListener('keydown', (e) => e.stopPropagation());
-
-        return { open, canOpen, UNKNOWN_LOCATION, isOpen: () => el.dialog.open };
+        return {
+          open, canOpen, UNKNOWN_LOCATION, renderSettings,
+          /** Settings closed: drop a half-finished "open this track" request. */
+          onSettingsClosed() { if (pending) { pending = null; updatePending(); } }
+        };
       })();
       /* ---- [Audacity integration] — end ---- */
 
@@ -8572,6 +8987,13 @@
         Audacity.open(state.trackMap.get(state.currentTrackId), e.shiftKey);
       });
 
+
+      /* ========================================================================
+         [Looks] Look-and-feel pass: shared helpers.
+         ======================================================================== */
+      const reducedMotionQuery = window.matchMedia ? matchMedia('(prefers-reduced-motion: reduce)') : null;
+      function prefersReducedMotion() { return !!(reducedMotionQuery && reducedMotionQuery.matches); }
+      /* [/Looks] helpers */
 
       /* ========================================================================
          Init
