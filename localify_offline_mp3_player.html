@@ -4,18 +4,218 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Localify — Offline MP3 Player</title>
+  <!-- [PWA] Installable-app metadata. The manifest <link> is added by the [PWA] script only on
+       http(s), so opening this file straight from disk (file://) doesn't log a CORS error. -->
+  <meta name="description" content="Offline music player for the songs already on your device. Nothing is uploaded.">
+  <meta name="theme-color" content="#121212">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Localify">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <!-- [/PWA] -->
+  <script>
+    /* ==========================================================================
+       [Profiles] core — local profiles (no password). Runs before anything else
+       reads storage, so the first paint already uses the right profile.
+
+       HOW NAMESPACING WORKS (read this before adding a storage key):
+       - Per-user localStorage keys are stored as "localify@<profileId>:<key>",
+         e.g. "localify@default:localify_liked_v1".
+       - App code never builds that prefix itself. loadJSON / saveJSON / removeJSON
+         in the app script call LocalifyProfiles.key(k), so a new STORAGE_KEYS entry
+         that is read and written through them is per-profile automatically, and is
+         included in backups. Don't call localStorage directly for user data; if you
+         must, wrap the key: localStorage.getItem(LocalifyProfiles.key('localify_x_v1')).
+       - Only GLOBAL_KEYS below (the profile list and "remember me") are shared by
+         the whole device.
+       - IndexedDB (saved folder handles) is per-profile too: LocalifyProfiles.folderDbName().
+       ========================================================================== */
+    (function () {
+      var PROFILES_KEY = 'localify_profiles_v1';            // { version, profiles:[...], lastUsed }
+      var REMEMBER_KEY = 'localify_remember_profile_v1';    // profile id picked with "remember me"
+      var SESSION_KEY = 'localify_session_profile_v1';      // sessionStorage: this tab's choice
+      var GLOBAL_KEYS = [PROFILES_KEY, REMEMBER_KEY];
+      var ACCENTS = ['green', 'blue', 'purple', 'pink', 'orange', 'teal'];
+      var LEGACY_FOLDER_DB = 'localify_folders';
+
+      var ls = null;
+      try { ls = window.localStorage; ls.getItem(PROFILES_KEY); } catch (e) { ls = null; }
+      function read(k) { try { var r = ls && ls.getItem(k); return r == null ? null : JSON.parse(r); } catch (e) { return null; } }
+      function write(k, v) { try { if (ls) ls.setItem(k, JSON.stringify(v)); return !!ls; } catch (e) { return false; } }
+      function prefix(id) { return 'localify@' + id + ':'; }
+      function isGlobalKey(k) { return GLOBAL_KEYS.indexOf(k) >= 0; }
+      // An un-namespaced app key ("localify_..._v1") that belongs to a profile.
+      function isProfileDataKey(k) { return /^localify_[a-z0-9_]+$/i.test(k) && !isGlobalKey(k); }
+      function allKeys() {
+        var out = [];
+        if (!ls) return out;
+        try { for (var i = 0; i < ls.length; i++) out.push(ls.key(i)); } catch (e) {}
+        return out;
+      }
+      function newId() { return 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+      function cleanAccent(a) { return ACCENTS.indexOf(a) >= 0 ? a : 'green'; }
+
+      function loadRegistry() {
+        var r = read(PROFILES_KEY);
+        return (r && Array.isArray(r.profiles) && r.profiles.length) ? r : null;
+      }
+
+      var reg = loadRegistry();
+      var migrated = false;
+      if (!reg) {
+        // First run with profiles: copy the existing (pre-profiles) data into a default
+        // profile so nothing is lost. The old un-prefixed keys are left untouched as a
+        // safety net (an older copy of the app still finds them); nothing reads them now.
+        var appearance = read('localify_appearance_v1');
+        var first = {
+          id: 'default', name: 'Me', avatar: '',
+          accent: cleanAccent(appearance && appearance.accent),
+          created: Date.now(),
+          folderDb: LEGACY_FOLDER_DB   // keeps the folders this device already granted access to
+        };
+        allKeys().forEach(function (k) {
+          if (!isProfileDataKey(k)) return;
+          migrated = true;
+          try { ls.setItem(prefix(first.id) + k, ls.getItem(k)); } catch (e) {}
+        });
+        reg = { version: 1, profiles: [first], lastUsed: first.id };
+        write(PROFILES_KEY, reg);
+      }
+
+      function find(id) {
+        for (var i = 0; i < reg.profiles.length; i++) if (reg.profiles[i].id === id) return reg.profiles[i];
+        return null;
+      }
+
+      var sessionId = null;
+      try { sessionId = sessionStorage.getItem(SESSION_KEY); } catch (e) {}
+      var remembered = read(REMEMBER_KEY);
+      var active = find(sessionId) || find(remembered) || find(reg.lastUsed) || reg.profiles[0];
+      // Ask "Who's listening?" only when there's a real choice and nothing decided it yet.
+      var needsPicker = reg.profiles.length > 1 && !find(sessionId) && !find(remembered);
+      if (reg.lastUsed !== active.id) { reg.lastUsed = active.id; write(PROFILES_KEY, reg); }
+
+      function keysOf(id) {
+        var p = prefix(id);
+        return allKeys().filter(function (k) { return k.indexOf(p) === 0; });
+      }
+
+      var api = {
+        ACCENTS: ACCENTS,
+        storageAvailable: !!ls,
+        migrated: migrated,
+        needsPicker: needsPicker,
+        get active() { return active; },
+        list: function () { return reg.profiles.slice(); },
+        find: find,
+        rememberedId: function () { return read(REMEMBER_KEY); },
+        /** Storage key for the active profile. Use for every per-user key. */
+        key: function (k) { return isGlobalKey(k) ? k : prefix(active.id) + k; },
+        keyFor: function (id, k) { return prefix(id) + k; },
+        isProfileDataKey: isProfileDataKey,
+        folderDbName: function (p) { p = p || active; return p.folderDb || (LEGACY_FOLDER_DB + '@' + p.id); },
+
+        /** All of a profile's data as { "localify_x_v1": value }. */
+        dataOf: function (id) {
+          var out = {}, p = prefix(id);
+          keysOf(id).forEach(function (k) {
+            var bare = k.slice(p.length);
+            if (!isProfileDataKey(bare)) return;
+            try { out[bare] = JSON.parse(ls.getItem(k)); } catch (e) { /* skip non-JSON */ }
+          });
+          return out;
+        },
+        /** Write { key: value } into a profile. replace=true clears its old data first. */
+        writeData: function (id, data, replace) {
+          if (replace) keysOf(id).forEach(function (k) { try { ls.removeItem(k); } catch (e) {} });
+          var ok = true;
+          Object.keys(data).forEach(function (k) {
+            if (!isProfileDataKey(k)) return;
+            if (!write(prefix(id) + k, data[k])) ok = false;
+          });
+          return ok;
+        },
+
+        create: function (fields) {
+          reg = loadRegistry() || reg;
+          var id = newId();
+          var p = {
+            id: id,
+            name: String(fields.name || 'Listener').slice(0, 24),
+            avatar: String(fields.avatar || '').slice(0, 8),
+            accent: cleanAccent(fields.accent),
+            created: Date.now(),
+            folderDb: LEGACY_FOLDER_DB + '@' + id
+          };
+          reg.profiles.push(p);
+          write(PROFILES_KEY, reg);
+          if (fields.seedAppearance !== false) {
+            // Start the new profile with the current look, in its own accent color.
+            var cur = read(api.key('localify_appearance_v1')) || {};
+            write(prefix(id) + 'localify_appearance_v1', { mode: cur.mode || 'dark', density: cur.density || 'comfortable', accent: p.accent });
+          }
+          return p;
+        },
+        update: function (id, fields) {
+          reg = loadRegistry() || reg;
+          var p = find(id);
+          if (!p) return null;
+          if (fields.name != null) p.name = String(fields.name).slice(0, 24) || p.name;
+          if (fields.avatar != null) p.avatar = String(fields.avatar).slice(0, 8);
+          if (fields.accent != null) p.accent = cleanAccent(fields.accent);
+          write(PROFILES_KEY, reg);
+          if (p.id === active.id) active = p;
+          return p;
+        },
+        /** Delete a profile and all its data. Returns false for the last profile. */
+        remove: function (id) {
+          reg = loadRegistry() || reg;
+          var p = find(id);
+          if (!p || reg.profiles.length <= 1) return false;
+          keysOf(id).forEach(function (k) { try { ls.removeItem(k); } catch (e) {} });
+          try { indexedDB.deleteDatabase(api.folderDbName(p)); } catch (e) {}
+          reg.profiles = reg.profiles.filter(function (x) { return x.id !== id; });
+          if (reg.lastUsed === id) reg.lastUsed = reg.profiles[0].id;
+          write(PROFILES_KEY, reg);
+          if (read(REMEMBER_KEY) === id) try { ls.removeItem(REMEMBER_KEY); } catch (e) {}
+          return true;
+        },
+        /**
+         * Make `id` this tab's profile. remember: true = skip the picker on this device,
+         * false = forget, undefined = leave as is. Returns true when a reload is needed.
+         * Switching reloads the page: every module reads its saved state once at startup,
+         * so a reload is the one way that's guaranteed to leave nothing from the old profile.
+         */
+        choose: function (id, remember) {
+          reg = loadRegistry() || reg;
+          if (!find(id)) return false;
+          try { sessionStorage.setItem(SESSION_KEY, id); } catch (e) {}
+          if (remember === true) write(REMEMBER_KEY, id);
+          else if (remember === false) { try { ls.removeItem(REMEMBER_KEY); } catch (e) {} }
+          reg.lastUsed = id;
+          write(PROFILES_KEY, reg);
+          return id !== active.id;
+        }
+      };
+      window.LocalifyProfiles = api;
+    })();
+  </script>
+  <!-- [/Profiles] core -->
   <script>
     // [Settings] Apply the saved mode/accent/density before first paint (no flash).
     // Keep the legacy map in sync with LEGACY_THEME_MAP in the app script.
     (function () {
       var root = document.documentElement, mode = 'dark', accent = 'green', density = 'comfortable';
+      var K = window.LocalifyProfiles ? window.LocalifyProfiles.key : function (k) { return k; };   // [Profiles]
       try {
-        var s = JSON.parse(localStorage.getItem('localify_appearance_v1'));
+        var s = JSON.parse(localStorage.getItem(K('localify_appearance_v1')));
         if (s && typeof s === 'object') {
           mode = s.mode || mode; accent = s.accent || accent; density = s.density || density;
         } else {
           var legacy = { emerald: ['dark', 'green'], light: ['light', 'green'], ocean: ['dark', 'blue'],
-            sunset: ['dark', 'orange'], violet: ['dark', 'purple'], rose: ['dark', 'pink'] }[JSON.parse(localStorage.getItem('localify_theme_v1'))];
+            sunset: ['dark', 'orange'], violet: ['dark', 'purple'], rose: ['dark', 'pink'] }[JSON.parse(localStorage.getItem(K('localify_theme_v1')))];
           if (legacy) { mode = legacy[0]; accent = legacy[1]; }
         }
       } catch (e) { /* no storage */ }
@@ -2330,6 +2530,382 @@
     /* [/Settings] panel */
 
     /* ==========================================================================
+       [Profiles] Chip, menu, "Who's listening?" picker, editor
+       [Backup]   Your data section + import preview
+       [PWA]      Update bar
+       An element with data-accent="<name>" gets that accent's --accent/--on-accent,
+       so avatars and swatches show each profile's own color.
+       ========================================================================== */
+    .lp-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+      height: 38px;
+      max-width: 180px;
+      padding: 0 12px 0 4px;
+      border-radius: var(--radius-full);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 600;
+      transition: background var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .lp-chip:hover,
+    .lp-chip[aria-expanded="true"] {
+      background: var(--bg-highlight);
+      border-color: rgba(var(--fg-rgb), 0.25);
+    }
+
+    .lp-chip-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .lp-avatar {
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+      border-radius: var(--radius-full);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent);
+      color: var(--on-accent);
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1;
+      user-select: none;
+    }
+
+    .lp-avatar.is-emoji {
+      background: rgba(var(--accent-rgb), 0.22);
+      box-shadow: inset 0 0 0 2px var(--accent);
+      font-size: 16px;
+    }
+
+    .lp-avatar-lg { width: 72px; height: 72px; font-size: 30px; }
+    .lp-avatar-lg.is-emoji { font-size: 38px; box-shadow: inset 0 0 0 3px var(--accent); }
+    .lp-avatar-xl { width: 64px; height: 64px; font-size: 28px; }
+    .lp-avatar-xl.is-emoji { font-size: 34px; box-shadow: inset 0 0 0 3px var(--accent); }
+
+    .lp-menu {
+      position: fixed;
+      z-index: 95;
+      min-width: 230px;
+      max-width: calc(100vw - 16px);
+      max-height: calc(100vh - 80px);
+      overflow-y: auto;
+      padding: 6px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+    }
+
+    .lp-menu[hidden] { display: none; }
+
+    .lp-menu-label {
+      padding: 8px 10px 4px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .lp-menu-item {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-size: 14px;
+      text-align: left;
+    }
+
+    .lp-menu-item:hover,
+    .lp-menu-item:focus-visible {
+      background: rgba(var(--fg-rgb), 0.1);
+      outline: none;
+    }
+
+    .lp-menu-item .lp-avatar { width: 24px; height: 24px; font-size: 12px; }
+    .lp-menu-item .lp-avatar.is-emoji { font-size: 14px; }
+    .lp-menu-item > span:not(.lp-avatar) { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .lp-menu-item[aria-checked="true"]::after { content: "✓"; color: var(--accent); font-weight: 800; }
+    .lp-menu-item.danger { color: #ff6b6b; }
+    .lp-menu-item svg { flex-shrink: 0; color: var(--text-secondary); }
+    .lp-menu-sep { height: 1px; margin: 6px 4px; background: var(--border-subtle); }
+
+    .lp-dialog {
+      width: min(440px, calc(100vw - 24px));
+      max-height: calc(100vh - 24px);
+      margin: auto;
+      padding: 22px 22px 18px;
+      overflow-y: auto;
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+    }
+
+    .lp-dialog::backdrop {
+      background: rgba(0, 0, 0, 0.6);
+      -webkit-backdrop-filter: blur(6px);
+      backdrop-filter: blur(6px);
+    }
+
+    .lp-dialog-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .lp-picker {
+      width: min(560px, calc(100vw - 24px));
+      text-align: center;
+      padding: 28px 20px 22px;
+    }
+
+    .lp-picker .lp-dialog-title { font-size: 26px; margin-bottom: 22px; }
+
+    .lp-tiles {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .lp-tile {
+      width: 112px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 6px;
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 600;
+      transition: background var(--transition-fast), color var(--transition-fast);
+    }
+
+    .lp-tile span:last-child { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .lp-tile:hover, .lp-tile:focus-visible { background: rgba(var(--fg-rgb), 0.08); color: var(--text-primary); outline: none; }
+    .lp-tile:focus-visible .lp-avatar { outline: 3px solid var(--text-primary); outline-offset: 3px; }
+    .lp-tile.is-current .lp-avatar { outline: 2px solid rgba(var(--fg-rgb), 0.35); outline-offset: 3px; }
+
+    .lp-tile-add .lp-avatar {
+      background: transparent;
+      color: var(--text-secondary);
+      box-shadow: inset 0 0 0 2px rgba(var(--fg-rgb), 0.25);
+    }
+
+    .lp-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    .lp-check input, .bk-modes input { accent-color: var(--accent); width: 16px; height: 16px; }
+
+    .lp-editor-top {
+      display: flex;
+      align-items: flex-end;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .lp-editor-top .lp-field { flex: 1; margin-bottom: 0; }
+
+    .lp-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 14px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+
+    .lp-field input[type="text"] {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      font: inherit;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .lp-field input[type="text"]:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+
+    .lp-emoji-row, .lp-swatches { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .lp-emoji-row button {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .lp-emoji-row button[aria-checked="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); background: var(--accent-dim); }
+
+    .lp-swatches button {
+      width: 30px;
+      height: 30px;
+      border-radius: var(--radius-full);
+      background: var(--accent);
+      border: 2px solid transparent;
+    }
+
+    .lp-swatches button[aria-checked="true"] { box-shadow: 0 0 0 2px var(--bg-surface), 0 0 0 4px var(--accent); }
+
+    .lp-error { min-height: 1em; margin: -4px 0 8px; font-size: 13px; color: #ff6b6b; }
+    .lp-error:empty { display: none; }
+
+    .lp-dialog-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .bk-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .bk-actions .btn-secondary { flex: 1; }
+
+    .bk-drop {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      border: 1.5px dashed rgba(var(--fg-rgb), 0.25);
+      color: var(--text-secondary);
+      font-size: 13px;
+      line-height: 1.4;
+      cursor: pointer;
+      transition: border-color var(--transition-fast), background var(--transition-fast);
+    }
+
+    .bk-drop svg { flex-shrink: 0; color: var(--accent); }
+    .bk-drop:hover, .bk-drop.dragover { border-color: var(--accent); background: var(--accent-dim); color: var(--text-primary); }
+    .visually-hidden-input:focus-visible + .bk-drop, .bk-drop:focus-within { outline: 2px solid var(--accent); }
+
+    .visually-hidden-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .bk-preview {
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      border-radius: var(--radius-md);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .bk-preview-head { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .bk-preview-head b { display: block; color: var(--text-primary); font-size: 15px; }
+    .bk-preview ul { list-style: none; display: grid; gap: 4px; }
+    .bk-preview li b { color: var(--text-primary); }
+    .bk-preview select {
+      width: 100%;
+      margin: 0 0 10px;
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      font: inherit;
+    }
+
+    .bk-modes { border: 0; display: grid; gap: 8px; margin-bottom: 12px; }
+    .bk-modes legend { font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; }
+    .bk-modes label {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .bk-modes label:has(input:checked) { border-color: var(--accent); background: var(--accent-dim); }
+    .bk-modes label:has(input:disabled) { opacity: 0.45; cursor: not-allowed; }
+    .bk-modes input { margin-top: 2px; flex-shrink: 0; }
+    .bk-modes small { display: block; font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+    .bk-modes i { font-style: normal; }
+
+    .toast.has-action { pointer-events: auto; }
+
+    .toast .lp-toast-action {
+      margin-left: 12px;
+      color: var(--accent);
+      font-weight: 800;
+    }
+
+    /* [hidden] must win over the display rules of .btn-primary / .lp-menu / .pwa-update. */
+    .lp-menu[hidden],
+    .pwa-update[hidden],
+    #pwaInstallBtn[hidden] { display: none !important; }
+
+    .pwa-update {
+      position: fixed;
+      left: 50%;
+      top: 12px;
+      z-index: 96;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      max-width: calc(100vw - 24px);
+      padding: 8px 8px 8px 16px;
+      border-radius: var(--radius-full);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .pwa-update[hidden] { display: none; }
+    .pwa-update .btn-primary { padding: 7px 14px; font-size: 13px; }
+    .pwa-update-close { width: 28px; height: 28px; border-radius: var(--radius-full); color: var(--text-secondary); font-size: 18px; }
+    .pwa-update-close:hover { background: rgba(var(--fg-rgb), 0.1); color: var(--text-primary); }
+
+    @media (max-width: 600px) {
+      .lp-chip { padding: 0 4px; width: 38px; justify-content: center; }
+      .lp-chip-name { display: none; }
+      .lp-tile { width: 96px; }
+    }
+    /* [/Profiles] [/Backup] [/PWA] */
+
+    /* ==========================================================================
        Responsive Breakpoints (Tablet & Mobile)
        ========================================================================== */
     @media (max-width: 960px) {
@@ -3340,6 +3916,12 @@
           </svg>
         </button>
         <!-- [/Settings] -->
+        <!-- [Profiles] Profile chip: opens the profile menu (switch / add / edit / delete) -->
+        <button type="button" class="lp-chip" id="lpChip" aria-haspopup="menu" aria-expanded="false" aria-controls="lpMenu">
+          <span class="lp-avatar" id="lpChipAvatar" aria-hidden="true"></span>
+          <span class="lp-chip-name" id="lpChipName"></span>
+        </button>
+        <!-- [/Profiles] -->
       </header>
 
       <!-- Scrollable View Container -->
@@ -3775,10 +4357,113 @@
         </div>
       </section>
 
+      <!-- [Backup] Your data: profile, export and import -->
+      <section class="settings-section" aria-labelledby="setDataTitle">
+        <h3 class="settings-section-title" id="setDataTitle">Your data</h3>
+
+        <div class="settings-row">
+          <span class="settings-label">Profile<span class="settings-hint" id="bkProfileHint">Likes, settings and history are kept per profile.</span></span>
+          <button type="button" class="btn-secondary" id="bkSwitchProfile">Switch</button>
+        </div>
+
+        <div class="settings-row stacked">
+          <span class="settings-label">Export backup<span class="settings-hint">Saves likes, settings and history to a <b>.localify.json</b> file you can move to another device. Songs are never included.</span></span>
+          <div class="bk-actions">
+            <button type="button" class="btn-secondary" id="bkExportCurrent">This profile</button>
+            <button type="button" class="btn-secondary" id="bkExportAll">All profiles</button>
+          </div>
+        </div>
+
+        <div class="settings-row stacked">
+          <span class="settings-label" id="bkImportLabel">Import backup<span class="settings-hint">Preview first, then add it as a new profile, merge it into this one, or replace this one.</span></span>
+          <label class="bk-drop" id="bkDrop" for="bkFile">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span>Drop a <b>.localify.json</b> file here, or <u>choose a file</u></span>
+          </label>
+          <input type="file" id="bkFile" class="visually-hidden-input" accept=".json,application/json" aria-labelledby="bkImportLabel">
+        </div>
+      </section>
+      <!-- [/Backup] -->
+
+      <!-- [PWA] Install as an app -->
+      <section class="settings-section" aria-labelledby="setAppTitle">
+        <h3 class="settings-section-title" id="setAppTitle">App</h3>
+        <div class="settings-row">
+          <span class="settings-label">Install Localify<span class="settings-hint" id="pwaInstallHint">Open Localify from its web address to install it as an app.</span></span>
+          <button type="button" class="btn-primary" id="pwaInstallBtn" hidden>Install app</button>
+        </div>
+      </section>
+      <!-- [/PWA] -->
+
       <p class="settings-footer-note">Settings are saved on this device.</p>
     </div>
   </aside>
   <!-- [/Settings] panel -->
+
+  <!-- ======================================================================
+       [Profiles] Menu, "Who's listening?" picker and profile editor
+       ====================================================================== -->
+  <div class="lp-menu" id="lpMenu" role="menu" aria-labelledby="lpChip" hidden></div>
+
+  <dialog class="lp-dialog lp-picker" id="lpPicker" aria-labelledby="lpPickerTitle">
+    <h2 class="lp-dialog-title" id="lpPickerTitle">Who's listening?</h2>
+    <div class="lp-tiles" id="lpTiles"></div>
+    <label class="lp-check"><input type="checkbox" id="lpRemember"> Remember me on this device</label>
+  </dialog>
+
+  <dialog class="lp-dialog" id="lpEditor" aria-labelledby="lpEditorTitle">
+    <form id="lpEditorForm" method="dialog" novalidate>
+      <h2 class="lp-dialog-title" id="lpEditorTitle">New profile</h2>
+      <div class="lp-editor-top">
+        <span class="lp-avatar lp-avatar-xl" id="lpEditorAvatar" aria-hidden="true"></span>
+        <label class="lp-field">
+          <span>Name</span>
+          <input type="text" id="lpName" maxlength="24" autocomplete="off" spellcheck="false" placeholder="Your name">
+        </label>
+      </div>
+      <div class="lp-field">
+        <span id="lpEmojiLabel">Avatar</span>
+        <div class="lp-emoji-row" id="lpEmojiRow" role="radiogroup" aria-labelledby="lpEmojiLabel"></div>
+      </div>
+      <div class="lp-field">
+        <span id="lpAccentLabel">Color</span>
+        <div class="lp-swatches" id="lpSwatches" role="radiogroup" aria-labelledby="lpAccentLabel"></div>
+      </div>
+      <p class="lp-error" id="lpEditorError" role="alert"></p>
+      <div class="lp-dialog-actions">
+        <button type="button" class="btn-secondary" id="lpEditorCancel">Cancel</button>
+        <button type="submit" class="btn-primary" id="lpEditorSave">Create</button>
+      </div>
+    </form>
+  </dialog>
+  <!-- [/Profiles] -->
+
+  <!-- [Backup] Import preview -->
+  <dialog class="lp-dialog" id="bkImportDialog" aria-labelledby="bkImportTitle">
+    <form id="bkImportForm" method="dialog">
+      <h2 class="lp-dialog-title" id="bkImportTitle">Import backup</h2>
+      <div class="bk-preview" id="bkPreview"></div>
+      <fieldset class="bk-modes" id="bkModes">
+        <legend>How to import</legend>
+        <label><input type="radio" name="bkMode" value="new" checked> <span><b>As a new profile</b><small>Nothing you have now changes.</small></span></label>
+        <label><input type="radio" name="bkMode" value="merge"> <span><b>Merge into <i class="bk-current-name"></i></b><small>Adds the likes and folders. Your current settings win.</small></span></label>
+        <label><input type="radio" name="bkMode" value="replace"> <span><b>Replace <i class="bk-current-name"></i></b><small>This profile's likes, settings and history are overwritten.</small></span></label>
+      </fieldset>
+      <div class="lp-dialog-actions">
+        <button type="button" class="btn-secondary" id="bkImportCancel">Cancel</button>
+        <button type="submit" class="btn-primary" id="bkImportGo">Import</button>
+      </div>
+    </form>
+  </dialog>
+  <!-- [/Backup] -->
+
+  <!-- [PWA] "New version available" bar -->
+  <div class="pwa-update" id="pwaUpdate" role="status" hidden>
+    <span>A new version of Localify is ready.</span>
+    <button type="button" class="btn-primary" id="pwaUpdateReload">Reload</button>
+    <button type="button" class="pwa-update-close" id="pwaUpdateClose" aria-label="Later">&times;</button>
+  </div>
+  <!-- [/PWA] -->
 
   <script>
     /**
@@ -3860,9 +4545,15 @@
       /* ========================================================================
          Small utilities
          ======================================================================== */
+      // [Profiles] Every key goes through nsKey(), which prefixes it with the active
+      // profile ("localify@<id>:"). Add new keys to STORAGE_KEYS and use these three
+      // helpers: they are then per-profile and part of backups with no extra work.
+      // (See the "[Profiles] core" script in <head> for the details.)
+      const nsKey = (window.LocalifyProfiles && window.LocalifyProfiles.key) || ((k) => k);
+
       function loadJSON(key, fallback) {
         try {
-          const raw = localStorage.getItem(key);
+          const raw = localStorage.getItem(nsKey(key));
           return raw !== null ? JSON.parse(raw) : fallback;
         } catch (e) {
           return fallback;
@@ -3871,8 +4562,12 @@
 
       function saveJSON(key, value) {
         try {
-          localStorage.setItem(key, JSON.stringify(value));
+          localStorage.setItem(nsKey(key), JSON.stringify(value));
         } catch (e) { /* quota or private mode */ }
+      }
+
+      function removeJSON(key) {   // [Profiles]
+        try { localStorage.removeItem(nsKey(key)); } catch (e) { /* no storage */ }
       }
 
       function formatTime(seconds) {
@@ -4597,7 +5292,7 @@
          Folder handles (File System Access API) persisted in IndexedDB
          ======================================================================== */
       const supportsDirectoryPicker = 'showDirectoryPicker' in window;
-      const FOLDER_DB_NAME = 'localify_folders';
+      const FOLDER_DB_NAME = window.LocalifyProfiles ? window.LocalifyProfiles.folderDbName() : 'localify_folders';   // [Profiles] one DB per profile
       const FOLDER_DB_STORE = 'handles';
       let folderDBPromise = null;
 
@@ -6598,7 +7293,7 @@
           a = m ? { mode: m[0], accent: m[1], density: 'comfortable' } : {};
           if (legacy !== null) {
             saveJSON(STORAGE_KEYS.APPEARANCE, { ...DEFAULT_APPEARANCE, ...a });
-            try { localStorage.removeItem(STORAGE_KEYS.THEME); } catch (e) {}
+            removeJSON(STORAGE_KEYS.THEME);   // [Profiles] namespaced
           }
         }
         return {
@@ -6987,7 +7682,7 @@
         settings.fx = { ...DEFAULT_FX, eq: DEFAULT_FX.eq.slice() };
         settings.prefs = { ...DEFAULT_PREFS };
         [STORAGE_KEYS.APPEARANCE, STORAGE_KEYS.AUDIO_FX, STORAGE_KEYS.PREFS, STORAGE_KEYS.SPEED, STORAGE_KEYS.THEME]
-          .forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
+          .forEach(removeJSON);   // [Profiles] namespaced
         applyAppearance();
         applyEq();
         applyLevelingRoute();
@@ -8594,5 +9289,794 @@
       restoreSessionFolders();
     })();
   </script>
+
+  <script>
+    /* ==========================================================================
+       [Profiles] UI, [Backup] export/import and [PWA] install/update.
+       These talk to the player only through the DOM and window.LocalifyProfiles
+       (see "[Profiles] core" in <head>), so they don't depend on its internals.
+       ========================================================================== */
+    (function () {
+      'use strict';
+      var LP = window.LocalifyProfiles;
+      if (!LP) return;
+      var $ = function (id) { return document.getElementById(id); };
+      var FLASH_KEY = 'localify_flash_v1';   // sessionStorage: a message to show after a reload
+
+      /* ---- shared helpers ---- */
+      function toast(message, action) {
+        var box = $('toastContainer');
+        if (!box) return;
+        var t = document.createElement('div');
+        t.className = 'toast' + (action ? ' has-action' : '');
+        t.setAttribute('role', 'status');
+        t.appendChild(document.createTextNode(message));
+        if (action) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'lp-toast-action';
+          b.textContent = action.label;
+          b.addEventListener('click', function () { t.remove(); action.run(); });
+          t.appendChild(b);
+        }
+        box.appendChild(t);
+        setTimeout(function () {
+          t.style.opacity = '0';
+          t.style.transition = 'opacity 250ms ease';
+          setTimeout(function () { t.remove(); }, 260);
+        }, action ? 7000 : 2800);
+      }
+
+      function reloadWith(message) {
+        try { if (message) sessionStorage.setItem(FLASH_KEY, message); } catch (e) {}
+        location.reload();
+      }
+
+      function pausePlayers() {
+        document.querySelectorAll('audio').forEach(function (a) { try { a.pause(); } catch (e) {} });
+      }
+
+      function firstGrapheme(s) {
+        s = String(s || '').trim();
+        if (!s) return '';
+        try {
+          if (window.Intl && Intl.Segmenter) {
+            var it = new Intl.Segmenter().segment(s)[Symbol.iterator]().next();
+            return it.value ? it.value.segment : '';
+          }
+        } catch (e) {}
+        return Array.from(s)[0] || '';
+      }
+
+      var EMOJI_RE = /\p{Extended_Pictographic}/u;
+      function paintAvatar(el, p) {
+        var custom = firstGrapheme(p.avatar);
+        el.textContent = custom || firstGrapheme(p.name).toUpperCase() || '?';
+        el.dataset.accent = p.accent;
+        el.classList.toggle('is-emoji', !!custom && EMOJI_RE.test(custom));
+      }
+
+      function avatarEl(p, extraClass) {
+        var s = document.createElement('span');
+        s.className = 'lp-avatar' + (extraClass ? ' ' + extraClass : '');
+        s.setAttribute('aria-hidden', 'true');
+        paintAvatar(s, p);
+        return s;
+      }
+
+      function cleanName(s) { return String(s == null ? '' : s).replace(/\s+/g, ' ').trim().slice(0, 24); }
+
+      function nameTaken(name, exceptId) {
+        var n = name.toLowerCase();
+        return LP.list().some(function (p) { return p.id !== exceptId && p.name.toLowerCase() === n; });
+      }
+
+      function uniqueName(name) {
+        var base = cleanName(name) || 'Imported', n = base, i = 2;
+        while (nameTaken(n)) n = base.slice(0, 20) + ' (' + (i++) + ')';
+        return n;
+      }
+
+      function openSettingsAt(sectionId) {
+        var btn = $('btnSettings');
+        if (btn && btn.getAttribute('aria-expanded') !== 'true') btn.click();
+        setTimeout(function () {
+          var el = $(sectionId);
+          if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' });
+        }, 80);
+      }
+
+      /* ======================================================================
+         [Profiles] chip, menu, picker, editor
+         ====================================================================== */
+      var chip = $('lpChip'), menu = $('lpMenu');
+
+      function renderChip() {
+        var p = LP.active;
+        paintAvatar($('lpChipAvatar'), p);
+        $('lpChipName').textContent = p.name;
+        chip.title = 'Profile: ' + p.name;
+        chip.setAttribute('aria-label', 'Profile: ' + p.name + ' (open profile menu)');
+        var hint = $('bkProfileHint');
+        if (hint) hint.textContent = 'Using “' + p.name + '”. Likes, settings and history are kept per profile.';
+        document.querySelectorAll('.bk-current-name').forEach(function (e) { e.textContent = '“' + p.name + '”'; });
+      }
+
+      function switchTo(id, remember) {
+        if (LP.choose(id, remember)) {
+          pausePlayers();
+          var p = LP.find(id);
+          reloadWith(p ? 'Switched to ' + p.name : '');
+        }
+      }
+
+      var ICONS = {
+        add: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>',
+        edit: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg>',
+        trash: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6M14 11v6M9 6V4h6v2"></path></svg>',
+        data: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>',
+        install: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"></rect><polyline points="9 10 12 13 15 10"></polyline><line x1="12" y1="6" x2="12" y2="13"></line></svg>'
+      };
+
+      function menuItem(label, icon, run, opts) {
+        opts = opts || {};
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'lp-menu-item' + (opts.danger ? ' danger' : '');
+        b.setAttribute('role', opts.radio ? 'menuitemradio' : 'menuitem');
+        if (opts.radio) b.setAttribute('aria-checked', String(!!opts.checked));
+        b.tabIndex = -1;
+        if (typeof icon === 'string') b.insertAdjacentHTML('beforeend', icon); else if (icon) b.appendChild(icon);
+        var s = document.createElement('span');
+        s.textContent = label;
+        b.appendChild(s);
+        b.addEventListener('click', function () { closeMenu(); run(); });
+        return b;
+      }
+
+      function buildMenu() {
+        var active = LP.active, list = LP.list();
+        menu.textContent = '';
+        var lbl = document.createElement('div');
+        lbl.className = 'lp-menu-label';
+        lbl.textContent = 'Switch profile';
+        menu.appendChild(lbl);
+        list.forEach(function (p) {
+          menu.appendChild(menuItem(p.name, avatarEl(p), function () { switchTo(p.id); }, { radio: true, checked: p.id === active.id }));
+        });
+        menu.appendChild(menuItem('Add profile', ICONS.add, function () { openEditor(null); }));
+        var sep = document.createElement('div');
+        sep.className = 'lp-menu-sep';
+        sep.setAttribute('role', 'separator');
+        menu.appendChild(sep);
+        menu.appendChild(menuItem('Edit “' + active.name + '”', ICONS.edit, function () { openEditor(active); }));
+        if (list.length > 1) menu.appendChild(menuItem('Delete “' + active.name + '”…', ICONS.trash, function () { deleteProfile(active); }, { danger: true }));
+        menu.appendChild(menuItem('Back up & restore…', ICONS.data, function () { openSettingsAt('setDataTitle'); }));
+        if (PWA.canInstall()) menu.appendChild(menuItem('Install app', ICONS.install, PWA.install));
+      }
+
+      function positionMenu() {
+        var r = chip.getBoundingClientRect();
+        menu.style.top = Math.round(r.bottom + 6) + 'px';
+        menu.style.right = Math.max(8, Math.round(window.innerWidth - r.right)) + 'px';
+      }
+
+      function openMenu() {
+        buildMenu();
+        menu.hidden = false;
+        positionMenu();
+        chip.setAttribute('aria-expanded', 'true');
+        var first = menu.querySelector('[aria-checked="true"]') || menu.querySelector('.lp-menu-item');
+        if (first) first.focus();
+      }
+
+      function closeMenu(refocus) {
+        if (menu.hidden) return;
+        menu.hidden = true;
+        chip.setAttribute('aria-expanded', 'false');
+        if (refocus) chip.focus();
+      }
+
+      chip.addEventListener('click', function () { if (menu.hidden) openMenu(); else closeMenu(); });
+      document.addEventListener('pointerdown', function (e) {
+        if (!menu.hidden && !menu.contains(e.target) && !chip.contains(e.target)) closeMenu();
+      });
+      window.addEventListener('resize', function () { closeMenu(); });
+      menu.addEventListener('keydown', function (e) {
+        var items = Array.prototype.slice.call(menu.querySelectorAll('.lp-menu-item'));
+        var i = items.indexOf(document.activeElement);
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          var next = e.key === 'ArrowDown' ? (i + 1) % items.length : (i - 1 + items.length) % items.length;
+          items[next].focus();
+        } else if (e.key === 'Home' || e.key === 'End') {
+          e.preventDefault();
+          items[e.key === 'Home' ? 0 : items.length - 1].focus();
+        } else if (e.key === 'Escape' || e.key === 'Tab') {
+          e.preventDefault();
+          e.stopPropagation();
+          closeMenu(true);
+        }
+      });
+
+      function deleteProfile(p) {
+        var msg = 'Delete the profile “' + p.name + '”?\n\nIts liked songs, settings and history on this device are removed. ' +
+          'Your music files are not touched. This can\'t be undone — export a backup first if you might want it back.';
+        if (!window.confirm(msg)) return;
+        var wasActive = p.id === LP.active.id;
+        if (wasActive) pausePlayers();
+        if (!LP.remove(p.id)) { toast('The last profile can\'t be deleted.'); return; }
+        if (wasActive) {
+          LP.choose(LP.list()[0].id);
+          reloadWith('Deleted ' + p.name);
+        } else {
+          toast('Deleted ' + p.name);
+        }
+      }
+
+      /* ---- "Who's listening?" picker ---- */
+      var picker = $('lpPicker'), pickerAtStartup = false;
+
+      function openPicker(atStartup) {
+        pickerAtStartup = !!atStartup;
+        var tiles = $('lpTiles'), active = LP.active;
+        tiles.textContent = '';
+        LP.list().forEach(function (p) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'lp-tile' + (!atStartup && p.id === active.id ? ' is-current' : '');
+          b.appendChild(avatarEl(p, 'lp-avatar-lg'));
+          var n = document.createElement('span');
+          n.textContent = p.name;
+          b.appendChild(n);
+          b.addEventListener('click', function () { pick(p.id); });
+          tiles.appendChild(b);
+        });
+        var add = document.createElement('button');
+        add.type = 'button';
+        add.className = 'lp-tile lp-tile-add';
+        add.innerHTML = '<span class="lp-avatar lp-avatar-lg" aria-hidden="true">+</span><span>Add profile</span>';
+        add.addEventListener('click', function () { openEditor(null, function (p) { pick(p.id); }); });
+        tiles.appendChild(add);
+        $('lpRemember').checked = !atStartup && LP.rememberedId() === active.id;
+        if (!picker.open) picker.showModal();
+        var focusTile = tiles.querySelector('.is-current') || tiles.firstChild;
+        if (focusTile) focusTile.focus();
+      }
+
+      function pick(id) {
+        var remember = $('lpRemember').checked;
+        picker.close();
+        if (LP.choose(id, remember)) switchTo(id, remember);
+        else renderChip();
+      }
+
+      // Esc at startup keeps the profile that's already loaded, for this tab.
+      picker.addEventListener('cancel', function () {
+        if (pickerAtStartup) LP.choose(LP.active.id);
+      });
+
+      /* ---- Add / edit profile ---- */
+      var editor = $('lpEditor'), editing = null, editorDone = null, edAvatar = '', edAccent = 'green';
+      var EMOJIS = ['🎧', '🎸', '🎹', '🎤', '🎷', '🥁', '🦊', '🐱', '🐼', '🌙', '⭐', '🔥'];
+
+      function nextFreeAccent() {
+        var used = LP.list().map(function (p) { return p.accent; });
+        for (var i = 0; i < LP.ACCENTS.length; i++) if (used.indexOf(LP.ACCENTS[i]) < 0) return LP.ACCENTS[i];
+        return LP.ACCENTS[LP.list().length % LP.ACCENTS.length];
+      }
+
+      function draftProfile() {
+        return { name: cleanName($('lpName').value) || (editing ? editing.name : ''), avatar: edAvatar, accent: edAccent };
+      }
+
+      function renderEditor() {
+        var d = draftProfile();
+        paintAvatar($('lpEditorAvatar'), d);
+        var row = $('lpEmojiRow');
+        row.textContent = '';
+        [''].concat(EMOJIS).forEach(function (em) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.setAttribute('role', 'radio');
+          b.setAttribute('aria-checked', String(edAvatar === em));
+          b.textContent = em || (firstGrapheme(d.name).toUpperCase() || 'A');
+          b.title = em ? 'Use ' + em : 'Use your initial';
+          b.setAttribute('aria-label', em ? 'Emoji ' + em : 'Initial letter');
+          b.addEventListener('click', function () { edAvatar = em; renderEditor(); });
+          row.appendChild(b);
+        });
+        var sw = $('lpSwatches');
+        sw.textContent = '';
+        LP.ACCENTS.forEach(function (a) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.dataset.accent = a;
+          b.setAttribute('role', 'radio');
+          b.setAttribute('aria-checked', String(edAccent === a));
+          b.setAttribute('aria-label', a.charAt(0).toUpperCase() + a.slice(1));
+          b.title = b.getAttribute('aria-label');
+          b.addEventListener('click', function () { edAccent = a; renderEditor(); });
+          sw.appendChild(b);
+        });
+      }
+
+      function openEditor(profile, done) {
+        editing = profile || null;
+        editorDone = done || null;
+        $('lpEditorTitle').textContent = editing ? 'Edit profile' : 'New profile';
+        $('lpEditorSave').textContent = editing ? 'Save' : 'Create';
+        $('lpName').value = editing ? editing.name : '';
+        edAvatar = editing ? (editing.avatar || '') : '';
+        if (edAvatar && EMOJIS.indexOf(edAvatar) < 0) EMOJIS.unshift(edAvatar);
+        edAccent = editing ? editing.accent : nextFreeAccent();
+        $('lpEditorError').textContent = '';
+        renderEditor();
+        editor.showModal();
+        $('lpName').focus();
+        $('lpName').select();
+      }
+
+      $('lpName').addEventListener('input', function () {
+        $('lpEditorError').textContent = '';
+        paintAvatar($('lpEditorAvatar'), draftProfile());
+        var initialBtn = $('lpEmojiRow').firstChild;
+        if (initialBtn) initialBtn.textContent = firstGrapheme(draftProfile().name).toUpperCase() || 'A';
+      });
+      $('lpEditorCancel').addEventListener('click', function () { editor.close(); });
+      $('lpEditorForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var name = cleanName($('lpName').value);
+        if (!name) { $('lpEditorError').textContent = 'Give the profile a name.'; $('lpName').focus(); return; }
+        if (nameTaken(name, editing && editing.id)) { $('lpEditorError').textContent = 'There\'s already a profile called “' + name + '”.'; $('lpName').focus(); return; }
+        var fields = { name: name, avatar: edAvatar, accent: edAccent };
+        editor.close();
+        if (editing) {
+          LP.update(editing.id, fields);
+          renderChip();
+          toast('Profile saved');
+          return;
+        }
+        var p = LP.create(fields);
+        if (editorDone) { editorDone(p); return; }
+        renderChip();
+        toast('Created ' + p.name, { label: 'Switch now', run: function () { switchTo(p.id); } });
+      });
+
+      $('bkSwitchProfile').addEventListener('click', function () { openPicker(false); });
+
+      /* ======================================================================
+         [Backup] Export / import (.localify.json)
+         File format (schema 1):
+           { app: "localify", kind: "backup", schema: 1, exportedAt: ISO date,
+             scope: "profile" | "all",
+             profiles: [ { profile: { name, avatar, accent }, data: { "<key>": value } } ] }
+         `data` holds each profile's storage keys without the profile prefix.
+         Liked songs are stored by lower-cased file name (track.likeKey), which
+         doesn't depend on the device or folder, so they match on any device
+         as long as the files keep their names.
+         ====================================================================== */
+      var SCHEMA = 1;
+      var MAX_BYTES = 5 * 1024 * 1024;
+      // Folder access is granted per device; these entries are useless elsewhere.
+      var DEVICE_ONLY_KEYS = ['localify_session_folders_v1'];
+      // Loose shape checks for keys whose type matters; anything else just has to be JSON.
+      var SHAPES = {
+        localify_liked_v1: function (v) { return Array.isArray(v) && v.every(function (x) { return typeof x === 'string'; }); },
+        localify_folders_v1: function (v) { return Array.isArray(v) && v.every(function (x) { return x && typeof x.name === 'string'; }); },
+        localify_volume_v1: function (v) { return typeof v === 'number'; },
+        localify_speed_v1: function (v) { return typeof v === 'number'; }
+      };
+      var SETTINGS_KEYS = {
+        localify_appearance_v1: 'appearance', localify_audio_fx_v1: 'audio effects', localify_prefs_v1: 'preferences',
+        localify_speed_v1: 'speed', localify_volume_v1: 'volume', localify_audacity_roots_v1: 'Audacity folders'
+      };
+
+      function buildBackup(all) {
+        var list = all ? LP.list() : [LP.active];
+        return {
+          app: 'localify',
+          kind: 'backup',
+          schema: SCHEMA,
+          exportedAt: new Date().toISOString(),
+          scope: all ? 'all' : 'profile',
+          note: 'Localify backup: liked songs, settings and history. It contains no music.',
+          profiles: list.map(function (p) {
+            return { profile: { name: p.name, avatar: p.avatar || '', accent: p.accent }, data: LP.dataOf(p.id) };
+          })
+        };
+      }
+
+      function slug(s) {
+        return String(s).toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'profile';
+      }
+
+      async function exportBackup(all) {
+        var text = JSON.stringify(buildBackup(all), null, 2);
+        var now = new Date(), pad = function (n) { return String(n).padStart(2, '0'); };
+        var day = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());   // local date
+        var name = 'localify-' + (all ? 'all-profiles' : slug(LP.active.name)) + '-' + day + '.localify.json';
+        var blob = new Blob([text], { type: 'application/json' });
+        if (typeof window.showSaveFilePicker === 'function') {
+          try {
+            var handle = await window.showSaveFilePicker({
+              suggestedName: name,
+              types: [{ description: 'Localify backup', accept: { 'application/json': ['.json'] } }]
+            });
+            var w = await handle.createWritable();
+            await w.write(blob);
+            await w.close();
+            toast('Backup saved');
+            return;
+          } catch (e) {
+            if (e && e.name === 'AbortError') return;   // user cancelled
+            // Other errors (blocked in an iframe, unsupported type...): fall back to a download.
+          }
+        }
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = name;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(function () { URL.revokeObjectURL(a.href); }, 5000);
+        toast('Backup downloaded');
+      }
+
+      $('bkExportCurrent').addEventListener('click', function () { exportBackup(false); });
+      $('bkExportAll').addEventListener('click', function () { exportBackup(true); });
+
+      function parseBackup(text) {
+        var obj;
+        try { obj = JSON.parse(text); } catch (e) { throw new Error('That file isn\'t a Localify backup (it isn\'t valid JSON).'); }
+        if (!obj || typeof obj !== 'object' || obj.app !== 'localify' || !Array.isArray(obj.profiles)) {
+          throw new Error('That file isn\'t a Localify backup.');
+        }
+        if (typeof obj.schema !== 'number' || obj.schema < 1) throw new Error('That backup is missing its version, so it can\'t be read.');
+        if (obj.schema > SCHEMA) throw new Error('That backup comes from a newer version of Localify. Update the app, then try again.');
+        var profiles = [];
+        obj.profiles.forEach(function (entry) {
+          if (!entry || typeof entry !== 'object' || !entry.data || typeof entry.data !== 'object' || Array.isArray(entry.data)) return;
+          var info = entry.profile && typeof entry.profile === 'object' ? entry.profile : {};
+          var data = {}, skipped = 0;
+          Object.keys(entry.data).forEach(function (k) {
+            var v = entry.data[k];
+            if (!LP.isProfileDataKey(k) || DEVICE_ONLY_KEYS.indexOf(k) >= 0) { skipped++; return; }
+            if (SHAPES[k] && !SHAPES[k](v)) { skipped++; return; }
+            data[k] = v;
+          });
+          profiles.push({
+            profile: {
+              name: cleanName(info.name) || 'Imported',
+              avatar: typeof info.avatar === 'string' ? info.avatar.slice(0, 8) : '',
+              accent: LP.ACCENTS.indexOf(info.accent) >= 0 ? info.accent : 'green'
+            },
+            data: data,
+            skipped: skipped
+          });
+        });
+        if (!profiles.length) throw new Error('That backup doesn\'t contain any profiles.');
+        var date = new Date(obj.exportedAt);
+        return { exportedAt: isNaN(date) ? null : date, profiles: profiles };
+      }
+
+      function summarize(data) {
+        var out = [];
+        var liked = Array.isArray(data.localify_liked_v1) ? data.localify_liked_v1.length : 0;
+        out.push('<b>' + liked + '</b> liked song' + (liked === 1 ? '' : 's'));
+        var folders = Array.isArray(data.localify_folders_v1) ? data.localify_folders_v1.length : 0;
+        if (folders) out.push('<b>' + folders + '</b> recent folder' + (folders === 1 ? '' : 's'));
+        var settings = Object.keys(SETTINGS_KEYS).filter(function (k) { return k in data; }).map(function (k) { return SETTINGS_KEYS[k]; });
+        out.push(settings.length ? 'Settings: ' + escapeText(settings.join(', ')) : 'No settings');
+        var last = data.localify_last_track_v1 && data.localify_last_track_v1.key;
+        if (last) out.push('Last played: ' + escapeText(last));
+        return out;
+      }
+
+      function escapeText(s) {
+        var d = document.createElement('div');
+        d.textContent = String(s);
+        return d.innerHTML;
+      }
+
+      var pending = null;   // parsed backup waiting in the preview dialog
+      var importDialog = $('bkImportDialog');
+
+      function selectedEntries() {
+        var sel = $('bkWhich');
+        if (!sel) return pending.profiles;
+        return sel.value === 'all' ? pending.profiles : [pending.profiles[+sel.value]];
+      }
+
+      function renderPreview() {
+        var entries = selectedEntries(), many = entries.length > 1, box = $('bkPreview');
+        var e = entries[0];
+        var head = box.querySelector('.bk-preview-head');
+        head.textContent = '';
+        head.appendChild(avatarEl(many ? { name: '+', avatar: String(entries.length), accent: 'blue' } : e.profile));
+        var t = document.createElement('div');
+        var b = document.createElement('b');
+        b.textContent = many ? entries.length + ' profiles' : e.profile.name;
+        t.appendChild(b);
+        t.appendChild(document.createTextNode(pending.exportedAt
+          ? 'Exported ' + pending.exportedAt.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
+          : 'Export date unknown'));
+        head.appendChild(t);
+        var list = box.querySelector('ul');
+        list.innerHTML = (many
+          ? entries.map(function (x) { return '<li><b>' + escapeText(x.profile.name) + '</b> — ' + summarize(x.data)[0] + '</li>'; })
+          : summarize(e.data).map(function (line) { return '<li>' + line + '</li>'; })).join('');
+        var skipped = entries.reduce(function (n, x) { return n + x.skipped; }, 0);
+        if (skipped) list.insertAdjacentHTML('beforeend', '<li>' + skipped + ' item' + (skipped === 1 ? '' : 's') + ' that only work on the original device will be skipped.</li>');
+        // Merge / replace only make sense for one profile.
+        document.querySelectorAll('input[name="bkMode"]').forEach(function (r) {
+          r.disabled = many && r.value !== 'new';
+          if (r.disabled && r.checked) document.querySelector('input[name="bkMode"][value="new"]').checked = true;
+        });
+      }
+
+      function openImportPreview(parsed) {
+        pending = parsed;
+        var box = $('bkPreview');
+        box.innerHTML = '';
+        if (parsed.profiles.length > 1) {
+          var label = document.createElement('label');
+          label.className = 'visually-hidden-input';
+          label.htmlFor = 'bkWhich';
+          label.textContent = 'Profile to import';
+          var sel = document.createElement('select');
+          sel.id = 'bkWhich';
+          parsed.profiles.forEach(function (x, i) {
+            var o = document.createElement('option');
+            o.value = String(i);
+            o.textContent = x.profile.name;
+            sel.appendChild(o);
+          });
+          var all = document.createElement('option');
+          all.value = 'all';
+          all.textContent = 'All ' + parsed.profiles.length + ' profiles (as new profiles)';
+          sel.appendChild(all);
+          sel.value = 'all';
+          sel.addEventListener('change', renderPreview);
+          box.appendChild(label);
+          box.appendChild(sel);
+        }
+        var head = document.createElement('div');
+        head.className = 'bk-preview-head';
+        box.appendChild(head);
+        box.appendChild(document.createElement('ul'));
+        document.querySelector('input[name="bkMode"][value="new"]').checked = true;
+        renderChip();
+        renderPreview();
+        if (!importDialog.open) importDialog.showModal();
+      }
+
+      function isPlain(v) { return v && typeof v === 'object' && !Array.isArray(v); }
+
+      // Merge rule: lists are combined (likes, folders), settings you already have win.
+      function mergeValue(key, cur, imp) {
+        if (cur === undefined) return imp;
+        if (Array.isArray(cur) && Array.isArray(imp)) {
+          var both = cur.concat(imp);
+          if (both.every(function (x) { return x === null || typeof x !== 'object'; })) {
+            return Array.from(new Set(both));
+          }
+          if (both.every(function (x) { return x && typeof x.name === 'string'; })) {
+            var byName = new Map();
+            both.forEach(function (x) {
+              var o = byName.get(x.name);
+              if (!o || (x.lastUsed || 0) > (o.lastUsed || 0)) byName.set(x.name, x);
+            });
+            var out = Array.from(byName.values()).sort(function (a, b) { return (b.lastUsed || 0) - (a.lastUsed || 0); });
+            return key === 'localify_folders_v1' ? out.slice(0, 20) : out;
+          }
+          return cur;
+        }
+        if (isPlain(cur) && isPlain(imp)) return Object.assign({}, imp, cur);
+        return cur;
+      }
+
+      function doImport(mode) {
+        var entries = selectedEntries();
+        if (mode === 'new') {
+          var created = entries.map(function (x) {
+            var p = LP.create({ name: uniqueName(x.profile.name), avatar: x.profile.avatar, accent: x.profile.accent, seedAppearance: false });
+            if (!LP.writeData(p.id, x.data, true)) throw new Error('Not enough storage space to import everything.');
+            return p;
+          });
+          renderChip();
+          if (created.length === 1) toast('Imported as ' + created[0].name, { label: 'Switch now', run: function () { switchTo(created[0].id); } });
+          else toast('Imported ' + created.length + ' profiles');
+          return;
+        }
+        var active = LP.active, data = entries[0].data;
+        if (mode === 'replace') {
+          if (!window.confirm('Replace “' + active.name + '” with this backup?\n\nIts current liked songs, settings and history are overwritten. This can\'t be undone.')) return;
+          pausePlayers();
+          if (!LP.writeData(active.id, data, true)) throw new Error('Not enough storage space to import everything.');
+          reloadWith('Backup restored into ' + active.name);
+          return;
+        }
+        var current = LP.dataOf(active.id), merged = {};
+        Object.keys(data).forEach(function (k) { merged[k] = mergeValue(k, current[k], data[k]); });
+        pausePlayers();
+        if (!LP.writeData(active.id, merged, false)) throw new Error('Not enough storage space to import everything.');
+        reloadWith('Backup merged into ' + active.name);
+      }
+
+      $('bkImportCancel').addEventListener('click', function () { importDialog.close(); pending = null; });
+      $('bkImportForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        if (!pending) return;
+        var mode = (document.querySelector('input[name="bkMode"]:checked') || {}).value || 'new';
+        try {
+          importDialog.close();
+          doImport(mode);
+        } catch (err) {
+          toast(err.message || 'Import failed.');
+        }
+        pending = null;
+      });
+
+      async function readBackupFile(file) {
+        if (!file) return;
+        if (file.size > MAX_BYTES) { toast('That file is too big to be a Localify backup.'); return; }
+        try {
+          openImportPreview(parseBackup(await file.text()));
+        } catch (err) {
+          toast(err.message || 'Couldn\'t read that file.');
+        }
+      }
+
+      $('bkFile').addEventListener('change', function (e) {
+        readBackupFile(e.target.files && e.target.files[0]);
+        e.target.value = '';
+      });
+
+      // Drag & drop a backup anywhere (including the drop box in Settings). These run in
+      // the capture phase so the player's own "drop music here" handler never sees them.
+      var dropBox = $('bkDrop');
+      function isBackupDrag(e) {
+        var dt = e.dataTransfer;
+        if (!dt || !dt.items || !dt.items.length) return false;
+        return Array.prototype.every.call(dt.items, function (it) { return it.kind === 'file' && /json/i.test(it.type); });
+      }
+      ['dragenter', 'dragover', 'dragleave'].forEach(function (type) {
+        window.addEventListener(type, function (e) {
+          if (!isBackupDrag(e)) return;
+          e.stopImmediatePropagation();
+          if (type !== 'dragleave') {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'copy';
+          }
+          dropBox.classList.toggle('dragover', type !== 'dragleave' && e.target instanceof Node && dropBox.contains(e.target));
+        }, true);
+      });
+      window.addEventListener('drop', function (e) {
+        var files = e.dataTransfer && e.dataTransfer.files;
+        if (!files || files.length !== 1 || !/\.json$/i.test(files[0].name)) return;
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        dropBox.classList.remove('dragover');
+        // If the browser didn't report the file type while dragging, the player's
+        // "drop music" overlay may be showing: reset it with synthetic dragleaves.
+        var overlay = $('dropOverlay');
+        if (overlay && overlay.classList.contains('visible')) {
+          try {
+            var dt = new DataTransfer();
+            dt.items.add(new File([''], 'reset'));
+            for (var i = 0; i < 50; i++) window.dispatchEvent(new DragEvent('dragleave', { dataTransfer: dt }));
+          } catch (err) { /* old browser */ }
+          overlay.classList.remove('visible');
+        }
+        readBackupFile(files[0]);
+      }, true);
+
+      /* ======================================================================
+         [PWA] Manifest, service worker (offline + "new version" bar), install
+         Only on http(s): from file:// none of this applies and the app works as before.
+         ====================================================================== */
+      var PWA = (function () {
+        var isHttp = /^https?:$/.test(location.protocol);
+        var deferredPrompt = null;
+        var standalone = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+        var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        var btn = $('pwaInstallBtn'), hint = $('pwaInstallHint');
+
+        if (isHttp) {
+          var link = document.createElement('link');
+          link.rel = 'manifest';
+          link.href = 'manifest.webmanifest';
+          document.head.appendChild(link);
+        }
+
+        function updateUI() {
+          btn.hidden = !deferredPrompt;
+          if (standalone) hint.textContent = 'Installed. You\'re using Localify as an app.';
+          else if (deferredPrompt) hint.textContent = 'Add Localify to your home screen or desktop. It works offline, and your songs stay on your device.';
+          else if (!isHttp) hint.textContent = 'Open Localify from its web address (your GitHub Pages link) to install it as an app.';
+          else if (isIOS) hint.textContent = 'On iPhone or iPad: open this page in Safari, tap Share, then “Add to Home Screen”.';
+          else hint.textContent = 'Use your browser\'s menu: “Install app” or “Add to Home screen”.';
+        }
+
+        window.addEventListener('beforeinstallprompt', function (e) {
+          e.preventDefault();   // show our own button instead of the browser's mini-bar
+          deferredPrompt = e;
+          updateUI();
+        });
+        window.addEventListener('appinstalled', function () {
+          deferredPrompt = null;
+          standalone = true;
+          updateUI();
+          toast('Localify installed');
+        });
+
+        function install() {
+          if (deferredPrompt) {
+            var p = deferredPrompt;
+            deferredPrompt = null;
+            p.prompt();
+            p.userChoice.then(updateUI, updateUI);
+          } else {
+            openSettingsAt('setAppTitle');
+          }
+        }
+        btn.addEventListener('click', install);
+        updateUI();
+
+        // Service worker + update flow: a new deploy installs a new worker that waits;
+        // we show "A new version is ready → Reload", and reload once it takes over.
+        if (isHttp && 'serviceWorker' in navigator) {
+          var bar = $('pwaUpdate'), wantReload = false, reloading = false, reg = null;
+          var showUpdate = function () { bar.hidden = false; };
+          $('pwaUpdateReload').addEventListener('click', function () {
+            wantReload = true;
+            if (reg && reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+            else location.reload();
+          });
+          $('pwaUpdateClose').addEventListener('click', function () { bar.hidden = true; });
+          navigator.serviceWorker.addEventListener('controllerchange', function () {
+            if (!wantReload || reloading) return;
+            reloading = true;
+            location.reload();
+          });
+          window.addEventListener('load', function () {
+            navigator.serviceWorker.register('sw.js').then(function (r) {
+              reg = r;
+              if (r.waiting && navigator.serviceWorker.controller) showUpdate();
+              r.addEventListener('updatefound', function () {
+                var w = r.installing;
+                if (!w) return;
+                w.addEventListener('statechange', function () {
+                  if (w.state === 'installed' && navigator.serviceWorker.controller) showUpdate();
+                });
+              });
+              document.addEventListener('visibilitychange', function () {
+                if (document.visibilityState === 'visible') r.update().catch(function () {});
+              });
+            }).catch(function () { /* offline-only features unavailable; the app still works */ });
+          });
+        }
+
+        return { canInstall: function () { return !!deferredPrompt; }, install: install };
+      })();
+
+      /* ---- startup ---- */
+      renderChip();
+      var flash = null;
+      try { flash = sessionStorage.getItem(FLASH_KEY); sessionStorage.removeItem(FLASH_KEY); } catch (e) {}
+      if (flash) setTimeout(function () { toast(flash); }, 400);
+      if (LP.migrated && LP.list().length === 1) {
+        setTimeout(function () {
+          toast('Your likes and settings now live in the profile “' + LP.active.name + '”.', {
+            label: 'Rename', run: function () { openEditor(LP.active); }
+          });
+        }, 900);
+      }
+      if (!LP.storageAvailable) setTimeout(function () { toast('This browser is blocking storage, so profiles and likes won\'t be saved.'); }, 900);
+      if (LP.needsPicker) openPicker(true);
+    })();
+  </script>
+  <!-- [/Profiles] [/Backup] [/PWA] -->
 </body>
 </html>
