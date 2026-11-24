@@ -5108,6 +5108,13 @@
       .af-qa-play { width: 100%; }
     }
     /* ---- end [AI Tagger] ---- */
+
+    /* [Merge] Phones: the hero action bar now has four buttons (Shuffle, Load, Tidy),
+       so let it wrap instead of squeezing labels onto three lines. */
+    @media (max-width: 600px) {
+      #actionBar { flex-wrap: wrap; row-gap: 10px; }
+      #actionBar .btn-action-pill { white-space: nowrap; }
+    }
   </style>
 </head>
 <body>
