@@ -15,7 +15,7 @@
 
 - [Getting started](#getting-started)
 - [What it can do](#what-it-can-do)
-- [Tidy names & tags (AI)](#tidy-names--tags-ai)
+- [Tidy Names & Tags (AI)](#tidy-names--tags-ai)
 - [Lock-in focus timer](#lock-in-focus-timer)
 - [Profiles and backups](#profiles-and-backups)
 - [Install it as an app](#install-it-as-an-app)
@@ -43,8 +43,8 @@ That's all. Localify remembers your likes, settings, folders and the last song y
 
 | | |
 | --- | --- |
-| 🎵 **Library** | All tracks, **Albums** and **Artists** views, plus search. |
-| 📃 **Playlists** | Liked songs plus your own playlists. Press **+** next to *Playlists* in the sidebar, or use **⋯ → Add to playlist** on any song. Give each one a name, an icon (any emoji, or your own picture) and a color; hover it and press the pencil to rename or delete it. |
+| 🎵 **Library** | All Tracks, **Albums** and **Artists** views, plus search. |
+| 📃 **Playlists** | Liked Songs plus your own playlists. Press **+** next to *Playlists* in the sidebar, or use **⋯ → Add to playlist** on any song. Give each one a name, an icon (any emoji, or your own picture) and a color; hover it and press the pencil to rename or delete it. |
 | 🎨 **Looks** | Dark, Light or System mode, your choice of accent color, and compact rows. |
 | 🎤 **Lyrics** | Press **Y** or tap the lyrics icon. Synced lyrics highlight as the song plays; tap a line to jump there. Uses a matching `.lrc` file or the song's own tags first, then looks them up on [LRCLIB](https://lrclib.net). Lyrics you've opened are saved for offline use. |
 | 🌈 **Visualizer** | A full-screen visualizer that moves with the music. |
@@ -53,13 +53,13 @@ That's all. Localify remembers your likes, settings, folders and the last song y
 | 😴 **Sleep timer** | Fades out after 15, 30, 45 or 60 minutes, or at the end of the song. |
 | ✂️ **Audio editor** | Trim, cut, silence, reverse, fade in/out, gain, normalize, speed and EQ. Press **E** on a song. |
 | 🔊 **Audacity** | On Windows, send a song straight to Audacity (set up under **Settings → Integrations**). |
-| 📟 **SD card export** | Copy playlists and their songs to a microSD card for the [ESP32 breadboard player](#breadboard-player-esp32). **Settings → Your data → Export to SD card**. |
+| 📟 **SD card export** | Copy playlists and their songs to a microSD card for the [ESP32 breadboard player](#breadboard-player-esp32). **Settings → Your Data → Export to SD card**. |
 
 Find everything else in **Settings** (the gear icon, or press **,**).
 
 ---
 
-## Tidy names & tags (AI)
+## Tidy Names & Tags (AI)
 
 Messy file names like `shape_of_you_FINAL (1).mp3` get cleaned up automatically.
 
@@ -74,7 +74,7 @@ Messy file names like `shape_of_you_FINAL (1).mp3` get cleaned up automatically.
 
 To tidy one song by hand, select it and press **I**, or use the **⋯** menu on its row. To identify a song by its sound, choose **Identify by sound** from the **⋯** menu, or press **By Sound** on its row in Tidy.
 
-**Settings → Tidy names & tags** lets you:
+**Settings → Tidy Names & Tags** lets you:
 
 - choose the file name pattern (for example `{artist} - {title}`)
 - turn online lookups or AI suggestions on or off
@@ -100,7 +100,7 @@ Press **T** (or tap the timer icon) to start a focus session. Your music keeps p
 
 Share a computer? Each person can have their own **profile** with their own likes, settings and history. Click your avatar in the top-right corner to switch or add one.
 
-To move your data to another device, open **Settings → Your data**:
+To move your data to another device, open **Settings → Your Data**:
 
 - **Export backup** saves a small `.localify.json` file. Songs are never included.
 - **Import backup** previews the file first. You can then add it as a new profile, merge it, or replace the current one.
@@ -130,8 +130,8 @@ Publishing it yourself? See [docs/DEPLOY.md](docs/DEPLOY.md).
 Take your playlists away from the computer on a small music player you build yourself: an ESP32, a microSD card, a MAX98357A amp with a speaker, four buttons, and a colour screen (ST7789 or ST7735) or a 16×2 / 20×4 character LCD.
 
 1. Build it and upload the code in [`firmware/`](firmware). The [breadboard guide](docs/BREADBOARD.md) has the parts list, wiring and steps.
-2. In Localify, **Settings → Your data → Export to SD card**, pick the playlists, and choose the card.
-3. Put the card in the player. It shows your playlists, Liked songs and All Songs.
+2. In Localify, **Settings → Your Data → Export to SD card**, pick the playlists, and choose the card.
+3. Put the card in the player. It shows your playlists, Liked Songs and All Songs.
 
 Exporting needs Chrome or Edge on a computer.
 
@@ -167,7 +167,7 @@ Exporting needs Chrome or Edge on a computer.
 | <kbd>Enter</kbd> | Play the picked songs |
 | <kbd>Q</kbd> / <kbd>Shift</kbd> + <kbd>Q</kbd> | Add to queue / play next |
 | <kbd>L</kbd> | Like (or unlike) |
-| <kbd>Delete</kbd> | Remove from this playlist (or from Liked songs) |
+| <kbd>Delete</kbd> | Remove from this playlist (or from Liked Songs) |
 | <kbd>Esc</kbd> | Clear the selection |
 | <kbd>E</kbd> | Edit audio |
 | <kbd>I</kbd> | Tidy name & tags |

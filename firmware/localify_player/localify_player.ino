@@ -3,7 +3,7 @@
   ESP32 + microSD card + I2S amplifier + screen + 4 buttons.
 
   Plays the playlists that Localify writes to the card
-  (Settings -> Your data -> Export to SD card):
+  (Settings -> Your Data -> Export to SD card):
     /music/...              the songs (MP3 or WAV)
     /playlists/<name>.m3u   one file per playlist
   Songs copied to /music by hand also show up under "All Songs".

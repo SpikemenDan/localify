@@ -149,7 +149,7 @@ pio device monitor
 
 1. Put the microSD card in your computer.
 2. Open Localify in **Chrome or Edge** and load the folder with your music.
-3. **Settings → Your data → Export to SD card → Export…**
+3. **Settings → Your Data → Export to SD card → Export…**
 4. Tick the playlists you want. Leave **Copy the songs too** on.
 5. Press **Choose SD card** and pick the card itself (its top level, not a folder on it). Allow Localify to edit it.
 6. Wait for **Done**, then eject the card safely.
@@ -159,7 +159,7 @@ Localify writes:
 ```
 SD card
 ├── music/        your songs, in the same folders as on your computer
-└── playlists/    one .m3u file per playlist, Liked songs too
+└── playlists/    one .m3u file per playlist, Liked Songs too
 ```
 
 Run the export again any time. Songs that are already on the card are skipped, so it's quick, and the playlists are rewritten.
@@ -172,14 +172,14 @@ Run the export again any time. Songs that are already on the card are skipped, s
 
 ## Using the player
 
-The home screen lists **Now playing**, **Shuffle**, **All Songs**, then your playlists (Liked songs first).
+The home screen lists **Now Playing**, **Shuffle**, **All Songs**, then your playlists (Liked Songs first).
 
 | Where | Button | Does |
 | --- | --- | --- |
 | Lists | UP / DOWN | Move (hold to scroll) |
 | | OK | Open the playlist, or play the song |
 | | BACK | Back |
-| Now playing | OK | Play / pause |
+| Now Playing | OK | Play / pause |
 | | UP / DOWN | Previous / next song |
 | | Hold UP / DOWN | Volume up / down |
 | | BACK | Home screen |

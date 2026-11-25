@@ -7,8 +7,8 @@ opens offline like a normal app.
 
 Your music is never uploaded. The site only contains the player; songs are picked
 from your own device each time, and the offline cache stores only the player's own
-files (see `sw.js`). Liked songs, settings and profiles stay in your browser on each
-device — use **Settings → Your data** to move them between devices.
+files (see `sw.js`). Liked Songs, settings and profiles stay in your browser on each
+device — use **Settings → Your Data** to move them between devices.
 
 ## How the files fit together
 
@@ -82,11 +82,11 @@ on and the device is online, and never receive audio, file names or folders:
 
 | Service | Used for | What is sent | Turn off in |
 | --- | --- | --- | --- |
-| `musicbrainz.org`, `coverartarchive.org` | Song details and album covers | Title and artist text | Settings → Tidy names & tags → Look up songs online |
+| `musicbrainz.org`, `coverartarchive.org` | Song details and album covers | Title and artist text | Settings → Tidy Names & Tags → Look up songs online |
 | `itunes.apple.com` | Second opinion on details and covers | Title and artist text | Same as above |
 | `lrclib.net` | Lyrics | Title, artist, album text and song length | Settings → Lyrics → Find lyrics online |
-| `api.acoustid.org` | Identify a song by its sound | Audio fingerprint and song length (only with the user's own key) | Remove the key in Settings → Tidy names & tags |
-| `cdn.jsdelivr.net`, `huggingface.co` | Downloading the AI model and the fingerprint library, once | Nothing personal | Settings → Tidy names & tags → AI suggestions |
+| `api.acoustid.org` | Identify a song by its sound | Audio fingerprint and song length (only with the user's own key) | Remove the key in Settings → Tidy Names & Tags |
+| `cdn.jsdelivr.net`, `huggingface.co` | Downloading the AI model and the fingerprint library, once | Nothing personal | Settings → Tidy Names & Tags → AI suggestions |
 
 ## Launch checklist
 

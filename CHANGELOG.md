@@ -7,16 +7,16 @@
 - **Firefox and Safari keep your songs after a reload.** They can't reopen folders, so Localify saves its own copy of your songs in the browser and loads them from there. Single songs added with **Add Files** are kept the same way in every browser.
 - **Pick up where you left off**: after a reload, the song you were playing is ready at the same spot, with your Up Next order (including songs you queued) and the list it came from.
 - **A cleaner speed and sound menu**: speed and sound now sit in their own sections, and reverb is a slider (0 to 100%) instead of an on/off switch. The Nightcore, Daycore and Slowed + reverb buttons are gone: set the speed and reverb yourself. Each setting has a short line saying what it does.
-- Buttons, menus and headings now use sentence case ("Load folder", "Up next", "Shuffle play").
+- Buttons and menus now use sentence case ("Load folder", "Shuffle play"); headings and screen names use title case ("Speed and Sound", "Liked Songs", "Now Playing").
 - Notices now have a short title, an icon and a line of detail.
 - **All Tracks shows each song's folder** (its name and icon) next to the artist.
 - **Pick many songs at once**: <kbd>Ctrl</kbd>+<kbd>A</kbd>, <kbd>Ctrl</kbd>+click and <kbd>Shift</kbd>+click, then play, queue, like, add to a playlist or remove them together from the bar at the bottom. New keys in the song list: <kbd>Q</kbd> (add to queue), <kbd>Shift</kbd>+<kbd>Q</kbd> (play next), <kbd>Delete</kbd> and <kbd>Esc</kbd>.
 - **Your own pictures and icons** for playlists and folders: upload a picture (it's cropped square), or type or paste any emoji.
 - The *Auto* and *?* tags on songs are gone. Hover a song to see a small dot instead, or open its **⋯** menu to answer a question or see what Localify filled in.
-- **Breadboard player**: build your own ESP32 music player with a colour screen or a character LCD, and fill its microSD card from **Settings → Your data → Export to SD card**. The export copies your playlists and their MP3/WAV songs, and skips songs already on the card. See the [breadboard guide](docs/BREADBOARD.md).
+- **Breadboard player**: build your own ESP32 music player with a colour screen or a character LCD, and fill its microSD card from **Settings → Your Data → Export to SD card**. The export copies your playlists and their MP3/WAV songs, and skips songs already on the card. See the [breadboard guide](docs/BREADBOARD.md).
 - **Playlists**: make your own, with a name, icon and color. Add songs from a song's **⋯** menu (**Add to playlist**). Liked Songs now sits at the top of the new **Playlists** area in the sidebar. Playlists are kept after reloads, per profile and in backups.
 - Name your folders: when you add a folder, give it your own name, icon and color. It's remembered after reloads, kept in backups, and you can change it any time from **Your Folders** in the sidebar.
-- Localify now asks the browser to keep its data, so a full device doesn't quietly clear your settings, likes and folders. **Settings → Your data** shows whether it said yes.
+- Localify now asks the browser to keep its data, so a full device doesn't quietly clear your settings, likes and folders. **Settings → Your Data** shows whether it said yes.
 - Cleaner settings: sliders now fill with your accent color as you drag them, and the equalizer and sleep timer choices sit in a tidy grid.
 - The song count and total time in the sidebar are now two small cards.
 - Compact rows are slimmer: one line per song with the artist next to the title. On phones the title gets the whole line.
@@ -33,7 +33,7 @@
 - Synced lyrics that highlight as the song plays; tap a line to jump there.
 - Uses `.lrc` files and lyrics in your tags first, then LRCLIB online. Saved for offline use.
 
-**Tidy names & tags**
+**Tidy Names & Tags**
 - New songs get their title, artist, album, year, genre and cover filled in automatically when online.
 - Songs added offline wait in **Unsorted** and are filled in once you're back online.
 - When it isn't sure, Localify asks you a few quick questions instead of guessing.
