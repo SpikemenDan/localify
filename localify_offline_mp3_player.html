@@ -2183,11 +2183,21 @@
     }
 
     .speed-range-labels {
+      position: relative;
       display: flex;
       justify-content: space-between;
       font-size: 10px;
       color: var(--text-muted);
       font-variant-numeric: tabular-nums;
+    }
+
+    /* A label pinned under the thumb's real position for one value.
+       --at = (value - min) / (max - min); 1x on 0.25-3 is 0.75 / 2.75.
+       The thumb centre travels from thumb/2 to 100% - thumb/2. */
+    .speed-range-labels .speed-label-mark {
+      position: absolute;
+      left: calc(var(--thumb, 14px) / 2 + (100% - var(--thumb, 14px)) * var(--at));
+      transform: translateX(-50%);
     }
 
     .speed-presets-grid {
@@ -2846,7 +2856,7 @@
     .speed-popover .speed-range-slider { height: 6px; }
     .speed-popover .speed-range-slider::-webkit-slider-thumb { width: 16px; height: 16px; }
     .speed-popover .speed-range-slider::-moz-range-thumb { width: 16px; height: 16px; }
-    .speed-popover .speed-range-labels { font-size: 11px; }
+    .speed-popover .speed-range-labels { font-size: 11px; --thumb: 16px; }
     .speed-popover .speed-presets-grid {
       gap: 4px;
       padding: 4px;
@@ -6442,7 +6452,7 @@
                 <input type="range" id="speedSlider" min="0.25" max="3" step="0.05" value="1" class="speed-range-slider" aria-label="Speed">
                 <div class="speed-range-labels">
                   <span>0.25x</span>
-                  <span>1x</span>
+                  <span class="speed-label-mark" style="--at: 0.2727">1x</span>
                   <span>3x</span>
                 </div>
               </div>
