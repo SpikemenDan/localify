@@ -10,7 +10,9 @@
 #define DISPLAY_ST7789  1
 #define DISPLAY_ST7735  2
 #define DISPLAY_LCD_I2C 3
+#ifndef DISPLAY_TYPE
 #define DISPLAY_TYPE DISPLAY_ST7789
+#endif
 
 // Colour screens (ST7789 / ST7735)
 #define TFT_W        240
