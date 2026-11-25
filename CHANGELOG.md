@@ -2,6 +2,9 @@
 
 ## 1.0.1 — polish
 
+- **Pick many songs at once**: <kbd>Ctrl</kbd>+<kbd>A</kbd>, <kbd>Ctrl</kbd>+click and <kbd>Shift</kbd>+click, then play, queue, like, add to a playlist or remove them together from the bar at the bottom. New keys in the song list: <kbd>Q</kbd> (add to queue), <kbd>Shift</kbd>+<kbd>Q</kbd> (play next), <kbd>Delete</kbd> and <kbd>Esc</kbd>.
+- **Your own pictures and icons** for playlists and folders: upload a picture (it's cropped square), or type or paste any emoji.
+- The *Auto* and *?* tags on songs are gone. Hover a song to see a small dot instead, or open its **⋯** menu to answer a question or see what Localify filled in.
 - **Breadboard player**: build your own ESP32 music player with a colour screen or a character LCD, and fill its microSD card from **Settings → Your data → Export to SD card**. The export copies your playlists and their MP3/WAV songs, and skips songs already on the card. See the [breadboard guide](docs/BREADBOARD.md).
 - **Playlists**: make your own, with a name, icon and color. Add songs from a song's **⋯** menu (**Add to playlist**). Liked Songs now sits at the top of the new **Playlists** area in the sidebar. Playlists are kept after reloads, per profile and in backups.
 - Name your folders: when you add a folder, give it your own name, icon and color. It's remembered after reloads, kept in backups, and you can change it any time from **Your Folders** in the sidebar.

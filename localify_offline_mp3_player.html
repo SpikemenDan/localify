@@ -920,6 +920,23 @@
       background: rgba(var(--accent-rgb), 0.16);
     }
     .fd-preview svg { width: 26px; height: 26px; }
+    /* Your own pictures and icons */
+    .fd-preview, .pl-icon, .recent-folder-icon { overflow: hidden; }
+    .look-img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: inherit; }
+    .hero-cover .look-img { position: absolute; inset: 0; }
+    .lp-emoji-row input.lp-icon-input[type="text"] {
+      width: 38px; height: 38px; padding: 0; border-radius: var(--radius-sm); text-align: center;
+      background: var(--bg-elevated); border: 1px dashed var(--border-subtle); color: var(--text-primary);
+      font-size: 18px; font-weight: 800; font-family: inherit;
+    }
+    .lp-emoji-row .lp-icon-input::placeholder { color: var(--text-muted); font-weight: 600; }
+    .lp-emoji-row input.lp-icon-input[type="text"]:focus { outline: 2px solid var(--accent); outline-offset: 0; border-style: solid; }
+    .lp-emoji-row input.lp-icon-input[type="text"].is-on { border: 1px solid var(--accent); box-shadow: 0 0 0 1px var(--accent); background: var(--accent-dim); }
+    .lp-emoji-row button.lp-img-btn { display: grid; place-items: center; overflow: hidden; padding: 0; color: var(--text-secondary); border-style: dashed; }
+    .lp-emoji-row button.lp-img-btn[aria-checked="true"] { border-style: solid; }
+    .lp-emoji-row button.lp-img-btn:hover { color: var(--text-primary); }
+    .lp-emoji-row button.lp-img-remove { width: 28px; font-size: 12px; color: var(--text-secondary); background: transparent; border-color: transparent; }
+    .lp-emoji-row button.lp-img-remove:hover { color: var(--text-primary); background: var(--bg-highlight); }
     .lp-swatches button.fd-auto {
       background: conic-gradient(#1DB954, #4aa8ff, #a855f7, #ec4899, #f97316, #14b8a6, #1DB954);
     }
@@ -1395,6 +1412,31 @@
     .track-row.active:hover {
       background: rgba(var(--accent-rgb), 0.15);
     }
+
+    /* Multi-select (Ctrl/Shift-click, Ctrl+A) */
+    .track-row.selected { background: rgba(var(--accent-rgb), 0.2); }
+    .track-row.selected:hover { background: rgba(var(--accent-rgb), 0.26); }
+    .track-row.selected + .track-row.selected { box-shadow: inset 0 1px 0 rgba(var(--accent-rgb), 0.12); }
+    #tracklistBody.has-selection .track-row { user-select: none; }
+    .sel-bar {
+      position: fixed; left: 50%; bottom: calc(var(--player-height) + 16px); transform: translate(-50%, 12px);
+      z-index: 85; display: flex; align-items: center; gap: 2px; padding: 6px 6px 6px 14px;
+      max-width: calc(100vw - 32px); overflow-x: auto; scrollbar-width: none;
+      background: var(--bg-elevated, #282828); color: var(--text-primary);
+      border: 1px solid var(--border-subtle); border-radius: var(--radius-full);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35); opacity: 0; transition: opacity 0.16s ease, transform 0.16s ease;
+    }
+    .sel-bar.open { opacity: 1; transform: translate(-50%, 0); }
+    .sel-bar[hidden] { display: none; }
+    .sel-count { font-size: 13px; font-weight: 700; margin-right: 8px; white-space: nowrap; }
+    .sel-btn {
+      font-size: 13px; font-weight: 600; padding: 6px 10px; border-radius: var(--radius-full);
+      color: var(--text-secondary); white-space: nowrap;
+    }
+    .sel-btn:hover, .sel-btn:focus-visible { background: var(--bg-highlight); color: var(--text-primary); }
+    .sel-btn.sel-x { width: 30px; padding: 6px 0; text-align: center; }
+    @media (prefers-reduced-motion: reduce) { .sel-bar { transition: none; } }
+    body.has-selection .toast-container { bottom: calc(var(--player-height) + 76px); }
 
     .track-num-cell {
       display: flex;
@@ -5242,14 +5284,17 @@
     .af-chip[data-mode="question"] .af-chip-dot { background: var(--accent); }
     @keyframes afPulse { 50% { opacity: 0.3; } }
     @media (prefers-reduced-motion: reduce) { .af-chip[data-mode="busy"] .af-chip-dot { animation: none; } }
-    .af-badge {
-      display: inline-block; vertical-align: 1px; margin-right: 6px; padding: 1px 6px; border-radius: var(--radius-full);
-      font-size: 10px; font-weight: 700; letter-spacing: 0.02em; line-height: 1.5;
+    /* Song status from Localify: a small dot on the cover, shown only while you point at (or move to) the row */
+    .af-dot {
+      position: absolute; top: 3px; right: 3px; width: 9px; height: 9px; border-radius: 50%;
+      box-shadow: 0 0 0 2px var(--bg-base, #121212); opacity: 0; pointer-events: none;
+      transition: opacity 0.15s ease, transform 0.15s ease;
     }
-    .af-unsorted { background: rgba(var(--fg-rgb), 0.1); color: var(--text-secondary); }
-    .af-filled { background: rgba(var(--fg-rgb), 0.06); color: var(--text-muted); }
-    .af-q { background: var(--accent-dim); color: var(--accent); cursor: pointer; min-width: 18px; text-align: center; }
-    .af-q:hover { background: var(--accent); color: var(--bg-base, #000); }
+    .af-dot-unsorted { background: var(--text-muted); }
+    .af-dot-q { background: var(--accent); cursor: pointer; }
+    .track-row:hover .af-dot, .track-row.kbd-focus .af-dot { opacity: 1; pointer-events: auto; }
+    .af-dot-q:hover { transform: scale(1.35); }
+    @media (hover: none) { .af-dot { display: none; } }
     .toast.af-toast { display: flex; align-items: center; gap: 12px; pointer-events: auto; }
     .af-toast-btn { color: var(--accent); font-weight: 700; font-size: 13px; padding: 2px 4px; border-radius: 4px; }
     .af-toast-btn:hover { text-decoration: underline; }
@@ -5903,6 +5948,34 @@
                 <span>Move in list / play</span>
                 <div class="shortcut-keys"><span class="kbd">↑</span><span class="kbd">↓</span><span class="kbd">Enter</span></div>
               </div>
+              <div class="shortcut-row">
+                <span>Select all songs</span>
+                <div class="shortcut-keys"><span class="kbd">Ctrl</span><span class="kbd">A</span></div>
+              </div>
+              <div class="shortcut-row">
+                <span>Pick songs</span>
+                <div class="shortcut-keys"><span class="kbd">Ctrl</span><span class="kbd">Click</span></div>
+              </div>
+              <div class="shortcut-row">
+                <span>Pick a range</span>
+                <div class="shortcut-keys"><span class="kbd">Shift</span><span class="kbd">Click</span></div>
+              </div>
+              <div class="shortcut-row">
+                <span>Grow the selection</span>
+                <div class="shortcut-keys"><span class="kbd">Shift</span><span class="kbd">↑/↓</span></div>
+              </div>
+              <div class="shortcut-row">
+                <span>Add to queue / play next</span>
+                <div class="shortcut-keys"><span class="kbd">Q</span><span class="kbd">Shift Q</span></div>
+              </div>
+              <div class="shortcut-row">
+                <span>Remove from playlist</span>
+                <div class="shortcut-keys"><span class="kbd">Del</span></div>
+              </div>
+              <div class="shortcut-row">
+                <span>Clear selection</span>
+                <div class="shortcut-keys"><span class="kbd">Esc</span></div>
+              </div>
             </div>
           </details>
         </div>
@@ -6406,6 +6479,16 @@
 
   <div class="looks-menu-backdrop" id="looksMenuBackdrop" hidden></div>
   <div class="looks-menu" id="looksMenu" role="menu" aria-label="Track actions" hidden></div>
+  <div class="sel-bar" id="selBar" role="toolbar" aria-label="Selected songs" hidden>
+    <span class="sel-count" id="selCount" aria-live="polite"></span>
+    <button type="button" class="sel-btn" data-sel="play" title="Play the selected songs (Enter)">Play</button>
+    <button type="button" class="sel-btn" data-sel="next" title="Play next (Shift+Q)">Play next</button>
+    <button type="button" class="sel-btn" data-sel="queue" title="Add to queue (Q)">Add to queue</button>
+    <button type="button" class="sel-btn" data-sel="like" id="selLike" title="Like or unlike (L)">Like</button>
+    <button type="button" class="sel-btn" data-sel="pl" aria-haspopup="menu">Add to playlist</button>
+    <button type="button" class="sel-btn" data-sel="remove" id="selRemove" title="Remove from here (Delete)" hidden>Remove</button>
+    <button type="button" class="sel-btn sel-x" data-sel="clear" aria-label="Clear selection" title="Clear selection (Esc)">✕</button>
+  </div>
   <!-- [/Looks] -->
 
   <!-- ======================================================================
@@ -7072,6 +7155,11 @@
         try {
           localStorage.setItem(nsKey(key), JSON.stringify(value));
         } catch (e) { /* quota or private mode */ }
+      }
+
+      /** Like saveJSON, but says whether it fit (pictures can fill the browser's storage). */
+      function saveJSONChecked(key, value) {
+        try { localStorage.setItem(nsKey(key), JSON.stringify(value)); return true; } catch (e) { return false; }
       }
 
       function removeJSON(key) {   // [Profiles]
@@ -7917,35 +8005,147 @@
       if (!folderLooks || typeof folderLooks !== 'object' || Array.isArray(folderLooks)) folderLooks = {};
       const folderLabel = (name) => (folderLooks[name] && folderLooks[name].label) || name;
 
+      /* ---- Your own pictures and icons for folders and playlists ----
+         A picture is cropped square and shrunk to 256 px, then kept with the folder's or
+         playlist's look (this profile and its backups). Any emoji can be an icon. */
+      const LookArt = (() => {
+        const OK = /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/;
+        const SIZE = 256;
+        const safe = (u) => (typeof u === 'string' && u.length < 600000 && OK.test(u) ? u : '');
+        const img = (u) => (safe(u) ? `<img class="look-img" src="${safe(u)}" alt="" draggable="false">` : '');
+        const PIC = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"></rect><circle cx="9" cy="10" r="2"></circle><path d="M21 16l-5-5-9 9"></path></svg>';
+
+        /** The first character typed, kept whole (👩‍🎤, 🇯🇵 and ❤️ are one each). */
+        function firstGlyph(text) {
+          const t = String(text || '').trim();
+          if (!t) return '';
+          if (window.Intl && Intl.Segmenter) { for (const seg of new Intl.Segmenter().segment(t)) return seg.segment; }
+          return Array.from(t)[0];
+        }
+
+        async function fromFile(file) {
+          if (!file || !/^image\//.test(file.type)) throw new Error('That file isn’t a picture.');
+          const url = URL.createObjectURL(file);
+          try {
+            const im = new Image();
+            im.src = url;
+            await im.decode();
+            const w = im.naturalWidth, h = im.naturalHeight;
+            if (!w || !h) throw new Error('empty');
+            const side = Math.min(w, h);
+            const c = document.createElement('canvas');
+            c.width = c.height = SIZE;
+            const g = c.getContext('2d');
+            g.imageSmoothingQuality = 'high';
+            g.drawImage(im, (w - side) / 2, (h - side) / 2, side, side, 0, 0, SIZE, SIZE);
+            const webp = c.toDataURL('image/webp', 0.84);
+            if (webp.startsWith('data:image/webp')) return webp;
+            g.globalCompositeOperation = 'destination-over';   // JPEG has no see-through parts
+            g.fillStyle = '#202020';
+            g.fillRect(0, 0, SIZE, SIZE);
+            return c.toDataURL('image/jpeg', 0.84);
+          } catch (e) {
+            throw new Error('Couldn’t open that picture. Try a JPG or PNG.');
+          } finally {
+            URL.revokeObjectURL(url);
+          }
+        }
+
+        /** Adds "your own icon" and "your own picture" to an icon row.
+         *  o: { icon, image, presets, setIcon(glyph), setImage(dataUrl) } */
+        function addControls(row, o) {
+          const custom = o.icon && !o.presets.includes(o.icon) && !o.image;
+          const inp = document.createElement('input');
+          inp.type = 'text';
+          inp.className = 'lp-icon-input';
+          inp.value = custom ? o.icon : '';
+          inp.placeholder = '+';
+          inp.maxLength = 16;
+          inp.autocomplete = 'off';
+          inp.spellcheck = false;
+          inp.setAttribute('aria-label', 'Your own icon: type or paste any emoji');
+          inp.title = 'Your own icon: type or paste any emoji' + (/Win/.test(navigator.platform) ? ' (Windows key + . opens the emoji picker)' : '');
+          if (custom) inp.classList.add('is-on');
+          inp.addEventListener('input', () => {
+            const g = firstGlyph(inp.value);
+            if (!g) return;
+            o.setIcon(g);
+            const again = row.querySelector('.lp-icon-input');
+            if (again) { again.focus(); again.setSelectionRange(again.value.length, again.value.length); }
+          });
+          inp.addEventListener('focus', () => inp.select());
+          row.appendChild(inp);
+
+          const file = document.createElement('input');
+          file.type = 'file';
+          file.accept = 'image/*';
+          file.hidden = true;
+          file.addEventListener('change', async () => {
+            const f = file.files && file.files[0];
+            if (!f) return;
+            try { o.setImage(await fromFile(f)); } catch (e) { showToast(e.message); }
+          });
+          const pic = document.createElement('button');
+          pic.type = 'button';
+          pic.className = 'lp-img-btn';
+          pic.setAttribute('role', 'radio');
+          pic.setAttribute('aria-checked', String(!!safe(o.image)));
+          pic.setAttribute('aria-label', safe(o.image) ? 'Your picture. Press to pick another.' : 'Use your own picture');
+          pic.title = safe(o.image) ? 'Pick another picture' : 'Use your own picture';
+          pic.innerHTML = safe(o.image) ? img(o.image) : PIC;
+          pic.addEventListener('click', () => file.click());
+          row.appendChild(pic);
+          row.appendChild(file);
+          if (safe(o.image)) {
+            const rm = document.createElement('button');
+            rm.type = 'button';
+            rm.className = 'lp-img-remove';
+            rm.setAttribute('aria-label', 'Remove picture');
+            rm.title = 'Remove picture';
+            rm.textContent = '✕';
+            rm.addEventListener('click', () => o.setImage(''));
+            row.appendChild(rm);
+          }
+        }
+
+        return { safe, img, addControls };
+      })();
+
       function folderIconHTML(name) {
         const look = folderLooks[name] || {};
         const accent = look.accent ? ` data-accent="${escapeHtml(look.accent)}"` : '';
-        const cls = look.icon || look.accent ? ' has-look' : '';
-        const inner = look.icon ? `<span class="fd-emoji">${escapeHtml(look.icon)}</span>` : SVG.folder;
+        const pic = LookArt.img(look.image);
+        const cls = pic || look.icon || look.accent ? ' has-look' : '';
+        const inner = pic || (look.icon ? `<span class="fd-emoji">${escapeHtml(look.icon)}</span>` : SVG.folder);
         return `<div class="recent-folder-icon${cls}"${accent}>${inner}</div>`;
       }
 
       const FolderLook = (() => {
         const dlg = $('fdDialog');
         const queue = [];
-        let cur = null, icon = '', accent = '';
+        let cur = null, icon = '', accent = '', image = '';
 
         function paint() {
           const prev = $('fdPreview');
           if (accent) prev.dataset.accent = accent; else delete prev.dataset.accent;
-          prev.innerHTML = icon ? escapeHtml(icon) : SVG.folder;
+          prev.innerHTML = LookArt.img(image) || (icon ? escapeHtml(icon) : SVG.folder);
           const icons = $('fdIcons');
           icons.textContent = '';
           FOLDER_ICONS.forEach((em) => {
             const b = document.createElement('button');
             b.type = 'button';
             b.setAttribute('role', 'radio');
-            b.setAttribute('aria-checked', String(icon === em));
+            b.setAttribute('aria-checked', String(!image && icon === em));
             if (em) b.textContent = em; else b.innerHTML = SVG.folder;
             b.setAttribute('aria-label', em ? 'Icon ' + em : 'Folder icon');
             b.title = b.getAttribute('aria-label');
-            b.addEventListener('click', () => { icon = em; paint(); });
+            b.addEventListener('click', () => { icon = em; image = ''; paint(); });
             icons.appendChild(b);
+          });
+          LookArt.addControls(icons, {
+            icon, image, presets: FOLDER_ICONS,
+            setIcon: (g) => { icon = g; image = ''; paint(); },
+            setImage: (u) => { image = u; paint(); }
           });
           const colors = $('fdColors');
           colors.textContent = '';
@@ -7966,6 +8166,7 @@
           cur = { name, isNew };
           const look = folderLooks[name] || {};
           icon = look.icon || '';
+          image = LookArt.safe(look.image);
           accent = look.accent || '';
           $('fdTitle').textContent = isNew ? 'Name this folder' : 'Edit folder';
           $('fdSub').textContent = isNew
@@ -7986,7 +8187,7 @@
 
         function save(look) {
           folderLooks[cur.name] = look;
-          saveJSON(STORAGE_KEYS.FOLDER_LOOKS, folderLooks);
+          if (!saveJSONChecked(STORAGE_KEYS.FOLDER_LOOKS, folderLooks)) showToast('Couldn’t keep that: this browser’s storage is full. Try without the picture.');
           renderRecentFolders();
           updateReconnectUI();
         }
@@ -7997,6 +8198,7 @@
           const look = {};
           if (label && label !== cur.name) look.label = label;
           if (icon) look.icon = icon;
+          if (image) look.image = image;
           if (accent) look.accent = accent;
           const wasNew = cur.isNew;
           save(look);
@@ -8034,15 +8236,18 @@
           .map(p => ({ ...p, keys: Array.isArray(p.keys) ? Array.from(new Set(p.keys.filter(k => typeof k === 'string'))) : [] }));
 
         const dlg = $('plDialog');
-        let editing = null, icon = '', accent = '', pendingTrack = null, deleteArmed = false;
+        let editing = null, icon = '', accent = '', image = '', pendingTrack = null, deleteArmed = false;
 
         const byId = (id) => lists.find(p => p.id === id) || null;
         const viewOf = (p) => 'pl:' + p.id;
         function fromView(view) {
           return typeof view === 'string' && view.startsWith('pl:') ? byId(view.slice(3)) : null;
         }
-        function save() { saveJSON(STORAGE_KEYS.PLAYLISTS, lists); }
+        function save() {
+          if (!saveJSONChecked(STORAGE_KEYS.PLAYLISTS, lists)) showToast('Couldn’t save playlists: this browser’s storage is full. Try removing a picture.');
+        }
         function iconHTML(p, big) {
+          if (LookArt.safe(p.image)) return LookArt.img(p.image);
           if (p.icon) return escapeHtml(p.icon);
           return big ? SVG.playlist.replace(/width="16" height="16"/, 'width="64" height="64"').replace('stroke="currentColor"', 'stroke="#ffffff"') : SVG.playlist;
         }
@@ -8103,6 +8308,37 @@
           changed(p);
         }
 
+        function hasAll(p, tracks) { return tracks.length > 0 && tracks.every(t => p.keys.includes(t.likeKey)); }
+
+        /** Add several songs; if they're all in it already, take them out instead. */
+        function addMany(id, tracks) {
+          const p = byId(id);
+          if (!p || !tracks.length) return;
+          const keys = Array.from(new Set(tracks.map(t => t.likeKey)));
+          const n = (k) => k === 1 ? '1 song' : `${k} songs`;
+          if (keys.every(k => p.keys.includes(k))) {
+            const drop = new Set(keys);
+            p.keys = p.keys.filter(k => !drop.has(k));
+            showToast(`Removed ${n(keys.length)} from “${p.name}”`);
+          } else {
+            let added = 0;
+            for (const k of keys) if (!p.keys.includes(k)) { p.keys.push(k); added++; }
+            showToast(`Added ${n(added)} to “${p.name}”`);
+          }
+          changed(p);
+        }
+
+        function removeMany(tracks) {
+          const p = fromView(state.activeView);
+          if (!p || !tracks.length) return;
+          const drop = new Set(tracks.map(t => t.likeKey));
+          const before = p.keys.length;
+          p.keys = p.keys.filter(k => !drop.has(k));
+          const gone = before - p.keys.length;
+          showToast(`Removed ${gone === 1 ? '1 song' : gone + ' songs'} from “${p.name}”`);
+          changed(p);
+        }
+
         function removeFromCurrent(track) {
           const p = fromView(state.activeView);
           if (!p || !track) return;
@@ -8128,19 +8364,24 @@
         function paint() {
           const prev = $('plPreview');
           if (accent) prev.dataset.accent = accent; else delete prev.dataset.accent;
-          prev.innerHTML = icon ? escapeHtml(icon) : SVG.playlist;
+          prev.innerHTML = LookArt.img(image) || (icon ? escapeHtml(icon) : SVG.playlist);
           const icons = $('plIcons');
           icons.textContent = '';
           FOLDER_ICONS.forEach((em) => {
             const b = document.createElement('button');
             b.type = 'button';
             b.setAttribute('role', 'radio');
-            b.setAttribute('aria-checked', String(icon === em));
+            b.setAttribute('aria-checked', String(!image && icon === em));
             if (em) b.textContent = em; else b.innerHTML = SVG.playlist;
             b.setAttribute('aria-label', em ? 'Icon ' + em : 'Playlist icon');
             b.title = b.getAttribute('aria-label');
-            b.addEventListener('click', () => { icon = em; paint(); });
+            b.addEventListener('click', () => { icon = em; image = ''; paint(); });
             icons.appendChild(b);
+          });
+          LookArt.addControls(icons, {
+            icon, image, presets: FOLDER_ICONS,
+            setIcon: (g) => { icon = g; image = ''; paint(); },
+            setImage: (u) => { image = u; paint(); }
           });
           const colors = $('plColors');
           colors.textContent = '';
@@ -8160,9 +8401,10 @@
         function openDialog(p, track) {
           if (dlg.open) return;
           editing = p;
-          pendingTrack = track || null;
+          pendingTrack = track ? [].concat(track) : null;   // one song or several
           deleteArmed = false;
           icon = p ? p.icon || '' : '';
+          image = p ? LookArt.safe(p.image) : '';
           accent = p ? p.accent || '' : '';
           $('plTitle').textContent = p ? 'Edit playlist' : 'New playlist';
           $('plName').value = p ? p.name : '';
@@ -8189,6 +8431,7 @@
           if (editing) {
             editing.name = name || editing.name;
             if (icon) editing.icon = icon; else delete editing.icon;
+            if (image) editing.image = image; else delete editing.image;
             if (accent) editing.accent = accent; else delete editing.accent;
             save();
             render();
@@ -8200,13 +8443,14 @@
           name = uniqueName(name || `My playlist ${lists.length + 1}`);
           const p = { id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name, keys: [], created: Date.now() };
           if (icon) p.icon = icon;
+          if (image) p.image = image;
           if (accent) p.accent = accent;
-          if (pendingTrack) p.keys.push(pendingTrack.likeKey);
+          if (pendingTrack) for (const t of pendingTrack) if (!p.keys.includes(t.likeKey)) p.keys.push(t.likeKey);
           lists.push(p);
           save();
           render();
           dlg.close();
-          if (pendingTrack) showToast(`Added to “${p.name}”`);
+          if (pendingTrack) showToast(pendingTrack.length > 1 ? `Added ${pendingTrack.length} songs to “${p.name}”` : `Added to “${p.name}”`);
           else { switchView(viewOf(p)); showToast(`Created “${p.name}”`); }
         });
         $('plCancel').addEventListener('click', () => dlg.close());
@@ -8237,7 +8481,7 @@
 
         return {
           all: () => lists,
-          byId, fromView, viewOf, iconHTML, tracksOf, has, toggle, removeFromCurrent, renameKey,
+          byId, fromView, viewOf, iconHTML, tracksOf, has, hasAll, toggle, addMany, removeMany, removeFromCurrent, renameKey,
           render, updateCounts,
           create: (track) => openDialog(null, track),
           isView: (view) => !!fromView(view)
@@ -9400,6 +9644,7 @@
       function switchView(view) {
         if (view !== 'all' && view !== 'liked' && view !== 'visualizer' && view !== 'unsorted' && !Browse.isBrowseView(view) && !Playlists.isView(view)) view = 'all';   // [Looks] albums/artists + [AI Tagger] unsorted
         const prev = state.activeView;
+        if (view !== prev) clearSelection();
         state.activeView = view;
         saveJSON(STORAGE_KEYS.VIEW, view);
         closeMobileSidebar();
@@ -9480,7 +9725,7 @@
           }
           dom.heroType.textContent = 'Playlist';
           dom.heroTitle.textContent = pl.name;
-          dom.heroCover.innerHTML = pl.icon ? `<span class="pl-hero-emoji">${escapeHtml(pl.icon)}</span>` : Playlists.iconHTML(pl, true);
+          dom.heroCover.innerHTML = LookArt.img(pl.image) || (pl.icon ? `<span class="pl-hero-emoji">${escapeHtml(pl.icon)}</span>` : Playlists.iconHTML(pl, true));
           return;
         }
         const isLiked = state.activeView === 'liked';
@@ -9497,6 +9742,139 @@
       /* ---- Virtualized track list ----
          Only the rows inside the viewport (+ overscan) exist in the DOM. Rows are
          absolutely positioned inside #tracklistBody, whose height = rows * ROW_HEIGHT. */
+      /* ---- Multi-select: Ctrl/Cmd-click, Shift-click, Shift+arrows, Ctrl+A ---- */
+      const Sel = { ids: new Set(), anchor: -1 };
+      const selBar = $('selBar');
+      const songsText = (n) => n === 1 ? '1 song' : `${n} songs`;
+
+      /** The selected songs, in list order. */
+      function selectedTracks() {
+        if (!Sel.ids.size) return [];
+        return getVisibleTracks().filter(t => Sel.ids.has(t.id));
+      }
+
+      function paintSelection() {
+        for (const [id, el] of rowEls) {
+          const on = Sel.ids.has(id);
+          el.classList.toggle('selected', on);
+          el.setAttribute('aria-selected', on || id === state.currentTrackId ? 'true' : 'false');
+        }
+        const n = Sel.ids.size;
+        dom.tracklistBody.classList.toggle('has-selection', n > 0);
+        document.body.classList.toggle('has-selection', n > 0);
+        if (n === 0) { selBar.classList.remove('open'); selBar.hidden = true; return; }
+        const list = selectedTracks();
+        $('selCount').textContent = `${n} selected`;
+        $('selLike').textContent = list.length && list.every(t => state.likedKeys.has(t.likeKey)) ? 'Unlike' : 'Like';
+        $('selRemove').hidden = !(Playlists.isView(state.activeView) || state.activeView === 'liked');
+        if (selBar.hidden) { selBar.hidden = false; requestAnimationFrame(() => selBar.classList.add('open')); }
+      }
+
+      function clearSelection() {
+        Sel.anchor = -1;
+        if (!Sel.ids.size) return;
+        Sel.ids.clear();
+        paintSelection();
+      }
+
+      function selectAll() {
+        const v = getVisibleTracks();
+        if (!v.length) return;
+        Sel.ids = new Set(v.map(t => t.id));
+        Sel.anchor = 0;
+        paintSelection();
+      }
+
+      function toggleSelectIndex(idx) {
+        const t = getVisibleTracks()[idx];
+        if (!t) return;
+        if (Sel.ids.has(t.id)) Sel.ids.delete(t.id); else Sel.ids.add(t.id);
+        Sel.anchor = idx;
+        paintSelection();
+      }
+
+      /** Select from the anchor to idx. add: keep what was already selected (Ctrl+Shift). */
+      function selectRangeTo(idx, add) {
+        const v = getVisibleTracks();
+        if (!v[idx]) return;
+        if (Sel.anchor < 0 || Sel.anchor >= v.length) Sel.anchor = state.focusIndex >= 0 && state.focusIndex < v.length ? state.focusIndex : idx;
+        const a = Math.min(Sel.anchor, idx), b = Math.max(Sel.anchor, idx);
+        const ids = add ? new Set(Sel.ids) : new Set();
+        for (let i = a; i <= b; i++) ids.add(v[i].id);
+        Sel.ids = ids;
+        paintSelection();
+      }
+
+      /** Songs that left the list (search, a playlist change) leave the selection too. */
+      function pruneSelection() {
+        if (!Sel.ids.size) return;
+        const vis = new Set(getVisibleTracks().map(t => t.id));
+        for (const id of Array.from(Sel.ids)) if (!vis.has(id)) Sel.ids.delete(id);
+        paintSelection();
+      }
+
+      /** Put songs in the queue: right after the current song (next) or at the end. */
+      function queueTracks(list, next) {
+        if (!list.length) return;
+        if (!state.currentTrackId || !state.playQueue.length) { startPlaybackFromList(list); return; }
+        const ids = list.map(t => t.id).filter(id => id !== state.currentTrackId);
+        if (!ids.length) return;
+        const drop = new Set(ids);
+        const head = state.playQueue.slice(0, state.queueIndex + 1);
+        const tail = state.playQueue.slice(state.queueIndex + 1).filter(id => !drop.has(id));
+        state.playQueue = next ? [...head, ...ids, ...tail] : [...head, ...tail, ...ids];
+        const inBase = new Set(state.baseQueue);
+        for (const id of ids) if (!inBase.has(id)) state.baseQueue.push(id);
+        renderUpNextQueue();
+        showToast(next ? `${songsText(ids.length)} will play next` : `Added ${songsText(ids.length)} to the queue`);
+      }
+
+      /** Like them all, or unlike them all if every one is liked already. */
+      function likeTracks(list) {
+        if (!list.length) return;
+        const unlike = list.every(t => state.likedKeys.has(t.likeKey));
+        for (const t of list) { if (unlike) state.likedKeys.delete(t.likeKey); else state.likedKeys.add(t.likeKey); }
+        saveJSON(STORAGE_KEYS.LIKED, Array.from(state.likedKeys));
+        showToast(unlike ? `Removed ${songsText(list.length)} from Liked Songs` : `Added ${songsText(list.length)} to Liked Songs`);
+        updateLikeCurrentUI();
+        if (state.activeView === 'liked') {
+          invalidateVisible();
+          renderTracklist();
+          updateStats();
+        } else {
+          for (const t of list) { const el = rowEls.get(t.id); if (el) fillRow(el, t, +el.dataset.index); }
+          scheduleUI({ stats: true });
+          paintSelection();
+        }
+      }
+
+      /** Delete key: take songs out of the playlist (or Liked Songs) being viewed. Files are never deleted. */
+      function removeTracksHere(list) {
+        if (!list.length) return false;
+        if (Playlists.isView(state.activeView)) { Playlists.removeMany(list); return true; }
+        if (state.activeView === 'liked') {
+          const liked = list.filter(t => state.likedKeys.has(t.likeKey));
+          if (liked.length) likeTracks(liked);
+          return true;
+        }
+        return false;
+      }
+
+      selBar.addEventListener('click', (e) => {
+        const b = e.target.closest('[data-sel]');
+        if (!b) return;
+        const list = selectedTracks();
+        switch (b.dataset.sel) {
+          case 'play': if (list.length) startPlaybackFromList(list); break;
+          case 'next': queueTracks(list, true); break;
+          case 'queue': queueTracks(list, false); break;
+          case 'like': likeTracks(list); break;
+          case 'pl': if (list[0]) LooksMenu.openPicker(list[0].id, b); break;
+          case 'remove': removeTracksHere(list); break;
+          case 'clear': clearSelection(); dom.tracklistBody.focus({ preventScroll: true }); break;
+        }
+      });
+
       const rowEls = new Map();      // trackId -> row element currently in the DOM
       let renderedRange = [0, -1];
       let listOffsetTop = 0;          // #tracklistBody top inside the scroll container
@@ -9512,6 +9890,7 @@
         if (Browse.renderGrid()) return;   // [Looks] albums/artists card grid
         const visible = getVisibleTracks();
         const hasLibrary = state.tracks.length > 0;
+        pruneSelection();
 
         if (visible.length === 0) {
           dom.tracklistContainer.style.display = 'none';
@@ -9616,7 +9995,8 @@
         el.style.transform = `translateY(${index * ROW_HEIGHT}px)`;
         el.classList.toggle('active', isCurrent);
         el.classList.toggle('kbd-focus', index === state.focusIndex);
-        el.setAttribute('aria-selected', isCurrent ? 'true' : 'false');
+        el.classList.toggle('selected', Sel.ids.has(track.id));
+        el.setAttribute('aria-selected', isCurrent || Sel.ids.has(track.id) ? 'true' : 'false');
         el.setAttribute('aria-posinset', index + 1);
         el.setAttribute('aria-setsize', getVisibleTracks().length);
         el.setAttribute('aria-label', `${track.title}, ${track.artist}${track.duration ? ', ' + formatTime(track.duration) : ''}`);
@@ -9627,9 +10007,9 @@
         el.innerHTML = `
             <div class="track-num-cell">${numHTML}${hoverIcon}</div>
             <div class="track-title-cell">
-              <div class="track-thumb">${artHTML(track, 18)}</div>
+              <div class="track-thumb">${artHTML(track, 18)}${AutoFill.badgeHTML(track)}</div>
               <div class="track-text">
-                <div class="track-name" title="${escapeHtml(track.title)}">${AutoFill.badgeHTML(track)}${escapeHtml(track.title)}</div>
+                <div class="track-name" title="${escapeHtml(track.title)}">${escapeHtml(track.title)}</div>
                 <div class="track-artist" title="${escapeHtml(track.artist)}">${escapeHtml(track.artist)}</div>
               </div>
             </div>
@@ -10111,8 +10491,28 @@
         }
         const row = e.target.closest('.track-row');
         if (!row) return;
-        setFocusIndex(+row.dataset.index);
+        const idx = +row.dataset.index;
+        if (e.shiftKey) {   // select a range (Ctrl+Shift adds it to the selection)
+          selectRangeTo(idx, e.ctrlKey || e.metaKey);
+          setFocusIndex(idx);
+          return;
+        }
+        if (e.ctrlKey || e.metaKey) {   // add or remove one song
+          toggleSelectIndex(idx);
+          setFocusIndex(idx);
+          return;
+        }
+        clearSelection();
+        Sel.anchor = idx;
+        setFocusIndex(idx);
         activateTrack(row.dataset.id);
+      });
+      // Shift-click would also select the row text
+      dom.tracklistBody.addEventListener('mousedown', (e) => {
+        if ((e.shiftKey || e.ctrlKey || e.metaKey) && e.button === 0 && e.target.closest('.track-row') && !e.target.closest('button')) {
+          e.preventDefault();
+          dom.tracklistBody.focus({ preventScroll: true });
+        }
       });
 
       dom.tracklistBody.addEventListener('focus', () => {
@@ -10124,24 +10524,54 @@
       });
 
       dom.tracklistBody.addEventListener('keydown', (e) => {
-        if (e.ctrlKey || e.metaKey || e.altKey) return;
+        if (e.altKey) return;
         const visible = getVisibleTracks();
         if (visible.length === 0) return;
+        const mod = e.ctrlKey || e.metaKey;
         const page = Math.max(1, Math.floor(dom.mainScroll.clientHeight / ROW_HEIGHT) - 1);
         const i = state.focusIndex;
+        // Shift+move extends the selection; Ctrl+move only moves the focus
+        const move = (to) => {
+          const from = Math.max(0, i);
+          setFocusIndex(to);
+          if (e.shiftKey) { if (Sel.anchor < 0) Sel.anchor = from; selectRangeTo(state.focusIndex, mod); }
+          else if (!mod) Sel.anchor = state.focusIndex;
+        };
+        const sel = selectedTracks();
+        const targets = sel.length ? sel : (visible[i] ? [visible[i]] : []);
         let handled = true;
         switch (e.key) {
-          case 'ArrowDown': setFocusIndex(i + 1); break;
-          case 'ArrowUp': setFocusIndex(i - 1); break;
-          case 'PageDown': setFocusIndex(i + page); break;
-          case 'PageUp': setFocusIndex(i - page); break;
-          case 'Home': setFocusIndex(0); break;
-          case 'End': setFocusIndex(visible.length - 1); break;
-          case 'Enter': if (visible[i]) activateTrack(visible[i].id); break;
-          case 'l': case 'L': if (visible[i]) toggleLikeTrack(visible[i].id); break;
-          case 'e': case 'E': if (visible[i]) { e.preventDefault(); Editor.open(visible[i].id); } break;
-          case 'i': case 'I': if (visible[i]) { e.preventDefault(); Tagger.openForTrack(visible[i].id); } break;   // [AI Tagger] (I = song info; T is the focus timer)
+          case 'ArrowDown': move(i + 1); break;
+          case 'ArrowUp': move(i - 1); break;
+          case 'PageDown': move(i + page); break;
+          case 'PageUp': move(i - page); break;
+          case 'Home': move(0); break;
+          case 'End': move(visible.length - 1); break;
           default: handled = false;
+        }
+        if (!handled && mod) {
+          handled = true;
+          if ((e.key === 'a' || e.key === 'A') && !e.shiftKey) selectAll();
+          else if (e.key === ' ') toggleSelectIndex(Math.max(0, i));
+          else handled = false;
+        } else if (!handled) {
+          handled = true;
+          switch (e.key) {
+            case 'Escape': if (Sel.ids.size) clearSelection(); else handled = false; break;
+            case 'Enter':
+              if (sel.length > 1) startPlaybackFromList(sel, visible[i] && Sel.ids.has(visible[i].id) ? visible[i].id : null);
+              else if (visible[i]) activateTrack(visible[i].id);
+              break;
+            case 'l': case 'L':
+              if (sel.length > 1) likeTracks(sel);
+              else if (visible[i]) toggleLikeTrack(visible[i].id);
+              break;
+            case 'q': case 'Q': queueTracks(targets, e.shiftKey); break;
+            case 'Delete': if (!removeTracksHere(targets)) handled = false; break;
+            case 'e': case 'E': if (visible[i]) Editor.open(visible[i].id); break;
+            case 'i': case 'I': if (visible[i]) Tagger.openForTrack(visible[i].id); break;   // [AI Tagger] (I = song info; T is the focus timer)
+            default: handled = false;
+          }
         }
         if (handled) { e.preventDefault(); e.stopPropagation(); }
       });
@@ -10326,9 +10756,19 @@
       window.addEventListener('keydown', (e) => {
         // The editor and the Audacity setup dialog handle their own keys
         if (Editor.isOpen() || Tagger.isOpen() || AutoFill.isOpen()) return;   // [Looks] Audacity setup lives in Settings; [AI Tagger] dialogs
+        // Ctrl+A anywhere on the page selects every song in the list
+        if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && (e.key === 'a' || e.key === 'A') && !e.defaultPrevented
+            && !isTypingTarget(e.target) && !document.querySelector('dialog[open]') && !isSettingsOpen() && !LooksMenu.isOpen()
+            && state.activeView !== 'visualizer' && !Browse.isGrid() && getVisibleTracks().length) {
+          e.preventDefault();
+          selectAll();
+          dom.tracklistBody.focus({ preventScroll: true });
+          return;
+        }
         if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
         const target = e.target;
         if (e.key === 'Escape') {
+          if (Sel.ids.size && !isSettingsOpen() && !document.querySelector('dialog[open]')) { clearSelection(); return; }
           toggleSpeedPopover(false);
           closeMobileSidebar();
           closeSettings();   // [Settings]
@@ -16609,11 +17049,13 @@ self.onmessage = async (e) => {
           else switchView('unsorted');
         });
 
+        /** A small dot on the song's cover, shown only while you point at its row.
+         *  Filled-in songs get no mark; the ⋯ menu says what Localify did for any song. */
         function badgeHTML(track) {
           if (!track.afState || !pref().autoFill) return '';
-          if (track.afState === 'unsorted') return '<span class="af-badge af-unsorted" title="Unsorted: details will be filled in when you\'re online">Unsorted</span>';
-          if (track.afState === 'question') return `<span class="af-badge af-q" role="button" data-af-q="${track.id}" title="Localify has a question about this song">?</span>`;
-          return '<span class="af-badge af-filled" title="Details filled in by Localify. The file isn\'t changed until you apply them.">Auto</span>';
+          if (track.afState === 'unsorted') return '<span class="af-dot af-dot-unsorted" title="Unsorted: details will be filled in when you\'re online"></span>';
+          if (track.afState === 'question') return `<span class="af-dot af-dot-q" role="button" data-af-q="${track.id}" aria-label="Answer Localify's question" title="Localify has a question about this song. Click to answer."></span>`;
+          return '';
         }
 
         dom.tracklistBody.addEventListener('click', (e) => {
@@ -16694,6 +17136,7 @@ self.onmessage = async (e) => {
 
         return {
           onEnriched, badgeHTML, updateChip, openQuestions, questionCount,
+          statusOf: (t) => (t && t.afState && pref().autoFill ? t.afState : ''),
           identifyBySound, canIdentify: () => AcoustID.ready(),   // [AcoustID]
           isOpen: () => qa.dialog.open,
           // For tests in the console
@@ -17216,11 +17659,51 @@ self.onmessage = async (e) => {
         const menu = $('looksMenu'), backdrop = $('looksMenuBackdrop');
         const sheetQuery = matchMedia('(max-width: 768px)');
         let opener = null, trackId = null, isOpen = false;
+        let multi = null;   // the selected songs, when the menu acts on several
+        const ic = (d) => `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+        const MI = {
+          play: ic('<polygon points="7 4 19 12 7 20 7 4" fill="currentColor"></polygon>'),
+          next: ic('<line x1="4" y1="6" x2="14" y2="6"></line><line x1="4" y1="12" x2="14" y2="12"></line><polyline points="17 9 20 12 17 15"></polyline><line x1="4" y1="18" x2="10" y2="18"></line>'),
+          queue: ic('<line x1="4" y1="6" x2="16" y2="6"></line><line x1="4" y1="12" x2="16" y2="12"></line><line x1="4" y1="18" x2="11" y2="18"></line><line x1="18" y1="15" x2="18" y2="21"></line><line x1="15" y1="18" x2="21" y2="18"></line>'),
+          all: ic('<rect x="4" y="4" width="16" height="16" rx="3"></rect><polyline points="8.5 12 11 14.5 15.5 9.5"></polyline>'),
+          ask: ic('<circle cx="12" cy="12" r="9"></circle><path d="M9.5 9.5a2.5 2.5 0 0 1 4.8 1c0 1.7-2.3 2-2.3 3.5"></path><line x1="12" y1="17.5" x2="12" y2="17.5"></line>'),
+          info: ic('<circle cx="12" cy="12" r="9"></circle><line x1="12" y1="11" x2="12" y2="16.5"></line><line x1="12" y1="7.5" x2="12" y2="7.5"></line>')
+        };
+
+        // What Localify did for this song (the list only hints at it while you point at a row)
+        function statusItems(t) {
+          const st = AutoFill.statusOf(t);
+          if (st === 'question') return [null, { act: 'af-ask', label: 'Answer Localify’s question', icon: MI.ask }];
+          if (st === 'unsorted') return [null, { act: 'af-wait', label: 'Unsorted: fills in when you’re online', icon: MI.info, disabled: true, title: 'Localify fills in this song’s details when you’re back online.' }];
+          if (st) return [null, { act: 'af-review', label: 'See what Localify filled in', icon: MI.info, kbd: 'I' }];
+          return [];
+        }
+
+        function multiItems(list) {
+          const n = list.length;
+          const liked = list.every(t => state.likedKeys.has(t.likeKey));
+          return [
+            { act: 'm-play', label: `Play ${n} songs`, icon: MI.play, kbd: 'Enter' },
+            { act: 'm-next', label: 'Play next', icon: MI.next, kbd: '⇧Q' },
+            { act: 'm-queue', label: 'Add to queue', icon: MI.queue, kbd: 'Q' },
+            null,
+            { act: 'm-like', label: liked ? 'Remove from Liked Songs' : 'Add to Liked Songs', icon: SVG.heart, kbd: 'L', on: liked },
+            { act: 'pl', label: 'Add to playlist', icon: SVG.playlist, chev: true },
+            ...(Playlists.isView(state.activeView) ? [{ act: 'm-remove', label: `Remove ${n} from this playlist`, icon: SVG.close, kbd: 'Del' }] : []),
+            null,
+            { act: 'm-all', label: 'Select all', icon: MI.all, kbd: 'Ctrl A' },
+            { act: 'm-clear', label: 'Clear selection', icon: SVG.close, kbd: 'Esc' }
+          ];
+        }
 
         function items(t) {
+          if (multi) return multiItems(multi);
           const liked = state.likedKeys.has(t.likeKey);
           const canAud = Audacity.canOpen(t);
           return [
+            { act: 'next', label: 'Play next', icon: MI.next, kbd: '⇧Q' },
+            { act: 'queue', label: 'Add to queue', icon: MI.queue, kbd: 'Q' },
+            null,
             { act: 'edit', label: 'Edit audio', icon: SVG.edit, kbd: 'E' },
             { act: 'audacity', label: 'Open in Audacity', icon: SVG.audacity, disabled: !canAud, title: canAud ? '' : Audacity.UNKNOWN_LOCATION },
             { act: 'like', label: liked ? 'Remove from Liked Songs' : 'Add to Liked Songs', icon: SVG.heart, kbd: 'L', on: liked },
@@ -17230,12 +17713,15 @@ self.onmessage = async (e) => {
             { act: 'album', label: 'Go to album', icon: LOOKS_SVG.disc(16) },
             { act: 'artist', label: 'Go to artist', icon: LOOKS_SVG.person(16) },
             // [AcoustID]
-            ...(AutoFill.canIdentify() ? [null, { act: 'sound', label: 'Identify by sound', icon: SOUND_ICON }] : [])
+            ...(AutoFill.canIdentify() ? [null, { act: 'sound', label: 'Identify by sound', icon: SOUND_ICON }] : []),
+            ...statusItems(t)
           ];
         }
 
         function render(t, sheet) {
-          const head = sheet
+          const head = sheet && multi
+            ? `<div class="looks-menu-head"><div class="looks-menu-text"><div class="looks-menu-title">${multi.length} songs selected</div></div></div>`
+            : sheet
             ? `<div class="looks-menu-head"><div class="looks-menu-art">${artHTML(t, 20)}</div><div class="looks-menu-text"><div class="looks-menu-title">${escapeHtml(t.title)}</div><div class="looks-menu-sub">${escapeHtml(t.artist)}</div></div></div>`
             : '';
           return head + items(t).map((it) => it === null
@@ -17247,7 +17733,7 @@ self.onmessage = async (e) => {
         // [Playlists] the "Add to playlist" list replaces the menu's items
         function renderPicker(t) {
           const rows = Playlists.all().map(p => {
-            const on = Playlists.has(p, t);
+            const on = multi ? Playlists.hasAll(p, multi) : Playlists.has(p, t);
             return `<button type="button" role="menuitemcheckbox" aria-checked="${on}" class="looks-menu-item${on ? ' is-on' : ''}" data-act="pl-add:${p.id}" tabindex="-1"><span class="pl-icon" style="width:22px;height:22px;font-size:13px"${p.accent ? ` data-accent="${escapeHtml(p.accent)}"` : ''}>${Playlists.iconHTML(p)}</span><span>${escapeHtml(p.name)}</span>${on ? '<span class="pl-chev" aria-hidden="true">✓</span>' : ''}</button>`;
           }).join('');
           return `<button type="button" role="menuitem" class="looks-menu-item" data-act="pl-back" tabindex="-1"><span class="pl-chev" aria-hidden="true">‹</span><span>Back</span></button>`
@@ -17275,6 +17761,7 @@ self.onmessage = async (e) => {
           if (!t) return;
           close(false);
           trackId = id; opener = from || document.activeElement; isOpen = true;
+          multi = Sel.ids.size > 1 && Sel.ids.has(id) ? selectedTracks() : null;
           const sheet = sheetQuery.matches;
           menu.classList.toggle('is-sheet', sheet);
           menu.classList.remove('open');
@@ -17317,8 +17804,21 @@ self.onmessage = async (e) => {
           // [Playlists]
           if (act === 'pl') { swapItems(renderPicker(t)); return; }
           if (act === 'pl-back') { swapItems(render(t, menu.classList.contains('is-sheet'))); return; }
-          if (act.startsWith('pl-add:')) { close(); Playlists.toggle(act.slice(7), t); return; }
-          if (act === 'pl-new') { close(false); Playlists.create(t); return; }
+          if (act.startsWith('pl-add:')) { close(); if (multi) Playlists.addMany(act.slice(7), multi); else Playlists.toggle(act.slice(7), t); return; }
+          if (act === 'pl-new') { close(false); Playlists.create(multi || t); return; }
+          if (act === 'af-wait') return;
+          if (act.startsWith('m-') || act === 'next' || act === 'queue') {
+            const list = multi || [t];
+            close(act !== 'm-play');
+            if (act === 'm-play') startPlaybackFromList(list);
+            else if (act === 'm-next' || act === 'next') queueTracks(list, true);
+            else if (act === 'm-queue' || act === 'queue') queueTracks(list, false);
+            else if (act === 'm-like') likeTracks(list);
+            else if (act === 'm-remove') Playlists.removeMany(list);
+            else if (act === 'm-all') selectAll();
+            else if (act === 'm-clear') clearSelection();
+            return;
+          }
           if (act === 'pl-remove') { close(false); Playlists.removeFromCurrent(t); return; }
           close(act === 'like');
           if (act !== 'like' && FsPlayer.isOpen()) FsPlayer.close(false);
@@ -17328,6 +17828,8 @@ self.onmessage = async (e) => {
           else if (act === 'album') Browse.open('albums', Browse.albumKey(t));
           else if (act === 'artist') Browse.open('artists', Browse.artistKey(t));
           else if (act === 'sound') AutoFill.identifyBySound(t);   // [AcoustID]
+          else if (act === 'af-ask') AutoFill.openQuestions(t);
+          else if (act === 'af-review') Tagger.openForTrack(t.id);
         }
 
         menu.addEventListener('click', (e) => {
@@ -17362,7 +17864,7 @@ self.onmessage = async (e) => {
         dom.tracklistBody.addEventListener('click', (e) => {
           if (suppressClick) { suppressClick = false; e.preventDefault(); e.stopPropagation(); return; }
           const more = e.target.closest('.row-more');
-          if (more) { e.preventDefault(); e.stopPropagation(); openFor(more.dataset.moreId, more); }
+          if (more) { e.preventDefault(); e.stopPropagation(); if (!Sel.ids.has(more.dataset.moreId)) clearSelection(); openFor(more.dataset.moreId, more); }
         }, true);
         dom.tracklistBody.addEventListener('contextmenu', (e) => {
           const row = e.target.closest('.track-row');
@@ -17370,6 +17872,7 @@ self.onmessage = async (e) => {
           e.preventDefault();
           if (isOpen && trackId === row.dataset.id) return;   // long-press already opened it
           cancelLongPress();
+          if (!Sel.ids.has(row.dataset.id)) clearSelection();
           openFor(row.dataset.id, row, sheetQuery.matches ? null : { x: e.clientX, y: e.clientY });
         });
         dom.tracklistBody.addEventListener('pointerdown', (e) => {
@@ -17399,7 +17902,10 @@ self.onmessage = async (e) => {
           openFor(t.id, rowEls.get(t.id) || dom.tracklistBody);
         });
 
-        return { openFor, close, isOpen: () => isOpen };
+        /** Straight to the "Add to playlist" list (the selection bar's button). */
+        function openPicker(id, from) { openFor(id, from); if (isOpen) run('pl'); }
+
+        return { openFor, openPicker, close, isOpen: () => isOpen };
       })();
 
       /* ---- [Looks] mobile full-screen Now Playing ---- */
