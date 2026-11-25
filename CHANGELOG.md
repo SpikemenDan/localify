@@ -6,6 +6,8 @@
 - Folders you **drag onto the page** are now remembered after a reload too, like ones opened with **Load Folder**. 
 - **Firefox and Safari keep your songs after a reload.** They can't reopen folders, so Localify saves its own copy of your songs in the browser and loads them from there. Single songs added with **Add Files** are kept the same way in every browser.
 - **Pick up where you left off**: after a reload, the song you were playing is ready at the same spot, with your Up Next order (including songs you queued) and the list it came from.
+- **A cleaner speed and sound menu**: speed, vibes (Nightcore, Daycore, Slowed + reverb) and the pitch and reverb switches now sit in their own sections, with a short line under each switch saying what it does.
+- Buttons, menus and headings now use sentence case ("Load folder", "Up next", "Shuffle play").
 - Notices now have a short title, an icon and a line of detail.
 - **All Tracks shows each song's folder** (its name and icon) next to the artist.
 - **Pick many songs at once**: <kbd>Ctrl</kbd>+<kbd>A</kbd>, <kbd>Ctrl</kbd>+click and <kbd>Shift</kbd>+click, then play, queue, like, add to a playlist or remove them together from the bar at the bottom. New keys in the song list: <kbd>Q</kbd> (add to queue), <kbd>Shift</kbd>+<kbd>Q</kbd> (play next), <kbd>Delete</kbd> and <kbd>Esc</kbd>.

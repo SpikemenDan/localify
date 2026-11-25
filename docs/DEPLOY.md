@@ -84,7 +84,7 @@ on and the device is online, and never receive audio, file names or folders:
 | --- | --- | --- | --- |
 | `musicbrainz.org`, `coverartarchive.org` | Song details and album covers | Title and artist text | Settings → Tidy names & tags → Look up songs online |
 | `itunes.apple.com` | Second opinion on details and covers | Title and artist text | Same as above |
-| `lrclib.net` | Lyrics | Title, artist, album text and song length | Settings → Lyrics → Find Lyrics Online |
+| `lrclib.net` | Lyrics | Title, artist, album text and song length | Settings → Lyrics → Find lyrics online |
 | `api.acoustid.org` | Identify a song by its sound | Audio fingerprint and song length (only with the user's own key) | Remove the key in Settings → Tidy names & tags |
 | `cdn.jsdelivr.net`, `huggingface.co` | Downloading the AI model and the fingerprint library, once | Nothing personal | Settings → Tidy names & tags → AI suggestions |
 

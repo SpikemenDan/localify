@@ -29,10 +29,10 @@
 ## Getting started
 
 1. Open **`localify_offline_mp3_player.html`** in Chrome or Edge. Double-clicking it works.
-2. Click **Load Folder** and pick the folder that has your music. Localify asks you to give it a name, an icon and a color (or just skip).
-3. Press **Play**, or **Shuffle Play**.
+2. Click **Load folder** and pick the folder that has your music. Localify asks you to give it a name, an icon and a color (or just skip).
+3. Press **Play**, or **Shuffle play**.
 
-That's all. Localify remembers your likes, settings, folders and the last song you played the next time you open it. Your folders stay in the sidebar under **Your Folders**. Hover one and press the pencil to rename or restyle it. Your playlists are remembered the same way, and fill back in when you load the folder with their songs. After a restart, the browser may ask you to allow the folder again; in the installed app, choose **Allow on every visit** so it stops asking.
+That's all. Localify remembers your likes, settings, folders and the last song you played the next time you open it. Your folders stay in the sidebar under **Your folders**. Hover one and press the pencil to rename or restyle it. Your playlists are remembered the same way, and fill back in when you load the folder with their songs. After a restart, the browser may ask you to allow the folder again; in the installed app, choose **Allow on every visit** so it stops asking.
 
 > [!TIP]
 > Chrome and Edge work best. Other browsers can play music, but they can't save changes back into your files.
@@ -43,12 +43,12 @@ That's all. Localify remembers your likes, settings, folders and the last song y
 
 | | |
 | --- | --- |
-| 🎵 **Library** | All Tracks, **Albums** and **Artists** views, plus search. |
-| 📃 **Playlists** | Liked Songs plus your own playlists. Press **+** next to *Playlists* in the sidebar, or use **⋯ → Add to playlist** on any song. Give each one a name, an icon (any emoji, or your own picture) and a color; hover it and press the pencil to rename or delete it. |
+| 🎵 **Library** | All tracks, **Albums** and **Artists** views, plus search. |
+| 📃 **Playlists** | Liked songs plus your own playlists. Press **+** next to *Playlists* in the sidebar, or use **⋯ → Add to playlist** on any song. Give each one a name, an icon (any emoji, or your own picture) and a color; hover it and press the pencil to rename or delete it. |
 | 🎨 **Looks** | Dark, Light or System mode, your choice of accent color, and compact rows. |
 | 🎤 **Lyrics** | Press **Y** or tap the lyrics icon. Synced lyrics highlight as the song plays; tap a line to jump there. Uses a matching `.lrc` file or the song's own tags first, then looks them up on [LRCLIB](https://lrclib.net). Lyrics you've opened are saved for offline use. |
 | 🌈 **Visualizer** | A full-screen visualizer that moves with the music. |
-| 🎚️ **Sound** | Equalizer presets (Bass Boost, Vocal, Treble Boost, Loudness) or your own Bass/Mid/Treble, volume leveling and crossfade. |
+| 🎚️ **Sound** | Equalizer presets (Bass boost, Vocal, Treble boost, Loudness) or your own Bass/Mid/Treble, volume leveling and crossfade. |
 | ⏩ **Speed & pitch** | Playback speed with one-tap **Nightcore**, **Daycore** and **Slowed + reverb** presets. Turn *Change pitch with speed* off to keep the original key. |
 | 😴 **Sleep timer** | Fades out after 15, 30, 45 or 60 minutes, or at the end of the song. |
 | ✂️ **Audio editor** | Trim, cut, silence, reverse, fade in/out, gain, normalize, speed and EQ. Press **E** on a song. |
@@ -90,7 +90,7 @@ To tidy one song by hand, select it and press **I**, or use the **⋯** menu on 
 
 Press **T** (or tap the timer icon) to start a focus session. Your music keeps playing; when time's up, it dips and an alarm rings.
 
-- **Alarm sounds:** Soft Chime, Bell, Marimba, Digital Beep, Gentle Rise, Gong, or **your own sound file**.
+- **Alarm sounds:** Soft chime, Bell, Marimba, Digital beep, Gentle rise, Gong, or **your own sound file**.
 - Choose how loud the alarm is and how quiet the music gets while it rings.
 - Optional desktop notification, and vibration on phones.
 
@@ -131,7 +131,7 @@ Take your playlists away from the computer on a small music player you build you
 
 1. Build it and upload the code in [`firmware/`](firmware). The [breadboard guide](docs/BREADBOARD.md) has the parts list, wiring and steps.
 2. In Localify, **Settings → Your data → Export to SD card**, pick the playlists, and choose the card.
-3. Put the card in the player. It shows your playlists, Liked Songs and All Songs.
+3. Put the card in the player. It shows your playlists, Liked songs and All Songs.
 
 Exporting needs Chrome or Edge on a computer.
 
@@ -167,7 +167,7 @@ Exporting needs Chrome or Edge on a computer.
 | <kbd>Enter</kbd> | Play the picked songs |
 | <kbd>Q</kbd> / <kbd>Shift</kbd> + <kbd>Q</kbd> | Add to queue / play next |
 | <kbd>L</kbd> | Like (or unlike) |
-| <kbd>Delete</kbd> | Remove from this playlist (or from Liked Songs) |
+| <kbd>Delete</kbd> | Remove from this playlist (or from Liked songs) |
 | <kbd>Esc</kbd> | Clear the selection |
 | <kbd>E</kbd> | Edit audio |
 | <kbd>I</kbd> | Tidy name & tags |
@@ -181,7 +181,7 @@ When you pick more than one song, a bar at the bottom lets you play them, queue 
 - 🎧 **Your music never leaves your device.** Nothing is uploaded, ever.
 - 💾 **Your likes, settings and profiles** stay in your browser on this device.
 - 🌐 **Online lookups** send only a song's title and artist text to MusicBrainz and iTunes. No file names, folders or audio are sent. You can turn this off.
-- 🎤 **Lyrics lookups** send only a song's title, artist, album text and length to LRCLIB (lrclib.net), and only when you open the lyrics panel. `.lrc` files and lyrics in your tags are never sent. Turn it off with **Settings → Lyrics → Find Lyrics Online**.
+- 🎤 **Lyrics lookups** send only a song's title, artist, album text and length to LRCLIB (lrclib.net), and only when you open the lyrics panel. `.lrc` files and lyrics in your tags are never sent. Turn it off with **Settings → Lyrics → Find lyrics online**.
 - 🔊 **Identify by sound** (only with your own AcoustID key) sends a short fingerprint of the first two minutes and the song's length to AcoustID. The fingerprint is worked out on your computer; the audio itself is never sent.
 - 🤖 **The AI** runs on your own computer and only sees names and tags, never the audio.
 
@@ -198,7 +198,7 @@ Check that you're online. The music database is sometimes busy, so filling in so
 <details>
 <summary><b>No lyrics for a song</b></summary>
 
-Put a `.lrc` file with the same name next to the song (for example `Song.mp3` and `Song.lrc`) and load the folder again. Online lyrics also need **Find Lyrics Online** and **Look up songs online** turned on in Settings.
+Put a `.lrc` file with the same name next to the song (for example `Song.mp3` and `Song.lrc`) and load the folder again. Online lyrics also need **Find lyrics online** and **Look up songs online** turned on in Settings.
 </details>
 
 <details>
@@ -212,7 +212,7 @@ Use Chrome or Edge, and allow Localify to edit the folder when it asks.
 
 They're still saved. After a reload, the browser asks once more before Localify may open your folders. Click anywhere on the page and choose **Allow** (or **Allow on every visit**, so it stops asking), and the songs from all your folders come back.
 
-**Firefox and Safari** can't reopen folders, so Localify saves its own copy of the songs you add (in the browser's private storage, about the size of your music) and loads them from there after a reload. The same goes for single songs added with **Add Files** in any browser. Removing a folder from **Your Folders**, or clearing the library, deletes the copy.
+**Firefox and Safari** can't reopen folders, so Localify saves its own copy of the songs you add (in the browser's private storage, about the size of your music) and loads them from there after a reload. The same goes for single songs added with **Add files** in any browser. Removing a folder from **Your folders**, or clearing the library, deletes the copy.
 </details>
 
 <details>
@@ -224,5 +224,5 @@ You may be in a different profile. Click the avatar in the top-right to switch. 
 <details>
 <summary><b>Start over without losing my likes</b></summary>
 
-**Settings → General → Reset All Settings** resets settings only. Your library, likes and playlists stay.
+**Settings → General → Reset all settings** resets settings only. Your library, likes and playlists stay.
 </details>

@@ -1,6 +1,6 @@
 {
   "id": "./",
-  "name": "Localify — Offline Music Player",
+  "name": "Localify — offline music player",
   "short_name": "Localify",
   "description": "Play the music on your own device. Works offline; your songs never leave your device.",
   "start_url": "./localify_offline_mp3_player.html",
