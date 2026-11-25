@@ -2,6 +2,7 @@
 
 ## 1.0.1 — polish
 
+- **Playlists**: make your own, with a name, icon and color. Add songs from a song's **⋯** menu (**Add to playlist**). Liked Songs now sits at the top of the new **Playlists** area in the sidebar. Playlists are kept after reloads, per profile and in backups.
 - Name your folders: when you add a folder, give it your own name, icon and color. It's remembered after reloads, kept in backups, and you can change it any time from **Your Folders** in the sidebar.
 - Localify now asks the browser to keep its data, so a full device doesn't quietly clear your settings, likes and folders. **Settings → Your data** shows whether it said yes.
 - Cleaner settings: sliders now fill with your accent color as you drag them, and the equalizer and sleep timer choices sit in a tidy grid.

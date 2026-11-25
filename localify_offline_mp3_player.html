@@ -836,6 +836,52 @@
 
     .recent-folder-edit { right: 32px !important; }
 
+    /* [Playlists] sidebar area */
+    .sidebar-playlists { margin-bottom: 18px; }
+    .sidebar-playlists .sidebar-section-title { margin-bottom: 8px; }
+    .pl-add-btn {
+      width: 26px; height: 26px; border-radius: var(--radius-full);
+      display: grid; place-items: center; color: var(--text-secondary);
+      transition: color var(--transition-fast), background var(--transition-fast);
+    }
+    .pl-add-btn:hover, .pl-add-btn:focus-visible { color: var(--text-primary); background: rgba(var(--fg-rgb), 0.1); }
+    .pl-list { display: flex; flex-direction: column; gap: 2px; }
+    .pl-row { position: relative; }
+    .pl-item {
+      display: flex; align-items: center; gap: 10px; width: 100%;
+      padding: 6px 8px; border-radius: var(--radius-sm);
+      color: var(--text-secondary); font-weight: 600; font-size: 13px; text-align: left;
+      transition: color var(--transition-fast), background var(--transition-fast);
+    }
+    .pl-item:hover { color: var(--text-primary); background: rgba(var(--fg-rgb), 0.06); }
+    .pl-item.active { color: var(--text-primary); background: var(--bg-highlight); }
+    .pl-icon {
+      width: 32px; height: 32px; flex-shrink: 0; border-radius: var(--radius-sm);
+      display: grid; place-items: center; font-size: 17px; line-height: 1;
+      color: var(--accent); background: rgba(var(--accent-rgb), 0.16);
+    }
+    .pl-icon.pl-liked { color: #fff; background: linear-gradient(135deg, #450af5 0%, #c4efd9 100%); }
+    .pl-icon.pl-liked svg { fill: currentColor; }
+    .pl-name { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pl-item .nav-count { margin-left: 0; transition: opacity var(--transition-fast); }
+    .pl-edit {
+      position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+      width: 26px; height: 26px; border-radius: var(--radius-full);
+      display: grid; place-items: center; color: var(--text-secondary);
+      opacity: 0; pointer-events: none; transition: opacity var(--transition-fast), background var(--transition-fast);
+    }
+    .pl-edit:hover { color: var(--text-primary); background: rgba(var(--fg-rgb), 0.1); }
+    .pl-row:hover .pl-edit, .pl-row:focus-within .pl-edit { opacity: 1; pointer-events: auto; }
+    .pl-row:hover .nav-count, .pl-row:focus-within .nav-count { opacity: 0; }
+    .pl-empty { font-size: 12px; color: var(--text-secondary); padding: 4px 8px 0; }
+    @media (hover: none) { .pl-edit { opacity: 1; pointer-events: auto; } .pl-row .nav-count { display: none; } }
+    .pl-hero-emoji { font-size: 72px; line-height: 1; }
+    .pl-delete { margin-right: auto; color: var(--danger) !important; }
+    .pl-delete[hidden] { display: none !important; }
+    .looks-menu-item .pl-chev { flex: 0; color: var(--text-secondary); }
+    .looks-menu-item .pl-icon { flex: 0 0 22px; width: 22px; height: 22px; font-size: 13px; border-radius: 6px; }
+    .looks-menu-item .pl-icon svg { width: 13px; height: 13px; color: var(--accent); }
+
     .fd-sub {
       margin: -8px 0 14px;
       font-size: 13px;
@@ -5665,14 +5711,6 @@
             <span class="nav-count" id="countAll">0</span>
           </button>
 
-          <button class="nav-item" data-view="liked" id="navLiked">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-            </svg>
-            <span>Liked Songs</span>
-            <span class="nav-count" id="countLiked">0</span>
-          </button>
-
           <!-- [Looks] Albums & Artists browse views -->
           <button class="nav-item" data-view="albums" id="navAlbums">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -5713,6 +5751,26 @@
       </div>
 
       <div class="sidebar-card sidebar-library">
+        <!-- [Playlists] Liked Songs first, then your own playlists -->
+        <section class="sidebar-playlists" aria-labelledby="plHeading">
+          <div class="sidebar-section-title">
+            <span id="plHeading">Playlists</span>
+            <button type="button" class="pl-add-btn" id="btnNewPlaylist" title="New playlist" aria-label="New playlist">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+          </div>
+          <div class="pl-list" id="plList">
+            <div class="pl-row">
+              <button type="button" class="pl-item" data-view="liked" id="navLiked">
+                <span class="pl-icon pl-liked" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></span>
+                <span class="pl-name">Liked Songs</span>
+                <span class="nav-count" id="countLiked">0</span>
+              </button>
+            </div>
+            <div id="plUserList" class="pl-list"></div>
+          </div>
+        </section>
+
         <div class="sidebar-section-title">
           <span>Your Local Library</span>
           <button class="btn-ghost" id="btnClearLibrary" title="Clear loaded tracks" style="padding: 2px 6px;">Clear</button>
@@ -6782,6 +6840,33 @@
     </form>
   </dialog>
 
+  <!-- [Playlists] Create or edit a playlist -->
+  <dialog class="lp-dialog" id="plDialog" aria-labelledby="plTitle">
+    <form id="plForm" method="dialog" novalidate>
+      <h2 class="lp-dialog-title" id="plTitle">New playlist</h2>
+      <div class="lp-editor-top">
+        <span class="fd-preview" id="plPreview" aria-hidden="true"></span>
+        <label class="lp-field">
+          <span>Name</span>
+          <input type="text" id="plName" maxlength="40" autocomplete="off" spellcheck="false" placeholder="My playlist">
+        </label>
+      </div>
+      <div class="lp-field">
+        <span id="plIconLabel">Icon</span>
+        <div class="lp-emoji-row" id="plIcons" role="radiogroup" aria-labelledby="plIconLabel"></div>
+      </div>
+      <div class="lp-field">
+        <span id="plColorLabel">Color</span>
+        <div class="lp-swatches" id="plColors" role="radiogroup" aria-labelledby="plColorLabel"></div>
+      </div>
+      <div class="lp-dialog-actions">
+        <button type="button" class="btn-ghost pl-delete" id="plDelete" hidden>Delete playlist</button>
+        <button type="button" class="btn-secondary" id="plCancel">Cancel</button>
+        <button type="submit" class="btn-primary" id="plSave">Create</button>
+      </div>
+    </form>
+  </dialog>
+
   <!-- [Backup] Import preview -->
   <dialog class="lp-dialog" id="bkImportDialog" aria-labelledby="bkImportTitle">
     <form id="bkImportForm" method="dialog">
@@ -6847,7 +6932,8 @@
         SONG_DETAILS: 'localify_song_details_v1',   // [AI Tagger] auto-fill { "likekey|size": details | 'ok' }
         SONG_ANSWERS: 'localify_song_answers_v1',   // [AI Tagger] { artists: { name: spelling }, albums: { folder: { album, year } } }
         ACOUSTID: 'localify_acoustid_v1',           // [AcoustID] { key }: the user's own AcoustID application key
-        FOLDER_LOOKS: 'localify_folder_looks_v1'    // [Folder looks] { folderName: { label, icon, accent } }
+        FOLDER_LOOKS: 'localify_folder_looks_v1',   // [Folder looks] { folderName: { label, icon, accent } }
+        PLAYLISTS: 'localify_playlists_v1'          // [Playlists] [{ id, name, icon, accent, keys: [likeKey], created }]
       };
 
       // [Polish] Sliders show an accent fill up to the thumb. Sliders that go below and
@@ -6915,6 +7001,7 @@
         pauseInner: '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>',
         playInner: '<polygon points="6 4 20 12 6 20 6 4"></polygon>',
         folder: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>',
+        playlist: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h11M3 11h11M3 16h7"></path><path d="M21 16V4l-3 1"></path><circle cx="18" cy="16" r="3"></circle></svg>',
         close: '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>',
         edit: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>',
         audacity: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12h2l2-6 3 14 3-16 3 12 2-4h5"></path></svg>',
@@ -7895,6 +7982,227 @@
         };
       })();
 
+      /* ---- [Playlists] your own lists of songs ----
+         Songs are remembered by file name (likeKey), like Liked Songs, so a playlist
+         keeps working after a reload and fills in again when the folder is loaded.
+         Kept per profile and in backups. */
+      const Playlists = (() => {
+        let lists = loadJSON(STORAGE_KEYS.PLAYLISTS, []);
+        if (!Array.isArray(lists)) lists = [];
+        lists = lists.filter(p => p && typeof p.id === 'string' && typeof p.name === 'string')
+          .map(p => ({ ...p, keys: Array.isArray(p.keys) ? Array.from(new Set(p.keys.filter(k => typeof k === 'string'))) : [] }));
+
+        const dlg = $('plDialog');
+        let editing = null, icon = '', accent = '', pendingTrack = null, deleteArmed = false;
+
+        const byId = (id) => lists.find(p => p.id === id) || null;
+        const viewOf = (p) => 'pl:' + p.id;
+        function fromView(view) {
+          return typeof view === 'string' && view.startsWith('pl:') ? byId(view.slice(3)) : null;
+        }
+        function save() { saveJSON(STORAGE_KEYS.PLAYLISTS, lists); }
+        function iconHTML(p, big) {
+          if (p.icon) return escapeHtml(p.icon);
+          return big ? SVG.playlist.replace(/width="16" height="16"/, 'width="64" height="64"').replace('stroke="currentColor"', 'stroke="#ffffff"') : SVG.playlist;
+        }
+
+        function render() {
+          const box = $('plUserList');
+          box.innerHTML = lists.map(p => `
+            <div class="pl-row">
+              <button type="button" class="pl-item${state.activeView === viewOf(p) ? ' active' : ''}" data-view="${viewOf(p)}"${state.activeView === viewOf(p) ? ' aria-current="page"' : ''}>
+                <span class="pl-icon"${p.accent ? ` data-accent="${escapeHtml(p.accent)}"` : ''} aria-hidden="true">${iconHTML(p)}</span>
+                <span class="pl-name" title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</span>
+                <span class="nav-count" data-pl-count="${p.id}">0</span>
+              </button>
+              <button type="button" class="pl-edit" data-pl-edit="${p.id}" title="Rename, restyle or delete" aria-label="Edit ${escapeHtml(p.name)}">${SVG.edit}</button>
+            </div>`).join('');
+          updateCounts();
+        }
+
+        function updateCounts() {
+          const loaded = new Set();
+          for (const t of state.tracks) loaded.add(t.likeKey);
+          for (const p of lists) {
+            const el = document.querySelector(`[data-pl-count="${p.id}"]`);
+            if (el) el.textContent = p.keys.filter(k => loaded.has(k)).length;
+          }
+        }
+
+        /** Songs of a playlist in its own order (a name can match songs in two folders). */
+        function tracksOf(p, pool) {
+          const byKey = new Map();
+          for (const t of pool) {
+            const arr = byKey.get(t.likeKey);
+            if (arr) arr.push(t); else byKey.set(t.likeKey, [t]);
+          }
+          const out = [];
+          for (const k of p.keys) { const arr = byKey.get(k); if (arr) out.push(...arr); }
+          return out;
+        }
+
+        function changed(p) {
+          save();
+          updateCounts();
+          if (state.activeView === viewOf(p)) { invalidateVisible(); renderTracklist(); updateStats(); }
+        }
+
+        function has(p, track) { return p.keys.includes(track.likeKey); }
+
+        function toggle(id, track) {
+          const p = byId(id);
+          if (!p || !track) return;
+          if (has(p, track)) {
+            p.keys = p.keys.filter(k => k !== track.likeKey);
+            showToast(`Removed from “${p.name}”`);
+          } else {
+            p.keys.push(track.likeKey);
+            showToast(`Added to “${p.name}”`);
+          }
+          changed(p);
+        }
+
+        function removeFromCurrent(track) {
+          const p = fromView(state.activeView);
+          if (!p || !track) return;
+          p.keys = p.keys.filter(k => k !== track.likeKey);
+          showToast(`Removed from “${p.name}”`);
+          changed(p);
+        }
+
+        /** A file was renamed: keep it in its playlists. */
+        function renameKey(from, to) {
+          if (from === to) return;
+          let any = false;
+          for (const p of lists) {
+            const i = p.keys.indexOf(from);
+            if (i === -1) continue;
+            if (p.keys.includes(to)) p.keys.splice(i, 1); else p.keys[i] = to;
+            any = true;
+          }
+          if (any) save();
+        }
+
+        /* ---- dialog ---- */
+        function paint() {
+          const prev = $('plPreview');
+          if (accent) prev.dataset.accent = accent; else delete prev.dataset.accent;
+          prev.innerHTML = icon ? escapeHtml(icon) : SVG.playlist;
+          const icons = $('plIcons');
+          icons.textContent = '';
+          FOLDER_ICONS.forEach((em) => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.setAttribute('role', 'radio');
+            b.setAttribute('aria-checked', String(icon === em));
+            if (em) b.textContent = em; else b.innerHTML = SVG.playlist;
+            b.setAttribute('aria-label', em ? 'Icon ' + em : 'Playlist icon');
+            b.title = b.getAttribute('aria-label');
+            b.addEventListener('click', () => { icon = em; paint(); });
+            icons.appendChild(b);
+          });
+          const colors = $('plColors');
+          colors.textContent = '';
+          [{ id: '', name: 'Same as the app' }].concat(ACCENTS).forEach((a) => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            if (a.id) b.dataset.accent = a.id; else b.className = 'fd-auto';
+            b.setAttribute('role', 'radio');
+            b.setAttribute('aria-checked', String(accent === a.id));
+            b.setAttribute('aria-label', a.name);
+            b.title = a.name;
+            b.addEventListener('click', () => { accent = a.id; paint(); });
+            colors.appendChild(b);
+          });
+        }
+
+        function openDialog(p, track) {
+          if (dlg.open) return;
+          editing = p;
+          pendingTrack = track || null;
+          deleteArmed = false;
+          icon = p ? p.icon || '' : '';
+          accent = p ? p.accent || '' : '';
+          $('plTitle').textContent = p ? 'Edit playlist' : 'New playlist';
+          $('plName').value = p ? p.name : '';
+          $('plSave').textContent = p ? 'Save' : 'Create';
+          $('plDelete').hidden = !p;
+          $('plDelete').textContent = 'Delete playlist';
+          paint();
+          dlg.showModal();
+          $('plName').focus();
+          $('plName').select();
+        }
+
+        function uniqueName(base) {
+          const names = new Set(lists.map(p => p.name.toLowerCase()));
+          if (!names.has(base.toLowerCase())) return base;
+          let n = 2;
+          while (names.has(`${base} ${n}`.toLowerCase())) n++;
+          return `${base} ${n}`;
+        }
+
+        $('plForm').addEventListener('submit', (e) => {
+          e.preventDefault();
+          let name = $('plName').value.replace(/\s+/g, ' ').trim().slice(0, 40);
+          if (editing) {
+            editing.name = name || editing.name;
+            if (icon) editing.icon = icon; else delete editing.icon;
+            if (accent) editing.accent = accent; else delete editing.accent;
+            save();
+            render();
+            if (state.activeView === viewOf(editing)) renderHeroHeader();
+            dlg.close();
+            showToast('Playlist updated');
+            return;
+          }
+          name = uniqueName(name || `My playlist ${lists.length + 1}`);
+          const p = { id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name, keys: [], created: Date.now() };
+          if (icon) p.icon = icon;
+          if (accent) p.accent = accent;
+          if (pendingTrack) p.keys.push(pendingTrack.likeKey);
+          lists.push(p);
+          save();
+          render();
+          dlg.close();
+          if (pendingTrack) showToast(`Added to “${p.name}”`);
+          else { switchView(viewOf(p)); showToast(`Created “${p.name}”`); }
+        });
+        $('plCancel').addEventListener('click', () => dlg.close());
+        $('plDelete').addEventListener('click', () => {
+          if (!editing) return;
+          if (!deleteArmed) {
+            deleteArmed = true;
+            $('plDelete').textContent = 'Press again to delete';
+            return;
+          }
+          const gone = editing;
+          lists = lists.filter(p => p !== gone);
+          save();
+          render();
+          dlg.close();
+          if (state.activeView === viewOf(gone)) switchView('liked');
+          showToast(`Deleted “${gone.name}”. Your songs are still in your library.`);
+        });
+        dlg.addEventListener('close', () => { editing = null; pendingTrack = null; });
+
+        $('btnNewPlaylist').addEventListener('click', () => openDialog(null));
+        $('plUserList').addEventListener('click', (e) => {
+          const edit = e.target.closest('[data-pl-edit]');
+          if (edit) { openDialog(byId(edit.dataset.plEdit)); return; }
+          const item = e.target.closest('.pl-item');
+          if (item) switchView(item.dataset.view);
+        });
+
+        return {
+          all: () => lists,
+          byId, fromView, viewOf, iconHTML, tracksOf, has, toggle, removeFromCurrent, renameKey,
+          render, updateCounts,
+          create: (track) => openDialog(null, track),
+          isView: (view) => !!fromView(view)
+        };
+      })();
+
       /* ---- [Keep data] ask the browser not to clear Localify's data when space runs low ---- */
       const KeepData = (() => {
         const st = navigator.storage;
@@ -8279,6 +8587,8 @@
           list = list.filter(t => state.likedKeys.has(t.likeKey));
         } else if (state.activeView === 'unsorted') {   // [AI Tagger]
           list = list.filter(t => t.afState === 'unsorted');
+        } else if (Playlists.isView(state.activeView)) {   // [Playlists] in the playlist's own order
+          list = Playlists.tracksOf(Playlists.fromView(state.activeView), list);
         }
         if (Browse.selected()) list = Browse.filterSelected(list);   // [Looks] album/artist detail
         const q = state.searchQuery.trim().toLowerCase();
@@ -8855,13 +9165,18 @@
          Views & rendering
          ======================================================================== */
       function switchView(view) {
-        if (view !== 'all' && view !== 'liked' && view !== 'visualizer' && view !== 'unsorted' && !Browse.isBrowseView(view)) view = 'all';   // [Looks] albums/artists + [AI Tagger] unsorted
+        if (view !== 'all' && view !== 'liked' && view !== 'visualizer' && view !== 'unsorted' && !Browse.isBrowseView(view) && !Playlists.isView(view)) view = 'all';   // [Looks] albums/artists + [AI Tagger] unsorted
         const prev = state.activeView;
         state.activeView = view;
         saveJSON(STORAGE_KEYS.VIEW, view);
         closeMobileSidebar();
 
         [dom.navAll, dom.navLiked, dom.navUnsorted, dom.navVisualizer, $('navAlbums'), $('navArtists')].forEach(el => {   // [Looks] + [AI Tagger]
+          const isActive = el.dataset.view === view;
+          el.classList.toggle('active', isActive);
+          if (isActive) el.setAttribute('aria-current', 'page'); else el.removeAttribute('aria-current');
+        });
+        document.querySelectorAll('#plUserList .pl-item').forEach(el => {   // [Playlists]
           const isActive = el.dataset.view === view;
           el.classList.toggle('active', isActive);
           if (isActive) el.setAttribute('aria-current', 'page'); else el.removeAttribute('aria-current');
@@ -8906,6 +9221,7 @@
         }
         dom.countAll.textContent = state.tracks.length;
         dom.countLiked.textContent = liked;
+        Playlists.updateCounts();   // [Playlists]
         AutoFill.updateChip();   // [AI Tagger]
         dom.statTracks.textContent = state.tracks.length;
         dom.statDuration.textContent = formatTotalDuration(totalSec);
@@ -8920,7 +9236,20 @@
       }
 
       function renderHeroHeader() {
+        delete dom.heroBanner.dataset.accent;   // [Playlists]
         if (Browse.renderHero()) return;   // [Looks] albums/artists hero
+        const pl = Playlists.fromView(state.activeView);   // [Playlists]
+        if (pl) {
+          dom.heroBanner.classList.remove('liked-theme');
+          if (pl.accent) {
+            dom.heroBanner.dataset.accent = pl.accent;
+            dom.heroBanner.style.setProperty('--tint-rgb', 'var(--accent-rgb)');
+          }
+          dom.heroType.textContent = 'Playlist';
+          dom.heroTitle.textContent = pl.name;
+          dom.heroCover.innerHTML = pl.icon ? `<span class="pl-hero-emoji">${escapeHtml(pl.icon)}</span>` : Playlists.iconHTML(pl, true);
+          return;
+        }
         const isLiked = state.activeView === 'liked';
         dom.heroBanner.classList.toggle('liked-theme', isLiked);
         dom.heroType.textContent = isLiked ? 'Favorites' : 'Local Music Library';
@@ -8972,6 +9301,12 @@
           } else if (state.activeView === 'liked') {
             dom.emptyTitle.textContent = 'No Liked Songs Yet';
             dom.emptyDesc.textContent = 'Tap the heart on a song to save it.';
+            dom.emptyActions.style.display = 'none';
+          } else if (Playlists.isView(state.activeView)) {   // [Playlists]
+            dom.emptyTitle.textContent = 'This Playlist Is Empty';
+            dom.emptyDesc.textContent = Playlists.fromView(state.activeView).keys.length
+              ? 'Load the folder with its songs to play it.'
+              : 'Open the ⋯ menu on any song and choose Add to playlist.';
             dom.emptyActions.style.display = 'none';
           } else if (state.activeView === 'unsorted') {   // [AI Tagger]
             dom.emptyTitle.textContent = 'Nothing unsorted';
@@ -14311,6 +14646,7 @@
         }
 
         function moveLike(from, to) {
+          Playlists.renameKey(from, to);   // [Playlists]
           if (from === to || !state.likedKeys.has(from)) return;
           state.likedKeys.delete(from);
           state.likedKeys.add(to);
@@ -16596,7 +16932,7 @@ self.onmessage = async (e) => {
         const m = Browse.mode();
         const kind = !hasLib ? 'welcome'
           : state.searchQuery.trim() ? 'search'
-          : state.activeView === 'liked' ? 'liked'
+          : state.activeView === 'liked' || Playlists.isView(state.activeView) ? 'liked'
           : m || 'welcome';
         dom.emptyState.dataset.kind = kind;
         const wrap = dom.emptyState.querySelector('.empty-icon-wrap');
@@ -16607,6 +16943,7 @@ self.onmessage = async (e) => {
         let label = '';
         looksEmptyAction = null;
         if (kind === 'liked') {
+          if (Playlists.isView(state.activeView)) dom.emptyState.dataset.kind = 'playlist';
           label = 'Browse All Tracks';
           looksEmptyAction = () => switchView('all');
         } else if (kind === 'search') {
@@ -16654,6 +16991,8 @@ self.onmessage = async (e) => {
             { act: 'edit', label: 'Edit audio', icon: SVG.edit, kbd: 'E' },
             { act: 'audacity', label: 'Open in Audacity', icon: SVG.audacity, disabled: !canAud, title: canAud ? '' : Audacity.UNKNOWN_LOCATION },
             { act: 'like', label: liked ? 'Remove from Liked Songs' : 'Add to Liked Songs', icon: SVG.heart, kbd: 'L', on: liked },
+            { act: 'pl', label: 'Add to playlist', icon: SVG.playlist, chev: true },   // [Playlists]
+            ...(Playlists.isView(state.activeView) ? [{ act: 'pl-remove', label: 'Remove from this playlist', icon: SVG.close }] : []),
             null,
             { act: 'album', label: 'Go to album', icon: LOOKS_SVG.disc(16) },
             { act: 'artist', label: 'Go to artist', icon: LOOKS_SVG.person(16) },
@@ -16668,8 +17007,31 @@ self.onmessage = async (e) => {
             : '';
           return head + items(t).map((it) => it === null
             ? '<div class="looks-menu-sep" role="separator"></div>'
-            : `<button type="button" role="menuitem" class="looks-menu-item${it.on ? ' is-on' : ''}" data-act="${it.act}" tabindex="-1"${it.disabled ? ` aria-disabled="true" title="${escapeHtml(it.title)}"` : ''}>${it.icon}<span>${it.label}</span>${it.kbd && !sheet ? `<kbd>${it.kbd}</kbd>` : ''}</button>`
+            : `<button type="button" role="menuitem" class="looks-menu-item${it.on ? ' is-on' : ''}" data-act="${it.act}" tabindex="-1"${it.disabled ? ` aria-disabled="true" title="${escapeHtml(it.title)}"` : ''}>${it.icon}<span>${it.label}</span>${it.kbd && !sheet ? `<kbd>${it.kbd}</kbd>` : ''}${it.chev ? '<span class="pl-chev" aria-hidden="true">›</span>' : ''}</button>`
           ).join('');
+        }
+
+        // [Playlists] the "Add to playlist" list replaces the menu's items
+        function renderPicker(t) {
+          const rows = Playlists.all().map(p => {
+            const on = Playlists.has(p, t);
+            return `<button type="button" role="menuitemcheckbox" aria-checked="${on}" class="looks-menu-item${on ? ' is-on' : ''}" data-act="pl-add:${p.id}" tabindex="-1"><span class="pl-icon" style="width:22px;height:22px;font-size:13px"${p.accent ? ` data-accent="${escapeHtml(p.accent)}"` : ''}>${Playlists.iconHTML(p)}</span><span>${escapeHtml(p.name)}</span>${on ? '<span class="pl-chev" aria-hidden="true">✓</span>' : ''}</button>`;
+          }).join('');
+          return `<button type="button" role="menuitem" class="looks-menu-item" data-act="pl-back" tabindex="-1"><span class="pl-chev" aria-hidden="true">‹</span><span>Back</span></button>`
+            + '<div class="looks-menu-sep" role="separator"></div>'
+            + rows
+            + `<button type="button" role="menuitem" class="looks-menu-item" data-act="pl-new" tabindex="-1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg><span>New playlist</span></button>`;
+        }
+
+        function swapItems(html) {
+          menu.innerHTML = html;
+          if (!menu.classList.contains('is-sheet')) {
+            const vh = document.documentElement.clientHeight;
+            const r = menu.getBoundingClientRect();
+            if (r.bottom > vh - 8) menu.style.top = `${Math.max(8, vh - r.height - 8)}px`;
+          }
+          const first = enabledItems()[0];
+          if (first) first.focus({ preventScroll: true });
         }
 
         function enabledItems() { return Array.from(menu.querySelectorAll('.looks-menu-item:not([aria-disabled="true"])')); }
@@ -16719,6 +17081,12 @@ self.onmessage = async (e) => {
           const t = state.trackMap.get(trackId);
           if (!t) { close(); return; }
           if (act === 'audacity' && !Audacity.canOpen(t)) { showToast(Audacity.UNKNOWN_LOCATION); return; }
+          // [Playlists]
+          if (act === 'pl') { swapItems(renderPicker(t)); return; }
+          if (act === 'pl-back') { swapItems(render(t, menu.classList.contains('is-sheet'))); return; }
+          if (act.startsWith('pl-add:')) { close(); Playlists.toggle(act.slice(7), t); return; }
+          if (act === 'pl-new') { close(false); Playlists.create(t); return; }
+          if (act === 'pl-remove') { close(false); Playlists.removeFromCurrent(t); return; }
           close(act === 'like');
           if (act !== 'like' && FsPlayer.isOpen()) FsPlayer.close(false);
           if (act === 'edit') Editor.open(t.id, opener && opener.isConnected ? opener : undefined);
@@ -16821,6 +17189,8 @@ self.onmessage = async (e) => {
         function contextLabel() {
           const m = Browse.mode(), sel = Browse.selected();
           if (state.activeView === 'liked') return 'Liked Songs';
+          const pl = Playlists.fromView(state.activeView);   // [Playlists]
+          if (pl) return pl.name;
           if (m && sel) return dom.heroTitle.textContent;
           return 'Your library';
         }
@@ -17607,7 +17977,8 @@ self.onmessage = async (e) => {
       updateControlStatesUI();
       updateVolumeUI();
       updatePlayerBarUI();
-      switchView(state.activeView === 'liked' || Browse.isBrowseView(state.activeView) ? state.activeView : 'all');   // [Looks] + browse views
+      Playlists.render();   // [Playlists]
+      switchView(state.activeView === 'liked' || Playlists.isView(state.activeView) || Browse.isBrowseView(state.activeView) ? state.activeView : 'all');   // [Looks] + browse views
       renderAll();
       restoreSessionFolders();
     })();
@@ -18180,6 +18551,16 @@ self.onmessage = async (e) => {
       function mergeValue(key, cur, imp) {
         if (cur === undefined) return imp;
         if (Array.isArray(cur) && Array.isArray(imp)) {
+          if (key === 'localify_playlists_v1') {   // [Playlists] same playlist: combine its songs
+            var byId = new Map();
+            cur.concat(imp).forEach(function (p) {
+              if (!p || typeof p.id !== 'string') return;
+              var o = byId.get(p.id);
+              if (!o) byId.set(p.id, Object.assign({}, p, { keys: (p.keys || []).slice() }));
+              else (p.keys || []).forEach(function (k) { if (o.keys.indexOf(k) === -1) o.keys.push(k); });
+            });
+            return Array.from(byId.values());
+          }
           var both = cur.concat(imp);
           if (both.every(function (x) { return x === null || typeof x !== 'object'; })) {
             return Array.from(new Set(both));

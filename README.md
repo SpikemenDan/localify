@@ -31,7 +31,7 @@
 2. Click **Load Folder** and pick the folder that has your music. Localify asks you to give it a name, an icon and a color (or just skip).
 3. Press **Play**, or **Shuffle Play**.
 
-That's all. Localify remembers your likes, settings, folders and the last song you played the next time you open it. Your folders stay in the sidebar under **Your Folders**. Hover one and press the pencil to rename or restyle it. After a restart, the browser may ask you to allow the folder again; in the installed app, choose **Allow on every visit** so it stops asking.
+That's all. Localify remembers your likes, settings, folders and the last song you played the next time you open it. Your folders stay in the sidebar under **Your Folders**. Hover one and press the pencil to rename or restyle it. Your playlists are remembered the same way, and fill back in when you load the folder with their songs. After a restart, the browser may ask you to allow the folder again; in the installed app, choose **Allow on every visit** so it stops asking.
 
 > [!TIP]
 > Chrome and Edge work best. Other browsers can play music, but they can't save changes back into your files.
@@ -42,7 +42,8 @@ That's all. Localify remembers your likes, settings, folders and the last song y
 
 | | |
 | --- | --- |
-| 🎵 **Library** | All Tracks, Liked Songs, **Albums** and **Artists** views, plus search. |
+| 🎵 **Library** | All Tracks, **Albums** and **Artists** views, plus search. |
+| 📃 **Playlists** | Liked Songs plus your own playlists. Press **+** next to *Playlists* in the sidebar, or use **⋯ → Add to playlist** on any song. Give each one a name, icon and color; hover it and press the pencil to rename or delete it. |
 | 🎨 **Looks** | Dark, Light or System mode, your choice of accent color, and compact rows. |
 | 🎤 **Lyrics** | Press **Y** or tap the lyrics icon. Synced lyrics highlight as the song plays; tap a line to jump there. Uses a matching `.lrc` file or the song's own tags first, then looks them up on [LRCLIB](https://lrclib.net). Lyrics you've opened are saved for offline use. |
 | 🌈 **Visualizer** | A full-screen visualizer that moves with the music. |
@@ -182,13 +183,13 @@ Use Chrome or Edge, and allow Localify to edit the folder when it asks.
 </details>
 
 <details>
-<summary><b>My likes disappeared</b></summary>
+<summary><b>My likes or playlists disappeared</b></summary>
 
-You may be in a different profile. Click the avatar in the top-right to switch. Likes are also saved per browser, so a different browser or device starts fresh unless you import a backup.
+You may be in a different profile. Click the avatar in the top-right to switch. Likes and playlists are also saved per browser, so a different browser or device starts fresh unless you import a backup.
 </details>
 
 <details>
 <summary><b>Start over without losing my likes</b></summary>
 
-**Settings → General → Reset All Settings** resets settings only. Your library and likes stay.
+**Settings → General → Reset All Settings** resets settings only. Your library, likes and playlists stay.
 </details>
