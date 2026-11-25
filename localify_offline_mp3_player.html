@@ -8824,13 +8824,7 @@
           showToast(needClick.length === 1
             ? `Click anywhere to bring back the songs in “${folderLabel(needClick[0].name)}”.`
             : `Click anywhere to bring back the songs in your ${needClick.length} folders.`);
-          const onFirstClick = (e) => {
-            document.removeEventListener('pointerdown', onFirstClick, true);
-            if (!state.pendingReconnect.length) return;
-            if (e.target.closest && e.target.closest('#btnReconnect, [data-remove-folder], [data-edit-folder]')) return;
-            reconnectPendingFolders();
-          };
-          document.addEventListener('pointerdown', onFirstClick, true);
+          armReconnectOnClick();
         } else if (state.tracks.length > 0) {
           showToast(`Restored ${state.tracks.length} tracks`);
         }
@@ -8848,6 +8842,27 @@
         if (state.tracks.length === 0) renderTracklist();
       }
 
+      let reconnectArmed = false;
+      /** The next click anywhere asks the browser again for folders it hasn't answered about yet. */
+      async function armReconnectOnClick() {
+        if (reconnectArmed) return;
+        const unasked = [];
+        for (const p of state.pendingReconnect) {
+          try { if ((await p.handle.queryPermission({ mode: 'read' })) === 'prompt') unasked.push(p); } catch (e) {}
+        }
+        if (!unasked.length) return;
+        reconnectArmed = true;
+        const onClick = (e) => {
+          if (e.target.closest && e.target.closest('#btnReconnect, [data-remove-folder], [data-edit-folder], [data-folder-name]')) return;
+          document.removeEventListener('pointerdown', onClick, true);
+          document.removeEventListener('keydown', onClick, true);
+          reconnectArmed = false;
+          if (state.pendingReconnect.length) reconnectPendingFolders();
+        };
+        document.addEventListener('pointerdown', onClick, true);
+        document.addEventListener('keydown', onClick, true);
+      }
+
       let reconnecting = false;
       async function reconnectPendingFolders() {
         if (reconnecting || !state.pendingReconnect.length) return;
@@ -8856,13 +8871,14 @@
         const denied = [];
         let added = 0, back = 0;
         try {
+          const allowed = [];
           for (const item of pending) {
-            if (await ensureReadPermission(item.handle, true)) {
-              added += await loadFolderFromHandle(item.handle, { quiet: true });
-              back++;
-            } else {
-              denied.push(item);
-            }
+            if (await ensureReadPermission(item.handle, true)) allowed.push(item);
+            else denied.push(item);
+          }
+          for (const item of allowed) {
+            added += await loadFolderFromHandle(item.handle, { quiet: true });
+            back++;
           }
         } finally {
           reconnecting = false;
@@ -8870,7 +8886,10 @@
         state.pendingReconnect = denied;
         updateReconnectUI();
         renderAll();
-        if (denied.length && back) showToast(`${back} of ${pending.length} folders are back. Press Reconnect for the rest.`);
+        // The browser may allow only one question per click. If a folder wasn't asked about
+        // (not refused, just not asked yet), the next click asks about it.
+        armReconnectOnClick();
+        if (denied.length && back) showToast(`${back} of ${pending.length} folders are back. Click again for the rest.`);
         else if (denied.length) showToast('Localify wasn’t allowed to open the folder. Press Reconnect to try again.');
         else if (added) showToast(`Your songs are back: ${added} from ${back} ${back === 1 ? 'folder' : 'folders'}.`);
       }
@@ -10408,13 +10427,23 @@
         const files = Array.from(e.target.files || [])
           .map(f => ({ file: f, folderName: null, path: f.webkitRelativePath || f.name }))
           .sort((a, b) => collator.compare(a.path, b.path));
-        ingestFiles(files);
+        noteNotKept(ingestFiles(files));
         e.target.value = '';
         closeMobileSidebar();
       });
 
+      /** Songs added without a folder link can't be reopened after a reload: say so once per visit. */
+      let toldNotKept = false;
+      function noteNotKept(count) {
+        if (!count || toldNotKept) return;
+        toldNotKept = true;
+        setTimeout(() => showToast(supportsDirectoryPicker
+          ? 'Songs added as single files are gone after a reload. Use Load Folder to keep them.'
+          : 'This browser can’t reopen folders, so you’ll add your music again after a reload. Chrome or Edge remember it.'), 2500);
+      }
+
       dom.fileInput.addEventListener('change', (e) => {
-        ingestFiles(Array.from(e.target.files || []).map(f => ({ file: f, folderName: null })));
+        noteNotKept(ingestFiles(Array.from(e.target.files || []).map(f => ({ file: f, folderName: null }))));
         e.target.value = '';
         closeMobileSidebar();
       });
@@ -10443,10 +10472,26 @@
         e.preventDefault();
         dragDepth = 0;
         dom.dropOverlay.classList.remove('visible');
+        // Both of these must start before the first await: the drop data is cleared after it.
+        const items = Array.from(e.dataTransfer.items || []).filter(it => it.kind === 'file');
+        const handleJobs = supportsDirectoryPicker && items.length && items.every(it => typeof it.getAsFileSystemHandle === 'function')
+          ? items.map(it => it.getAsFileSystemHandle().catch(() => null))
+          : null;
+        const collected = collectDroppedFiles(e.dataTransfer);
         setLoadingState(true);
         try {
-          const { entries, folderName } = await collectDroppedFiles(e.dataTransfer);
-          ingestFiles(entries, { folderName });
+          const handles = handleJobs ? await Promise.all(handleJobs) : [];
+          if (handles.length && handles.every(h => h && h.kind === 'directory')) {
+            // Dropped folders: load them like "Load Folder" so they're remembered after a reload
+            for (const h of handles) {
+              state.pendingReconnect = state.pendingReconnect.filter(p => p.name !== h.name);
+              await loadFolderFromHandle(h);
+            }
+            updateReconnectUI();
+          } else {
+            const { entries, folderName } = await collected;
+            noteNotKept(ingestFiles(entries, { folderName }));
+          }
         } finally {
           setLoadingState(false);
         }
