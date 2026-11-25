@@ -44,6 +44,7 @@ That's all. Localify remembers your likes, settings and the last song you played
 | --- | --- |
 | 🎵 **Library** | All Tracks, Liked Songs, **Albums** and **Artists** views, plus search. |
 | 🎨 **Looks** | Dark, Light or System mode, your choice of accent color, and compact rows. |
+| 🎤 **Lyrics** | Press **Y** or tap the lyrics icon. Synced lyrics highlight as the song plays; tap a line to jump there. Uses a matching `.lrc` file or the song's own tags first, then looks them up on [LRCLIB](https://lrclib.net). Lyrics you've opened are saved for offline use. |
 | 🌈 **Visualizer** | A full-screen visualizer that moves with the music. |
 | 🎚️ **Sound** | Equalizer presets (Bass Boost, Vocal, Treble Boost, Loudness) or your own Bass/Mid/Treble, volume leveling and crossfade. |
 | ⏩ **Speed & pitch** | Playback speed with one-tap **Nightcore**, **Daycore** and **Slowed + reverb** presets. Turn *Change pitch with speed* off to keep the original key. |
@@ -129,6 +130,7 @@ Publishing it yourself? See [docs/DEPLOY.md](docs/DEPLOY.md).
 | <kbd>L</kbd> | Like the current song |
 | <kbd>V</kbd> | Visualizer |
 | <kbd>T</kbd> | Focus timer |
+| <kbd>Y</kbd> | Lyrics |
 | <kbd>/</kbd> | Search |
 | <kbd>,</kbd> | Settings |
 
@@ -148,6 +150,7 @@ Publishing it yourself? See [docs/DEPLOY.md](docs/DEPLOY.md).
 - 🎧 **Your music never leaves your device.** Nothing is uploaded, ever.
 - 💾 **Your likes, settings and profiles** stay in your browser on this device.
 - 🌐 **Online lookups** send only a song's title and artist text to MusicBrainz and iTunes. No file names, folders or audio are sent. You can turn this off.
+- 🎤 **Lyrics lookups** send only a song's title, artist, album text and length to LRCLIB (lrclib.net), and only when you open the lyrics panel. `.lrc` files and lyrics in your tags are never sent. Turn it off with **Settings → Lyrics → Find Lyrics Online**.
 - 🤖 **The AI** runs on your own computer and only sees names and tags, never the audio.
 
 ---
@@ -158,6 +161,12 @@ Publishing it yourself? See [docs/DEPLOY.md](docs/DEPLOY.md).
 <summary><b>Songs aren't being filled in</b></summary>
 
 Check that you're online. The music database is sometimes busy, so filling in songs can take around 10 seconds each. Localify keeps retrying on its own. Songs waiting their turn show up under **Unsorted**.
+</details>
+
+<details>
+<summary><b>No lyrics for a song</b></summary>
+
+Put a `.lrc` file with the same name next to the song (for example `Song.mp3` and `Song.lrc`) and load the folder again. Online lyrics also need **Find Lyrics Online** and **Look up songs online** turned on in Settings.
 </details>
 
 <details>
