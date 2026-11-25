@@ -5030,6 +5030,15 @@
     .tg-example { font-size: 12px; color: var(--text-muted); margin-top: 6px; overflow-wrap: anywhere; }
     .tg-model-row { display: flex; align-items: center; gap: 10px; }
     .tg-model-row .settings-hint { flex: 1; }
+    /* [AcoustID] */
+    .aid-key-row { display: flex; gap: 8px; align-items: center; margin-top: 6px; }
+    .aid-key-row .tg-settings-input { flex: 1; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .aid-status { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+    .aid-status[data-kind="error"] { color: var(--danger, #e5484d); }
+    .settings-hint a { color: var(--accent); }
+    .tg-msg.ok { color: var(--text-secondary); }
+    .tg-act.tg-sound:disabled { opacity: 0.6; cursor: progress; }
+    /* [/AcoustID] */
     @media (max-width: 768px) {
       .tg-dialog { width: 100vw; height: 100dvh; max-height: 100dvh; border-radius: 0; border: 0; margin: 0; }
       .row-action.row-tidy { display: none; }
@@ -5076,6 +5085,10 @@
     .toast.af-toast { display: flex; align-items: center; gap: 12px; pointer-events: auto; }
     .af-toast-btn { color: var(--accent); font-weight: 700; font-size: 13px; padding: 2px 4px; border-radius: 4px; }
     .af-toast-btn:hover { text-decoration: underline; }
+    /* [AcoustID] Sound results are longer: let them use the screen width instead of wrapping into a narrow oval */
+    .toast.af-toast { width: max-content; max-width: min(520px, calc(100vw - 32px)); }
+    @media (max-width: 600px) { .toast.af-toast { border-radius: var(--radius-lg); } }
+    /* [/AcoustID] */
     .tg-dialog.af-qa { width: min(560px, calc(100vw - 32px)); height: fit-content; max-height: calc(100dvh - 32px); margin: auto; }
     .af-qa .toast-container { bottom: 24px; }
     .af-qa .toast.af-toast { display: none; }   /* "Review" / "Answer" prompts don't belong over the Q&A itself */
@@ -6288,9 +6301,19 @@
           <button type="button" class="switch" id="setAfOnline" role="switch" aria-checked="true" aria-labelledby="setAfOnlineLabel"></button>
         </div>
         <div class="settings-row">
-          <span class="settings-label" id="setAfMbLabel">Look up songs online<span class="settings-hint">Asks MusicBrainz and iTunes for missing details, genres and album covers. Only the song's title and artist text are sent (to musicbrainz.org and itunes.apple.com). No file names, folders or audio are sent. Covers come from coverartarchive.org or Apple and are shown in your library only.</span></span>
+          <span class="settings-label" id="setAfMbLabel">Look up songs online<span class="settings-hint">Asks MusicBrainz and iTunes for missing details, genres and album covers. Only the song's title and artist text are sent (to musicbrainz.org and itunes.apple.com). No file names, folders or audio are sent. Covers come from coverartarchive.org or Apple and are shown in your library only. With an AcoustID key, songs can also be identified by a fingerprint of their sound.</span></span>
           <button type="button" class="switch" id="setAfMb" role="switch" aria-checked="true" aria-labelledby="setAfMbLabel"></button>
         </div>
+        <!-- [AcoustID] -->
+        <div class="settings-row stacked">
+          <label class="settings-label" for="setAidKey">AcoustID Key<span class="settings-hint" id="setAidHint">Identifies songs by their sound when the name and tags don't say. <a href="https://acoustid.org/new-application" target="_blank" rel="noopener noreferrer">Get a free key</a>, then paste it here. Only a fingerprint and the song's length go to api.acoustid.org, never the audio. The key stays in this profile and its backups.</span></label>
+          <div class="aid-key-row">
+            <input type="text" class="tg-settings-input" id="setAidKey" spellcheck="false" autocomplete="off" autocapitalize="off" maxlength="64" placeholder="Paste your application key" aria-describedby="setAidHint setAidStatus">
+            <button type="button" class="btn-secondary" id="setAidCheck" disabled>Check</button>
+          </div>
+          <div class="aid-status" id="setAidStatus" aria-live="polite"></div>
+        </div>
+        <!-- [/AcoustID] -->
         <div class="settings-row">
           <span class="settings-label" id="setAfApplyLabel">Auto-apply to files<span class="settings-hint">Writes filled-in details straight into the files, only in folders you've already allowed Localify to edit. Undo from Tidy names &amp; tags.</span></span>
           <button type="button" class="switch" id="setAfApply" role="switch" aria-checked="false" aria-labelledby="setAfApplyLabel"></button>
@@ -6457,7 +6480,8 @@
         FOCUS_RUN: 'localify_focus_run_v1',             // { endAt, pausedLeft, total, ringing } (survives reloads)
         TAGGER: 'localify_tagger_v1',    // [AI Tagger] { template, dashOrder, ai, autoFill, onlineOnly, autoApply, musicbrainz }
         SONG_DETAILS: 'localify_song_details_v1',   // [AI Tagger] auto-fill { "likekey|size": details | 'ok' }
-        SONG_ANSWERS: 'localify_song_answers_v1'    // [AI Tagger] { artists: { name: spelling }, albums: { folder: { album, year } } }
+        SONG_ANSWERS: 'localify_song_answers_v1',   // [AI Tagger] { artists: { name: spelling }, albums: { folder: { album, year } } }
+        ACOUSTID: 'localify_acoustid_v1'            // [AcoustID] { key }: the user's own AcoustID application key
       };
 
       const AUDIO_EXTENSIONS = new Set(['mp3', 'wav', 'ogg', 'm4a', 'flac', 'aac', 'opus', 'webm']);
@@ -12414,7 +12438,7 @@
         const savePrefs = () => saveJSON(STORAGE_KEYS.TAGGER, prefs);
         // Set by the auto-fill module below: stored details, after-apply cleanup, settings changes
         // knownArtist(name): true if that artist is already in the library (tags, lookups or answers)
-        const hooks = { suggestion: null, applied: null, prefsChanged: null, knownArtist: null };
+        const hooks = { suggestion: null, applied: null, prefsChanged: null, knownArtist: null, identify: null, canIdentify: null };   // identify/canIdentify: [AcoustID]
 
         /* ---------------- Text rules (offline) ---------------- */
         const NOISE = [
@@ -13374,13 +13398,14 @@
               ${item.readError ? `<div class="tg-msg">${escapeHtml(item.readError)}</div>` : ''}
             </div>
             <div class="tg-arrow" aria-hidden="true">→</div>
-            <div class="tg-new">${right}${item.message ? `<div class="tg-msg">${escapeHtml(item.message)}</div>` : ''}</div>
+            <div class="tg-new">${right}${item.message ? `<div class="tg-msg${item.message === item.okMessage ? ' ok' : ''}">${escapeHtml(item.message)}</div>` : ''}</div>
             <div class="tg-actions">
               ${stateLabel ? `<span class="tg-pill" data-kind="${st}">${stateLabel}</span>` : ''}
               ${locked ? '' : `
               <button type="button" class="tg-act tg-accept" data-act="accept" aria-pressed="${st === 'accepted'}" title="Accept this change"${st === 'same' && !item.editing ? ' hidden' : ''}>${st === 'accepted' ? 'Accepted' : 'Accept'}</button>
               <button type="button" class="tg-act" data-act="edit" aria-pressed="${item.editing}">${item.editing ? 'Done' : 'Edit'}</button>
-              <button type="button" class="tg-act tg-skip" data-act="skip" aria-pressed="${st === 'skipped'}"${st === 'same' ? ' hidden' : ''}>${st === 'skipped' ? 'Skipped' : 'Skip'}</button>`}
+              <button type="button" class="tg-act tg-skip" data-act="skip" aria-pressed="${st === 'skipped'}"${st === 'same' ? ' hidden' : ''}>${st === 'skipped' ? 'Skipped' : 'Skip'}</button>
+              ${hooks.canIdentify && hooks.canIdentify() ? `<button type="button" class="tg-act tg-sound" data-act="sound" title="Identify this song by its sound (AcoustID)"${item.identifying ? ' disabled' : ''}>${item.identifying ? 'Listening…' : 'By Sound'}</button>` : ''}`}
             </div>
           </div>`;
         }
@@ -13636,6 +13661,7 @@
           const i = +row.dataset.i;
           const it = ui.items[i];
           const act = btn.dataset.act;
+          if (act === 'sound') { identifyRow(i); return; }   // [AcoustID]
           if (act === 'edit') {
             if (it.editing) {
               readEdits(i);
@@ -13655,6 +13681,31 @@
           if (act === 'skip') it.status = it.status === 'skipped' ? (hasChanges(it) ? 'pending' : 'same') : 'skipped';
           renderRow(i);
           const again = el.list.querySelector(`.tg-row[data-i="${i}"] [data-act="${act}"]`);
+          if (again) again.focus();
+        }
+
+        // [AcoustID] Identify one row's song by its sound, then show what was found as its suggestion
+        async function identifyRow(i) {
+          const it = ui.items[i];
+          if (!it || it.identifying || !hooks.identify) return;
+          if (it.editing) { readEdits(i); it.editing = false; }
+          it.identifying = true;
+          it.message = '';
+          renderRow(i);
+          let msg = '', ok = false;
+          try { ({ msg, ok } = await hooks.identify(it.track)); } catch (e) { msg = 'Couldn\'t identify this song by sound.'; }
+          it.identifying = false;
+          if (ui.items[i] !== it) return;   // the dialog was closed or reopened meanwhile
+          const stored = hooks.suggestion && hooks.suggestion(it.track);
+          if (stored) {
+            it.aiBy = { ...stored.by };
+            if (it.status !== 'accepted') it.status = 'pending';
+            setSuggestion(it, { ...it.rules, ...stored.fields });
+          }
+          it.message = msg || '';
+          it.okMessage = ok ? it.message : '';   // [AcoustID] a match isn't an error: don't show it in red
+          renderRow(i);
+          const again = el.list.querySelector(`.tg-row[data-i="${i}"] [data-act="sound"]`);
           if (again) again.focus();
         }
 
@@ -14082,6 +14133,297 @@
       /* [/AI Tagger] */
 
       /* ==========================================================================
+         [AcoustID] Identify songs by their sound
+         A Chromaprint fingerprint of the first two minutes is made in this browser (WebAssembly,
+         in a worker) and looked up at api.acoustid.org, which answers with MusicBrainz recording IDs.
+         Only the fingerprint and the song's length are sent, never the audio. Needs the user's own
+         free application key (Settings → Tidy names & tags). AutoFill uses it as a fallback.
+         ========================================================================== */
+      const AcoustID = (() => {
+        // The real Chromaprint C library compiled to WebAssembly (MIT). Loads chromaprint.wasm next to it.
+        const CP_URL = 'https://cdn.jsdelivr.net/npm/@unimusic/chromaprint@0.1.4/dist/chromaprint.js';
+        const API_URL = 'https://api.acoustid.org/v2/lookup';
+        const SECONDS = 120;        // AcoustID fingerprints cover the first two minutes
+        const GAP_MS = 350;         // AcoustID allows 3 requests a second
+        const KEY_RE = /^[A-Za-z0-9_-]{4,64}$/;
+        const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+        const fail = (code, msg) => Object.assign(new Error(msg || code), { code });
+
+        let cfg = loadJSON(STORAGE_KEYS.ACOUSTID, {});
+        if (!cfg || typeof cfg !== 'object' || Array.isArray(cfg)) cfg = {};
+        let keyBad = false;   // AcoustID said the key is wrong (until it's changed)
+        const key = () => String(cfg.key || '').trim();
+        const hasKey = () => KEY_RE.test(key());
+        const lookupsOn = () => !!Tagger.internals.prefs().musicbrainz;
+        /** A key is set, AcoustID hasn't rejected it, and online lookups are on. */
+        const ready = () => hasKey() && !keyBad && lookupsOn();
+
+        /* ---- Fingerprint ---- */
+        // Runs inside the worker (its source is copied there), or here if workers fail. M: the Chromaprint module.
+        function fpCompute(M, pcm, rate) {
+          const ctx = M._chromaprint_new(1);   // CHROMAPRINT_ALGORITHM_DEFAULT, the one AcoustID uses
+          if (!ctx) throw new Error('chromaprint_new failed');
+          let buf = 0, out = 0;
+          try {
+            if (!M._chromaprint_start(ctx, rate, 1)) throw new Error('chromaprint_start failed');
+            buf = M._malloc(pcm.length * 2);
+            M.HEAP16.set(pcm, buf >> 1);
+            if (!M._chromaprint_feed(ctx, buf, pcm.length)) throw new Error('chromaprint_feed failed');
+            if (!M._chromaprint_finish(ctx)) throw new Error('chromaprint_finish failed');
+            out = M._malloc(4);
+            if (!M._chromaprint_get_fingerprint(ctx, out)) throw new Error('no fingerprint');
+            const p = M.HEAP32[out >> 2];
+            const fp = M.UTF8ToString(p);
+            M._free(p);
+            return fp;
+          } finally {
+            if (buf) M._free(buf);
+            if (out) M._free(out);
+            M._chromaprint_free(ctx);
+          }
+        }
+
+        let worker = null, workerOk = true, seq = 0, mainModule = null;
+        const waiting = new Map();
+        function getWorker() {
+          if (worker || !workerOk) return worker;
+          try {
+            const src = `import createModule from ${JSON.stringify(CP_URL)};
+const compute = ${fpCompute.toString()};
+let mod = null;
+self.onmessage = async (e) => {
+  const { id, pcm, rate } = e.data;
+  try { mod = mod || await createModule(); self.postMessage({ id, fp: compute(mod, pcm, rate) }); }
+  catch (err) { self.postMessage({ id, error: String((err && err.message) || err) }); }
+};`;
+            const url = URL.createObjectURL(new Blob([src], { type: 'text/javascript' }));
+            worker = new Worker(url, { type: 'module' });
+            worker.onmessage = (e) => {
+              const w = waiting.get(e.data.id);
+              if (!w) return;
+              waiting.delete(e.data.id);
+              if (e.data.error) w.reject(fail('fingerprint', e.data.error)); else w.resolve(e.data.fp);
+            };
+            worker.onerror = (e) => {
+              // The worker couldn't start (or load the library): finish the waiting ones here instead
+              e.preventDefault && e.preventDefault();
+              workerOk = false;
+              try { worker.terminate(); } catch (err) { /* ignore */ }
+              worker = null;
+              const list = [...waiting.values()];
+              waiting.clear();
+              for (const w of list) onMain(w.pcm, w.rate).then(w.resolve, w.reject);
+            };
+          } catch (e) { workerOk = false; worker = null; }
+          return worker;
+        }
+        async function onMain(pcm, rate) {
+          if (!mainModule) mainModule = import(CP_URL).then(m => m.default());
+          try { return fpCompute(await mainModule, pcm, rate); }
+          catch (e) { mainModule = null; throw fail('fingerprint', e && e.message); }
+        }
+        function fingerprint(pcm, rate) {
+          const w = getWorker();
+          if (!w) return onMain(pcm, rate);
+          return new Promise((resolve, reject) => {
+            const id = ++seq;
+            waiting.set(id, { resolve, reject, pcm, rate });
+            w.postMessage({ id, pcm, rate });
+          });
+        }
+
+        /* ---- Audio: the first two minutes, mono, 16-bit ---- */
+        async function id3Size(file) {
+          try {
+            const b = new Uint8Array(await file.slice(0, 10).arrayBuffer());
+            if (b[0] !== 0x49 || b[1] !== 0x44 || b[2] !== 0x33) return 0;   // "ID3"
+            return 10 + ((b[6] & 0x7f) << 21 | (b[7] & 0x7f) << 14 | (b[8] & 0x7f) << 7 | (b[9] & 0x7f)) + (b[5] & 0x10 ? 10 : 0);
+          } catch (e) { return 0; }
+        }
+        async function decode(ab) {
+          let ctx;
+          try { ctx = new OfflineAudioContext(1, 1, 11025); }   // Chromaprint works at 11025 Hz anyway
+          catch (e) { ctx = new OfflineAudioContext(1, 1, 44100); }
+          return ctx.decodeAudioData(ab);
+        }
+        /** Decodes only the start of long files (MP3 frames decode from any cut); the whole file if that fails. */
+        async function readStart(track) {
+          const file = track.file;
+          if (!file) throw fail('decode', 'no file');
+          const dur = +track.duration || 0;
+          let part = file;
+          if (dur > SECONDS + 10 && file.size) {
+            const head = await id3Size(file);
+            const perSec = (file.size - head) / dur;
+            const end = Math.ceil(head + perSec * (SECONDS + 5) + 65536);
+            if (end < file.size) part = file.slice(0, end);
+          }
+          let ab;
+          try { ab = await decode(await part.arrayBuffer()); }
+          catch (e) {
+            if (part === file) throw fail('decode', 'couldn\'t decode');
+            try { ab = await decode(await file.arrayBuffer()); } catch (e2) { throw fail('decode', 'couldn\'t decode'); }
+          }
+          const rate = ab.sampleRate;
+          const n = Math.min(ab.length, Math.round(SECONDS * rate));
+          const chans = [];
+          for (let c = 0; c < ab.numberOfChannels; c++) chans.push(ab.getChannelData(c));
+          const pcm = new Int16Array(n);
+          for (let i = 0; i < n; i++) {
+            let s = 0;
+            for (const ch of chans) s += ch[i];
+            s /= chans.length;
+            pcm[i] = s >= 1 ? 32767 : s <= -1 ? -32768 : Math.round(s * 32767);
+          }
+          const duration = Math.round(dur || ab.duration);
+          if (duration < 1 || n < rate * 3) throw fail('short', 'too short');
+          return { pcm, rate, duration };
+        }
+
+        /* ---- Lookup ---- */
+        let nextAt = 0;
+        async function lookup(fp, duration) {
+          // Test seam: window.__LOCALIFY_ACOUSTID_STUB__ = async ({ fingerprint, duration }) => AcoustID JSON
+          const stub = window.__LOCALIFY_ACOUSTID_STUB__;
+          if (typeof stub === 'function') return stub({ fingerprint: fp, duration });
+          for (let attempt = 0; ; attempt++) {
+            const wait = nextAt - Date.now();
+            if (wait > 0) await sleep(wait);
+            nextAt = Date.now() + GAP_MS;
+            const ctl = new AbortController();
+            const timer = setTimeout(() => ctl.abort(), 12000);
+            // A plain form POST: AcoustID allows any origin but answers preflights with 400, so no custom
+            // headers. No cookies, no referrer; only the key, the fingerprint and the length.
+            const body = new URLSearchParams({ client: key(), format: 'json', duration: String(duration), fingerprint: fp, meta: 'recordings releasegroups' });
+            let res;
+            try { res = await fetch(API_URL, { method: 'POST', body, credentials: 'omit', referrerPolicy: 'no-referrer', signal: ctl.signal }); }
+            catch (e) { throw fail('network', 'couldn\'t reach AcoustID'); }
+            finally { clearTimeout(timer); }
+            if ((res.status === 429 || res.status === 503) && attempt < 2) { await sleep(2000 * (attempt + 1)); continue; }
+            try { return await res.json(); } catch (e) { throw fail('network', `HTTP ${res.status}`); }
+          }
+        }
+
+        function parse(json, prefer) {
+          if (!json || json.status !== 'ok') {
+            const code = json && json.error && json.error.code;
+            if (code === 4) { keyBad = true; syncSettings(); throw fail('key', 'invalid API key'); }
+            throw fail('api', (json && json.error && json.error.message) || 'lookup failed');
+          }
+          const same = Tagger.internals.sameish;
+          const results = (Array.isArray(json.results) ? json.results : [])
+            .filter(r => r && Array.isArray(r.recordings) && r.recordings.length)
+            .sort((a, b) => (+b.score || 0) - (+a.score || 0));
+          const best = results[0];
+          if (!best) return null;
+          const artistOf = (r) => (r.artists || []).map(a => (a.name || '') + (a.joinphrase || '')).join('').trim();
+          // Several recordings share one fingerprint: prefer one with a title, the one the name hints at,
+          // and one on a studio album over live sets and compilations
+          const rank = (r) => {
+            let n = 0;
+            if (!r.title) n += 10;
+            const rgs = Array.isArray(r.releasegroups) ? r.releasegroups : [];
+            if (!rgs.some(g => g && g.type === 'Album' && !(g.secondarytypes || []).length)) n += 2;
+            if (prefer && prefer.title && r.title && !same(r.title, prefer.title)) n += 1;
+            if (prefer && prefer.artist && r.artists && !same(artistOf(r), prefer.artist)) n += 1;
+            return n;
+          };
+          const recs = best.recordings.filter(r => r && /^[0-9a-f-]{36}$/i.test(r.id || '')).sort((a, b) => rank(a) - rank(b));
+          const r = recs[0];
+          if (!r) return null;
+          return { score: Math.max(0, Math.min(1, +best.score || 0)), id: r.id, title: String(r.title || ''), artist: artistOf(r) };
+        }
+
+        // One song at a time: decoding and fingerprinting are heavy
+        let chain = Promise.resolve();
+        const found = new Map();   // likeKey|size -> { score, id, title, artist } | null (no match), this session
+        /** Identify a track by its sound. Resolves to the best match or null; throws { code } on failure. */
+        function identify(track, prefer) {
+          if (!hasKey()) return Promise.reject(fail('nokey', 'no AcoustID key'));
+          if (keyBad) return Promise.reject(fail('key', 'invalid API key'));
+          const k = `${track.likeKey}|${track.size}`;
+          if (found.has(k)) return Promise.resolve(found.get(k));
+          const run = async () => {
+            if (found.has(k)) return found.get(k);
+            const { pcm, rate, duration } = await readStart(track);
+            const fp = await fingerprint(pcm, rate);
+            const m = parse(await lookup(fp, duration), prefer);
+            found.set(k, m);
+            return m;
+          };
+          const p = chain.then(run, run);
+          chain = p.catch(() => {});
+          return p;
+        }
+
+        /** For testing in the console: the fingerprint and length that would be sent. */
+        async function fingerprintTrack(track) {
+          const { pcm, rate, duration } = await readStart(track);
+          return { fingerprint: await fingerprint(pcm, rate), duration };
+        }
+
+        /* ---- Settings: the key ---- */
+        const set = { key: $('setAidKey'), check: $('setAidCheck'), status: $('setAidStatus') };
+        let statusNote = '';
+        function syncSettings() {
+          if (!set.key) return;
+          if (document.activeElement !== set.key) set.key.value = key();
+          set.check.disabled = !hasKey();
+          let s;
+          if (statusNote) s = statusNote;
+          else if (!key()) s = 'No key yet. Songs won’t be identified by sound.';
+          else if (!hasKey()) s = 'That doesn’t look like an AcoustID key.';
+          else if (keyBad) s = 'AcoustID didn’t accept this key. Check it and try again.';
+          else if (!lookupsOn()) s = 'Saved. Turn on Look up songs online to use it.';
+          else s = 'Saved in this profile. Songs can be identified by sound.';
+          set.status.textContent = s;
+          set.status.dataset.kind = keyBad || (key() && !hasKey()) ? 'error' : '';
+        }
+        if (set.key) {
+          set.key.addEventListener('input', () => {
+            cfg = { ...cfg, key: set.key.value.trim().slice(0, 64) };
+            saveJSON(STORAGE_KEYS.ACOUSTID, cfg);
+            keyBad = false;
+            statusNote = '';
+            found.clear();
+            syncSettings();
+          });
+          set.check.addEventListener('click', async () => {
+            if (!hasKey()) return;
+            set.check.disabled = true;
+            statusNote = 'Checking…';
+            syncSettings();
+            let json = null;
+            try {
+              const stub = window.__LOCALIFY_ACOUSTID_STUB__;
+              if (typeof stub === 'function') json = await stub({ fingerprint: '', duration: 0, check: true });
+              else {
+                const res = await fetch(API_URL, { method: 'POST', credentials: 'omit', referrerPolicy: 'no-referrer',
+                  body: new URLSearchParams({ client: key(), format: 'json', duration: '1', fingerprint: 'AQ' }) });
+                json = await res.json();
+              }
+              // A real key gets past the key check and only the made-up fingerprint is refused
+              keyBad = !!(json && json.error && json.error.code === 4);
+              statusNote = keyBad ? '' : 'The key works.';
+            } catch (e) {
+              statusNote = 'Couldn’t reach AcoustID. Check your connection.';
+            }
+            syncSettings();
+            setTimeout(() => { statusNote = ''; syncSettings(); }, 6000);
+          });
+        }
+        syncSettings();
+
+        return {
+          ready, hasKey, identify, syncSettings,
+          keyRejected: () => keyBad,
+          _test: { fingerprintTrack, readStart, parse, lookup, fpCompute, cache: () => found, CP_URL }
+        };
+      })();
+      window.LocalifyAcoustID = AcoustID._test;
+      /* [/AcoustID] */
+
+      /* ==========================================================================
          [AI Tagger] auto-fill: fill in song details in the background.
          - Details live in STORAGE_KEYS.SONG_DETAILS (per song key), shown in the
            library only. Files change only through Apply, or "Auto-apply to files".
@@ -14095,7 +14437,9 @@
         const LABEL = { title: 'title', artist: 'artist', album: 'album', year: 'year', genre: 'genre', track: 'track number' };
         // How much each source is trusted (0..1). MusicBrainz is scaled by its own match score,
         // iTunes by how well its result matches. nameAlt: the other way round of an "A - B" file name.
-        const CONF = { user: 1, hint: 0.98, tag: 1, ripped: 0.85, mb: 0.95, itunes: 0.9, ai: 0.7, name: 0.6, nameAlt: 0.5, folder: 0.45 };
+        const CONF = { user: 1, hint: 0.98, tag: 1, ripped: 0.85, mb: 0.95, itunes: 0.9, ai: 0.7, name: 0.6, nameAlt: 0.5, folder: 0.45, sound: 0.96 };
+        const SOUND_SURE = 0.8;    // [AcoustID] weaker matches by sound become questions instead
+        const MIN_SOUND = 0.4;     // [AcoustID] below this, a match by sound is ignored
         const ASK_GAP = 0.2;       // two different values closer than this → ask
         const MIN_OPTION = 0.5;    // weaker guesses are not offered as answers
         const BATCH = 3;           // songs processed at a time
@@ -14174,7 +14518,7 @@
           for (const t of state.tracks) {
             const d = details[keyOf(t)];
             if (d === 'ok') { if (t.artist && t.artist !== t.folder) put(t.artist); }   // checked: the tags were complete
-            else if (d && d.f && d.f.artist && ['tag', 'ripped', 'mb', 'itunes', 'user', 'hint'].includes(d.src && d.src.artist)) put(d.f.artist);
+            else if (d && d.f && d.f.artist && ['tag', 'ripped', 'mb', 'itunes', 'user', 'hint', 'sound'].includes(d.src && d.src.artist)) put(d.f.artist);
           }
           knownCache = { at: Date.now(), set };
           return set;
@@ -14324,8 +14668,10 @@
           return leave;
         }
 
-        async function processTrack(track) {
-          if (!state.trackMap.has(track.id)) return;
+        /** opts.sound: identify by sound even if the names look fine ([AcoustID], from "Identify by sound").
+         *  opts.manual: don't auto-apply. Resolves to { state, sound } (sound: what the sound lookup found). */
+        async function processTrack(track, opts = {}) {
+          if (!state.trackMap.has(track.id)) return null;
           const key = keyOf(track);
           const item = await T.readItem(track, { raw: true });
           const orig = {};
@@ -14435,6 +14781,12 @@
             }
           }
 
+          // 3b. [AcoustID] Identify by the sound when the name, tags and text lookups aren't sure, or when asked
+          let sound = null;
+          if (opts.sound || (pref().musicbrainz && AcoustID.ready() && !namesSure(cands))) {
+            sound = await soundCands(track, cands, add, !!opts.sound);
+          }
+
           // 4. Earlier answers from the user
           const leave = hintsFor(track, cands);
 
@@ -14452,7 +14804,7 @@
               }
               continue;
             }
-            const sure = top.src === 'hint' || top.src === 'user' || (top.src === 'tag' && top.conf >= CONF.tag);
+            const sure = top.src === 'hint' || top.src === 'user' || (top.src === 'tag' && top.conf >= CONF.tag) || !!top.sure;
             const options = groups.filter(g => g.conf >= MIN_OPTION).slice(0, 3);
             if (!sure && alt && alt.conf >= MIN_OPTION && top.conf - alt.conf < ASK_GAP) {
               f[k] = orig[k];
@@ -14493,13 +14845,31 @@
             }
           }
 
-          if (!state.trackMap.has(track.id) || keyOf(track) !== key) return;
+          // [AcoustID] A weak match by sound: ask instead of applying it
+          if (sound && sound.low) {
+            const m = sound.low;
+            const why = `It sounds like “${m.title || '?'}”${m.artist ? ` by ${m.artist}` : ''}, but the match is only ${Math.round(m.score * 100)}% sure.`;
+            for (const k of ['title', 'artist']) {
+              const v = m[k];
+              if (!v) continue;
+              const ex = q.find(x => x.field === k);
+              if (ex) {
+                if (!ex.titles && !ex.options.some(o => norm(o) === norm(v))) { ex.options = [v, ...ex.options].slice(0, 3); ex.why = `${ex.why} ${why}`; }
+                continue;
+              }
+              if (f[k] && T.sameish(f[k], v)) continue;   // the sound agrees with what we have
+              q.push({ field: k, options: [v, f[k]].filter(Boolean), why });
+              f[k] = orig[k]; delete src[k]; delete conf[k];
+            }
+          }
+
+          if (!state.trackMap.has(track.id) || keyOf(track) !== key) return null;
           const changed = FIELDS.some(k => (f[k] || '') !== orig[k]);
           if (!q.length && !changed) {
             details[key] = 'ok';
             if (track.afState) { track.afState = undefined; patchTrackEverywhere(track); }
             saveDetails();
-            return;
+            return { state: 'ok', sound };
           }
           const e = { state: q.length ? 'question' : 'filled', f, src, conf, q, orig, at: Date.now() };
           if (mbid) e.mbid = mbid;
@@ -14509,11 +14879,90 @@
           overlay(track, e);
           if (changed) { summary.filled++; summary.tracks.push(track); }
           summary.questions += q.length;
-          if (e.state === 'filled') await maybeAutoApply(track);
+          if (e.state === 'filled' && !opts.manual) await maybeAutoApply(track);
+          return { state: e.state, sound, changed };
+        }
+
+        /* ---------------- [AcoustID] Identify by sound ---------------- */
+        /** Title and artist both settled (by tags, earlier answers, or a clear lookup)? */
+        function namesSure(cands) {
+          return ['title', 'artist'].every(k => {
+            const [top, alt] = groupCands(cands[k]);
+            if (!top) return false;
+            if (top.src === 'hint' || top.src === 'user' || (top.src === 'tag' && top.conf >= CONF.tag)) return true;
+            return top.conf >= 0.75 && (!alt || top.conf - alt.conf >= ASK_GAP);
+          });
+        }
+
+        /** Adds what the sound says as candidates. Returns { match, sure } | { low } | { none } | { error }. */
+        async function soundCands(track, cands, add, forced) {
+          const ti = groupCands(cands.title)[0], ar = groupCands(cands.artist)[0];
+          let m;
+          try { m = await AcoustID.identify(track, { title: ti ? ti.v : '', artist: ar ? ar.v : '' }); }
+          catch (e) { return { error: (e && e.code) || 'fail' }; }
+          if (!m || m.score < MIN_SOUND || !m.title) return { none: true, match: m };
+          if (m.score < SOUND_SURE) return { low: m, match: m };
+          // A clear match: MusicBrainz has the album, year and track number (and the cover, by release ID)
+          const rec = await mbRecording(m.id);
+          const r = rec || { title: m.title, artist: m.artist, rank: 9 };
+          // Asked for by the user: a clear match wins over the tags; otherwise it's one more strong opinion
+          const c = forced ? 1.01 : m.score * CONF.sound;
+          const extra = forced ? { sure: true } : null;
+          add('title', r.title || m.title, 'sound', c, extra);
+          add('artist', r.artist || m.artist, 'sound', c, extra);
+          if (rec) {
+            const rk = rec.rank === 0 ? 1 : rec.rank < 3 ? 0.75 : 0.55;
+            add('album', rec.album, 'sound', c * rk, { mbid: rec.mbid });
+            add('year', rec.year, 'sound', c * 0.9 * (rec.rank < 3 ? 1 : 0.7));
+            add('track', rec.track, 'sound', c * 0.8 * (rec.rank === 0 ? 1 : 0.5));
+          }
+          return { match: { ...m, title: r.title || m.title, artist: r.artist || m.artist }, sure: true };
+        }
+
+        const soundBusy = new Set();
+        /** "Identify by sound" from the row menu or Tidy. quiet: return the message instead of showing it. */
+        async function identifyBySound(track, { quiet } = {}) {
+          const say = (msg, label, fn) => { if (!quiet) notify(msg, label, fn); return msg; };
+          if (!track || !state.trackMap.has(track.id)) return '';
+          if (!AcoustID.hasKey()) return say('Add an AcoustID key in Settings → Tidy names & tags first.');
+          if (!pref().musicbrainz) return say('Turn on Look up songs online in Settings first.');
+          if (AcoustID.keyRejected()) return say('AcoustID didn’t accept your key. Check it in Settings.');
+          if (!(await canRun())) return say('You’re offline. Try again when you’re back online.');
+          if (soundBusy.has(track.id)) return '';
+          soundBusy.add(track.id);
+          if (!quiet) showToast('Listening…');
+          // A one-off: keep it out of the next auto-fill summary
+          const keep = { filled: summary.filled, questions: summary.questions, applied: summary.applied, t: summary.tracks.length, s: summary.saved.length };
+          let res = null;
+          try { res = await processTrack(track, { sound: true, manual: true }); }
+          catch (e) { res = null; }
+          finally {
+            soundBusy.delete(track.id);
+            Object.assign(summary, { filled: keep.filled, questions: keep.questions, applied: keep.applied });
+            summary.tracks.length = Math.min(summary.tracks.length, keep.t);
+            summary.saved.length = Math.min(summary.saved.length, keep.s);
+            saveDetails(true);
+            refresh();
+          }
+          const s = res && res.sound;
+          if (!s) return say('Couldn’t identify this song by sound.');
+          if (s.error) {
+            const why = { key: 'AcoustID didn’t accept your key. Check it in Settings.', nokey: 'Add an AcoustID key in Settings first.',
+              network: 'Couldn’t reach AcoustID. Check your connection.', decode: 'Couldn’t read the audio of this song.',
+              short: 'This song is too short to identify.' }[s.error];
+            return say(why || 'Couldn’t identify this song by sound.');
+          }
+          if (s.none) return say('No match found by sound.');
+          const m = s.match;
+          const name = `“${m.title}”${m.artist ? ` by ${m.artist}` : ''}`;
+          if (s.low) return say(`Might be ${name}, ${Math.round(m.score * 100)}% sure. Check the question.`, 'Answer', () => openQuestions(track));
+          if (res.state === 'question') return say(`Sounds like ${name}. Some details need an answer.`, 'Answer', () => openQuestions(track));
+          if (res.state === 'ok') return say(`Sounds like ${name}. The details already match.`);
+          return say(`Identified ${name}`, 'Review', () => Tagger.openForTrack(track.id));
         }
 
         function whyDisagree(k, options) {
-          const srcName = { tag: 'the tags', ripped: 'the tags', name: 'the file name', ai: 'the AI', mb: 'MusicBrainz', itunes: 'iTunes', folder: 'the folder name', hint: 'an earlier answer' };
+          const srcName = { tag: 'the tags', ripped: 'the tags', name: 'the file name', ai: 'the AI', mb: 'MusicBrainz', itunes: 'iTunes', folder: 'the folder name', hint: 'an earlier answer', sound: 'the sound' };
           const from = [...new Set(options.map(o => srcName[o.src] || o.src))];
           return from.length > 1
             ? `${from.slice(0, -1).join(', ')} and ${from[from.length - 1]} don't agree on the ${LABEL[k]}.`
@@ -14540,42 +14989,66 @@
         let mbNext = 0;
         const luceneEscape = (s) => String(s).replace(/([+\-&|!(){}[\]^"~*?:\\/])/g, '\\$1');
 
+        async function mbWait() {
+          const wait = mbNext - Date.now();
+          if (wait > 0) await sleep(wait);
+          mbNext = Date.now() + MB_GAP_MS;
+        }
+
+        /** GET from MusicBrainz. JSON, or null if it failed or stayed busy. */
+        async function mbGet(url) {
+          // MusicBrainz often answers 503 "busy" even at one request a second: wait and try again (3 s, then 6 s)
+          for (let attempt = 0; ; attempt++) {
+            const ctl = new AbortController();
+            const timer = setTimeout(() => ctl.abort(), 8000);
+            // Browsers don't let a page replace its User-Agent, so the browser's own generic one is sent.
+            // No cookies, no referrer, and nothing but the title/artist text (or a recording ID).
+            const res = await fetch(url,
+              { headers: { Accept: 'application/json' }, credentials: 'omit', referrerPolicy: 'no-referrer', signal: ctl.signal });
+            clearTimeout(timer);
+            if (res.status === 503 || res.status === 429) {
+              if (attempt >= 2) { mbNext = Date.now() + 10000; return null; }
+              await sleep(3000 * (attempt + 1));
+              mbNext = Date.now() + MB_GAP_MS;
+              continue;
+            }
+            if (!res.ok) return null;
+            return res.json();
+          }
+        }
+
+        function mbQueue(run, empty) {
+          const p = mbChain.then(run, run);
+          mbChain = p.catch(() => {});
+          return p.catch(() => empty);
+        }
+
         function mbSearch(title, artist) {
-          const run = async () => {
-            const wait = mbNext - Date.now();
-            if (wait > 0) await sleep(wait);
-            mbNext = Date.now() + MB_GAP_MS;
+          return mbQueue(async () => {
+            await mbWait();
             const query = `recording:"${luceneEscape(title)}"` + (artist ? ` AND artist:"${luceneEscape(artist)}"` : '');
             // Test seam: window.__LOCALIFY_MB_STUB__ = async ({ title, artist, query }) => MusicBrainz JSON
             const stub = window.__LOCALIFY_MB_STUB__;
-            let json;
-            if (typeof stub === 'function') json = await stub({ title, artist, query });
-            else {
-              // MusicBrainz often answers 503 "busy" even at one request a second: wait and try again (3 s, then 6 s)
-              for (let attempt = 0; ; attempt++) {
-                const ctl = new AbortController();
-                const timer = setTimeout(() => ctl.abort(), 8000);
-                // Browsers don't let a page replace its User-Agent, so the browser's own generic one is sent.
-                // No cookies, no referrer, and nothing but the title/artist text.
-                const res = await fetch(`${MB_URL}?query=${encodeURIComponent(query)}&fmt=json&limit=10`,
-                  { headers: { Accept: 'application/json' }, credentials: 'omit', referrerPolicy: 'no-referrer', signal: ctl.signal });
-                clearTimeout(timer);
-                if (res.status === 503 || res.status === 429) {
-                  if (attempt >= 2) { mbNext = Date.now() + 10000; return []; }
-                  await sleep(3000 * (attempt + 1));
-                  mbNext = Date.now() + MB_GAP_MS;
-                  continue;
-                }
-                if (!res.ok) return [];
-                json = await res.json();
-                break;
-              }
-            }
-            return parseMB(json);
-          };
-          const p = mbChain.then(run, run);
-          mbChain = p.catch(() => {});
-          return p.catch(() => []);
+            const json = typeof stub === 'function' ? await stub({ title, artist, query })
+              : await mbGet(`${MB_URL}?query=${encodeURIComponent(query)}&fmt=json&limit=10`);
+            return json ? parseMB(json) : [];
+          }, []);
+        }
+
+        /** [AcoustID] One recording by its MusicBrainz ID, in the same shape as a search result (or null). */
+        function mbRecording(id) {
+          return mbQueue(async () => {
+            if (!/^[0-9a-f-]{36}$/i.test(String(id || ''))) return null;
+            await mbWait();
+            // Test seam: the same __LOCALIFY_MB_STUB__ gets ({ recording: id }) and may return the recording JSON
+            const stub = window.__LOCALIFY_MB_STUB__;
+            const rec = typeof stub === 'function' ? await stub({ recording: id })
+              : await mbGet(`${MB_URL}${id}?inc=releases+release-groups+media+artist-credits&fmt=json`);
+            if (!rec || !rec.id) return null;
+            // A lookup lists a release's tracks under "tracks"; search results use "track"
+            const releases = (rec.releases || []).map(r => ({ ...r, media: (r.media || []).map(m => ({ ...m, track: m.track || m.tracks })) }));
+            return parseMB({ recordings: [{ ...rec, score: 100, releases }] })[0] || null;
+          }, null);
         }
 
         function releaseRank(r) {
@@ -15051,7 +15524,7 @@
           for (const k of FIELDS) {
             if (asked.has(k) || !e.f[k]) continue;
             fields[k] = e.f[k];
-            if (['ai', 'mb', 'itunes', 'hint', 'user'].includes(e.src[k]) && e.f[k] !== e.orig[k]) by[k] = true;
+            if (['ai', 'mb', 'itunes', 'hint', 'user', 'sound'].includes(e.src[k]) && e.f[k] !== e.orig[k]) by[k] = true;
           }
           return { fields, by };
         };
@@ -15064,11 +15537,19 @@
           updateChip();
         };
         Tagger.hooks.knownArtist = (name) => knownArtists().has(norm(name));
+        // [AcoustID] "Identify by sound" in Tidy
+        Tagger.hooks.canIdentify = () => AcoustID.ready();
+        // [AcoustID] { msg, ok }: ok when the song was matched (the messages identifyBySound gives for a match)
+        Tagger.hooks.identify = async (track) => {
+          const msg = await identifyBySound(track, { quiet: true });
+          return { msg, ok: /^(Identified|Sounds like)\b/.test(msg || '') };
+        };
         Tagger.hooks.prefsChanged = (name) => {
           if (name === 'autoFill' && pref().autoFill) {
             for (const t of state.tracks) if (t.enriched) onEnriched(t);   // show stored details, queue the rest
           }
           if (name === 'onlineOnly' || name === 'musicbrainz') resumeUnsorted();
+          if (name === 'musicbrainz') AcoustID.syncSettings();   // [AcoustID] its status mentions this switch
           refresh();
         };
 
@@ -15081,9 +15562,10 @@
 
         return {
           onEnriched, badgeHTML, updateChip, openQuestions, questionCount,
+          identifyBySound, canIdentify: () => AcoustID.ready(),   // [AcoustID]
           isOpen: () => qa.dialog.open,
           // For tests in the console
-          _test: { details: () => details, answers: () => answers, isOnline, mbSearch, parseMB, itSearch, parseIT, knownArtists, keyOf, folderKey, resumeUnsorted,
+          _test: { details: () => details, answers: () => answers, isOnline, mbSearch, mbRecording, namesSure, parseMB, itSearch, parseIT, knownArtists, keyOf, folderKey, resumeUnsorted,
             reset: () => { reach.ok = null; knownCache.at = 0; } }
         };
       })();
@@ -15595,6 +16077,8 @@
       })();
 
       /* ---- [Looks] track actions menu: "⋯" button, right-click, long-press, Shift+F10 ---- */
+      // [AcoustID] a sound wave, for "Identify by sound"
+      const SOUND_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 12h1M7 8v8M11 4v16M15 7v10M19 10v4M22 12h-1"/></svg>';
       const LooksMenu = (() => {
         const menu = $('looksMenu'), backdrop = $('looksMenuBackdrop');
         const sheetQuery = matchMedia('(max-width: 768px)');
@@ -15609,7 +16093,9 @@
             { act: 'like', label: liked ? 'Remove from Liked Songs' : 'Add to Liked Songs', icon: SVG.heart, kbd: 'L', on: liked },
             null,
             { act: 'album', label: 'Go to album', icon: LOOKS_SVG.disc(16) },
-            { act: 'artist', label: 'Go to artist', icon: LOOKS_SVG.person(16) }
+            { act: 'artist', label: 'Go to artist', icon: LOOKS_SVG.person(16) },
+            // [AcoustID]
+            ...(AutoFill.canIdentify() ? [null, { act: 'sound', label: 'Identify by sound', icon: SOUND_ICON }] : [])
           ];
         }
 
@@ -15677,6 +16163,7 @@
           else if (act === 'like') toggleLikeTrack(t.id);
           else if (act === 'album') Browse.open('albums', Browse.albumKey(t));
           else if (act === 'artist') Browse.open('artists', Browse.artistKey(t));
+          else if (act === 'sound') AutoFill.identifyBySound(t);   // [AcoustID]
         }
 
         menu.addEventListener('click', (e) => {
