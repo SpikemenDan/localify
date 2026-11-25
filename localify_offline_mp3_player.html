@@ -9585,23 +9585,52 @@
         const now = Date.now();
         if (!force && now - lastResumeSave < 5000) return;
         lastResumeSave = now;
-        saveJSON(STORAGE_KEYS.LAST_TRACK, { key: track.likeKey, time: Math.floor(audio.currentTime || 0) });
+        const keyOf = (id) => { const t = state.trackMap.get(id); return t ? t.likeKey : null; };
+        // Up Next too: the play order (with songs you queued) and the list it came from
+        const MAX = 3000;
+        const start = Math.max(0, Math.min(state.queueIndex - 200, state.playQueue.length - MAX));
+        saveJSON(STORAGE_KEYS.LAST_TRACK, {
+          key: track.likeKey,
+          time: Math.floor(audio.currentTime || 0),
+          queue: state.playQueue.slice(start, start + MAX).map(keyOf),
+          base: state.baseQueue.slice(0, MAX).map(keyOf)
+        });
       }
+
+      // While saved folders are still loading at startup, wait before picking the song to resume,
+      // so its queue can include songs from every folder.
+      let startupLoading = true;
 
       /** After a library load, cue (not play) the track that was playing last time. */
       function maybeCueResumeTrack() {
         const r = state.resume;
-        if (!r || state.currentTrackId) return;
+        if (!r || state.currentTrackId || startupLoading) return;
         const track = state.tracks.find(t => t.likeKey === r.key);
         if (!track) return;
         state.resume = null;
-        const list = getVisibleTracks().some(t => t.id === track.id) ? getVisibleTracks() : state.tracks;
-        state.baseQueue = list.map(t => t.id);
-        state.playQueue = state.shuffle
-          ? [track.id, ...fisherYatesShuffle(state.baseQueue.filter(id => id !== track.id))]
-          : state.baseQueue.slice();
+        // Rebuild the saved Up Next (keys → this session's songs), else start from the open list
+        const byKey = new Map();
+        for (const t of state.tracks) if (!byKey.has(t.likeKey)) byKey.set(t.likeKey, t.id);
+        const toIds = (keys) => {
+          const seen = new Set(), out = [];
+          for (const k of keys || []) { const id = byKey.get(k); if (id && !seen.has(id)) { seen.add(id); out.push(id); } }
+          return out;
+        };
+        const savedQueue = toIds(r.queue);
+        if (savedQueue.includes(track.id)) {
+          state.playQueue = savedQueue;
+          const savedBase = toIds(r.base);
+          state.baseQueue = savedBase.length ? savedBase : savedQueue.slice();
+        } else {
+          const list = getVisibleTracks().some(t => t.id === track.id) ? getVisibleTracks() : state.tracks;
+          state.baseQueue = list.map(t => t.id);
+          state.playQueue = state.shuffle
+            ? [track.id, ...fisherYatesShuffle(state.baseQueue.filter(id => id !== track.id))]
+            : state.baseQueue.slice();
+        }
         state.queueIndex = state.playQueue.indexOf(track.id);
         setCurrentTrack(track);
+        renderUpNextQueue();
         if (r.time > 0) {
           audio.addEventListener('loadedmetadata', function once() {
             audio.removeEventListener('loadedmetadata', once);
@@ -10997,7 +11026,7 @@
         saveResumePoint(true);
       });
       onPlayers('ratechange', updateMediaSessionPlayback);
-      onPlayers('seeked', updateMediaSessionPlayback);
+      onPlayers('seeked', () => { updateMediaSessionPlayback(); if (!audio.paused) return; saveResumePoint(true); });
       onPlayers('error', () => {
         if (!audio.getAttribute('src')) return;
         const track = state.trackMap.get(state.currentTrackId);
@@ -18981,6 +19010,9 @@ self.onmessage = async (e) => {
       restoreSessionFolders().then(async () => {
         const n = await LibraryCopy.restore();
         if (n && !supportsDirectoryPicker) showToast(`Restored ${n} ${n === 1 ? 'track' : 'tracks'}`);
+      }).finally(() => {
+        startupLoading = false;
+        maybeCueResumeTrack();
       });
     })();
   </script>
