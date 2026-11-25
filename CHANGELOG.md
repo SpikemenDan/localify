@@ -1,5 +1,11 @@
 # What's new in Localify
 
+## 1.0.1 — polish
+
+- Cleaner settings: sliders now fill with your accent color as you drag them, and the equalizer and sleep timer choices sit in a tidy grid.
+- The song count and total time in the sidebar are now two small cards.
+- Compact rows are slimmer: one line per song with the artist next to the title. On phones the title gets the whole line.
+
 ## 1.0.0 — first public release
 
 **Playing music**

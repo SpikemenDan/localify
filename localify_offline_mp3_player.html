@@ -311,17 +311,59 @@
     /* --accent-dim is derived, so re-derive it wherever the accent changes */
     [data-accent] { --accent-dim: rgba(var(--accent-rgb), 0.16); }
 
-    /* [Settings] Compact rows (ROW_HEIGHT in JS follows this) */
+    /* [Settings] Compact rows (ROW_HEIGHT in JS follows this): one line per song,
+       title then artist, smaller art, and a slimmer header so more songs fit. */
     :root[data-density="compact"] #tracklistBody .track-row {
-      height: 44px;
-      padding-top: 4px;
-      padding-bottom: 4px;
+      height: 40px;
+      padding-top: 0;
+      padding-bottom: 0;
     }
 
     :root[data-density="compact"] #tracklistBody .track-thumb {
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
     }
+
+    :root[data-density="compact"] #tracklistBody .track-title-cell { gap: 10px; }
+
+    :root[data-density="compact"] #tracklistBody .track-text {
+      flex-direction: row;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    :root[data-density="compact"] #tracklistBody .track-name {
+      font-size: 13.5px;
+      flex: 0 1 auto;
+      min-width: 0;
+    }
+
+    /* The artist gives up its space before the title does */
+    :root[data-density="compact"] #tracklistBody .track-artist {
+      font-size: 12.5px;
+      flex: 0 1000 auto;
+      min-width: 0;
+    }
+
+    :root[data-density="compact"] #tracklistBody .track-artist:not(:empty)::before {
+      content: "\2022";
+      margin-right: 8px;
+      color: var(--text-muted);
+    }
+    /* Phones: a one-line compact row has no room for both, so the title wins. */
+    @media (max-width: 600px) {
+      :root[data-density="compact"] #tracklistBody .track-artist { display: none; }
+    }
+
+    :root[data-density="compact"] #tracklistBody .track-album,
+    :root[data-density="compact"] #tracklistBody .track-dur { font-size: 12.5px; }
+
+    :root[data-density="compact"] .tracklist-header { padding-top: 6px; padding-bottom: 6px; margin-bottom: 4px; }
+
+    :root[data-density="compact"] .hero-banner { padding: 18px 28px 14px; gap: 18px; }
+    :root[data-density="compact"] .hero-cover { width: 96px; height: 96px; }
+    :root[data-density="compact"] .hero-title { font-size: clamp(24px, 3vw, 36px); }
     /* [/Settings] Appearance */
 
     *, *::before, *::after {
@@ -607,55 +649,36 @@
     }
 
     .stats-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(var(--fg-rgb), 0.03);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
-      padding: 8px 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
     }
 
     .stat-item {
       display: flex;
-      align-items: center;
-      gap: 7px;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+      padding: 9px 12px;
+      border-radius: var(--radius-sm);
+      background: rgba(var(--fg-rgb), 0.04);
     }
 
-    .stat-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      flex-shrink: 0;
-      box-shadow: 0 0 6px rgba(var(--accent-rgb), 0.6);
-    }
-
-    .stat-icon {
-      color: var(--text-secondary);
-      display: flex;
-      align-items: center;
+    .stat-value {
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .stat-label {
       font-size: 11px;
-      color: var(--text-secondary);
       font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .stat-value {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text-primary);
-      font-variant-numeric: tabular-nums;
-    }
-
-    .stat-divider {
-      width: 1px;
-      height: 16px;
-      background: var(--border-subtle);
+      color: var(--text-secondary);
     }
 
     /* Clean Collapsible Shortcuts Drawer */
@@ -1960,10 +1983,30 @@
       height: 5px;
       -webkit-appearance: none;
       appearance: none;
-      background: rgba(var(--fg-rgb), 0.2);
+      /* --fill-from / --fill-to are set by paintRange() in JS */
+      background: linear-gradient(to right,
+        rgba(var(--fg-rgb), 0.18) var(--fill-from, 0%),
+        var(--accent) var(--fill-from, 0%),
+        var(--accent) var(--fill-to, 0%),
+        rgba(var(--fg-rgb), 0.18) var(--fill-to, 0%));
       border-radius: var(--radius-full);
       outline: none;
       cursor: pointer;
+    }
+
+    .speed-range-slider::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border: 0;
+      border-radius: 50%;
+      background: var(--text-primary);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+      cursor: pointer;
+    }
+
+    .speed-range-slider:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
     }
 
     .speed-range-slider::-webkit-slider-thumb {
@@ -2350,9 +2393,20 @@
       border: 1px solid var(--border-subtle);
     }
 
+    /* Many choices (EQ presets, sleep timer): an even 3-column grid, so nothing runs
+       past the edge and every button is the same size */
     .segmented.wrap {
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 3px;
       border-radius: var(--radius-md);
+    }
+
+    .segmented.wrap button {
+      border-radius: calc(var(--radius-md) - 3px);
+      padding: 7px 6px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .segmented button {
@@ -5657,20 +5711,12 @@
         <div class="sidebar-footer">
           <div class="stats-row">
             <div class="stat-item">
-              <span class="stat-dot"></span>
-              <span class="stat-label">Tracks</span>
               <span class="stat-value" id="statTracks">0</span>
+              <span class="stat-label">Tracks</span>
             </div>
-            <div class="stat-divider"></div>
             <div class="stat-item">
-              <span class="stat-icon">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-              </span>
-              <span class="stat-label">Duration</span>
               <span class="stat-value" id="statDuration">0m</span>
+              <span class="stat-label">Total time</span>
             </div>
           </div>
 
@@ -6734,9 +6780,35 @@
         ACOUSTID: 'localify_acoustid_v1'            // [AcoustID] { key }: the user's own AcoustID application key
       };
 
+      // [Polish] Sliders show an accent fill up to the thumb. Sliders that go below and
+      // above zero (EQ, gain) fill from the middle. The value setter is wrapped so code
+      // that sets .value repaints too, not just dragging.
+      function paintRange(el) {
+        const min = parseFloat(el.min || 0), max = parseFloat(el.max || 100);
+        const val = parseFloat(el.value);
+        if (!(max > min) || Number.isNaN(val)) return;
+        const pct = v => ((Math.min(max, Math.max(min, v)) - min) / (max - min)) * 100;
+        const origin = (min < 0 && max > 0) ? pct(0) : 0;
+        const at = pct(val);
+        el.style.setProperty('--fill-from', Math.min(origin, at) + '%');
+        el.style.setProperty('--fill-to', Math.max(origin, at) + '%');
+      }
+      (() => {
+        const isPainted = el => el && el.type === 'range' && el.classList.contains('speed-range-slider');
+        const desc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+        if (desc && desc.set) {
+          Object.defineProperty(HTMLInputElement.prototype, 'value', {
+            ...desc,
+            set(v) { desc.set.call(this, v); if (isPainted(this)) paintRange(this); }
+          });
+        }
+        document.addEventListener('input', e => { if (isPainted(e.target)) paintRange(e.target); }, true);
+        document.querySelectorAll('input.speed-range-slider').forEach(paintRange);
+      })();
+
       const AUDIO_EXTENSIONS = new Set(['mp3', 'wav', 'ogg', 'm4a', 'flac', 'aac', 'opus', 'webm']);
       const MAX_RECENT_FOLDERS = 20;
-      let ROW_HEIGHT = 58;            // must match .track-row height in CSS ([Settings] compact rows: 44)
+      let ROW_HEIGHT = 58;            // must match .track-row height in CSS ([Settings] compact rows: 40)
       const ROW_OVERSCAN = 8;         // extra rows rendered above/below the viewport
       const THUMB_SIZE = 96;          // px, list/queue thumbnails (2x of 42px for HiDPI)
       const ARTWORK_SIZE = 512;       // px, Media Session artwork
@@ -9656,7 +9728,7 @@
         setTimeout(() => { try { Editor.redraw(); } catch (err) { /* editor not initialised yet */ } }, 0);
         vis.gradient = null;   // canvas colors are read from the CSS tokens
         vis.lineColor = null;
-        const rowHeight = a.density === 'compact' ? 44 : 58;
+        const rowHeight = a.density === 'compact' ? 40 : 58;
         if (rowHeight !== ROW_HEIGHT) {
           ROW_HEIGHT = rowHeight;
           renderedRange = [0, -1];
