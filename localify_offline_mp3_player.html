@@ -818,8 +818,44 @@
       transition: padding-right var(--transition-fast);
     }
 
-    .recent-folder-item:hover .recent-folder-info {
-      padding-right: 26px;
+    .recent-folder-item:hover .recent-folder-info,
+    .recent-folder-item:focus-within .recent-folder-info {
+      padding-right: 54px;
+    }
+
+    /* [Folder looks] your own icon and color */
+    .recent-folder-icon.has-look {
+      color: var(--accent);
+      background: rgba(var(--accent-rgb), 0.16);
+    }
+    .recent-folder-item:hover .recent-folder-icon.has-look {
+      background: rgba(var(--accent-rgb), 0.26);
+      color: var(--accent);
+    }
+    .recent-folder-icon .fd-emoji { font-size: 17px; line-height: 1; }
+
+    .recent-folder-edit { right: 32px !important; }
+
+    .fd-sub {
+      margin: -8px 0 14px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      overflow-wrap: anywhere;
+    }
+    .fd-preview {
+      width: 56px;
+      height: 56px;
+      flex-shrink: 0;
+      border-radius: var(--radius-md);
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      color: var(--accent);
+      background: rgba(var(--accent-rgb), 0.16);
+    }
+    .fd-preview svg { width: 26px; height: 26px; }
+    .lp-swatches button.fd-auto {
+      background: conic-gradient(#1DB954, #4aa8ff, #a855f7, #ec4899, #f97316, #14b8a6, #1DB954);
     }
 
     .recent-folder-name {
@@ -854,7 +890,8 @@
       transition: opacity var(--transition-fast), transform var(--transition-fast), color var(--transition-fast), background var(--transition-fast);
     }
 
-    .recent-folder-item:hover .recent-folder-remove {
+    .recent-folder-item:hover .recent-folder-remove,
+    .recent-folder-item:focus-within .recent-folder-remove {
       opacity: 1;
       pointer-events: auto;
       transform: translateY(-50%) scale(1);
@@ -5701,7 +5738,7 @@
         <!-- Recent Folders Section (dynamically rendered) -->
         <div id="recentFoldersSection" class="recent-folders-section" style="display: none;">
           <div class="sidebar-section-title">
-            <span>Recent Folders</span>
+            <span>Your Folders</span>
             <button class="btn-ghost" id="btnClearFolderHistory" title="Clear folder history" style="padding: 2px 6px;">Clear</button>
           </div>
           <div class="recent-folders-list" id="recentFoldersList"></div>
@@ -6516,6 +6553,11 @@
           <button type="button" class="btn-secondary" id="bkSwitchProfile">Switch</button>
         </div>
 
+        <div class="settings-row">
+          <span class="settings-label">Keep data on this device<span class="settings-hint" id="stPersistHint">Checking…</span></span>
+          <button type="button" class="btn-secondary" id="stPersistBtn" hidden>Keep it</button>
+        </div>
+
         <div class="settings-row stacked">
           <span class="settings-label">Export backup<span class="settings-hint">Saves likes, settings and history to a <b>.localify.json</b> file you can move to another device. Songs are never included.</span></span>
           <div class="bk-actions">
@@ -6713,6 +6755,33 @@
   </dialog>
   <!-- [/Profiles] -->
 
+  <!-- [Folder looks] Name and style a folder -->
+  <dialog class="lp-dialog" id="fdDialog" aria-labelledby="fdTitle" aria-describedby="fdSub">
+    <form id="fdForm" method="dialog" novalidate>
+      <h2 class="lp-dialog-title" id="fdTitle">Name this folder</h2>
+      <p class="fd-sub" id="fdSub"></p>
+      <div class="lp-editor-top">
+        <span class="fd-preview" id="fdPreview" aria-hidden="true"></span>
+        <label class="lp-field">
+          <span>Name</span>
+          <input type="text" id="fdName" maxlength="40" autocomplete="off" spellcheck="false">
+        </label>
+      </div>
+      <div class="lp-field">
+        <span id="fdIconLabel">Icon</span>
+        <div class="lp-emoji-row" id="fdIcons" role="radiogroup" aria-labelledby="fdIconLabel"></div>
+      </div>
+      <div class="lp-field">
+        <span id="fdColorLabel">Color</span>
+        <div class="lp-swatches" id="fdColors" role="radiogroup" aria-labelledby="fdColorLabel"></div>
+      </div>
+      <div class="lp-dialog-actions">
+        <button type="button" class="btn-secondary" id="fdSkip">Skip</button>
+        <button type="submit" class="btn-primary" id="fdSave">Save</button>
+      </div>
+    </form>
+  </dialog>
+
   <!-- [Backup] Import preview -->
   <dialog class="lp-dialog" id="bkImportDialog" aria-labelledby="bkImportTitle">
     <form id="bkImportForm" method="dialog">
@@ -6777,7 +6846,8 @@
         TAGGER: 'localify_tagger_v1',    // [AI Tagger] { template, dashOrder, ai, autoFill, onlineOnly, autoApply, musicbrainz }
         SONG_DETAILS: 'localify_song_details_v1',   // [AI Tagger] auto-fill { "likekey|size": details | 'ok' }
         SONG_ANSWERS: 'localify_song_answers_v1',   // [AI Tagger] { artists: { name: spelling }, albums: { folder: { album, year } } }
-        ACOUSTID: 'localify_acoustid_v1'            // [AcoustID] { key }: the user's own AcoustID application key
+        ACOUSTID: 'localify_acoustid_v1',           // [AcoustID] { key }: the user's own AcoustID application key
+        FOLDER_LOOKS: 'localify_folder_looks_v1'    // [Folder looks] { folderName: { label, icon, accent } }
       };
 
       // [Polish] Sliders show an accent fill up to the thumb. Sliders that go below and
@@ -7710,6 +7780,165 @@
         }
       }
 
+      /* ---- [Folder looks] your own name, icon and color for each folder ----
+         Keyed by the folder's real name (what the browser reports). Kept per profile
+         and in backups. Removing a folder from the list keeps its look, so adding the
+         same folder again brings it back. */
+      const FOLDER_ICONS = ['', '🎵', '🎧', '🎸', '🎹', '🎤', '🎷', '🥁', '💿', '📻', '❤️', '⭐', '🔥', '🌙', '🚗', '🏋️', '😴', '🎮'];
+      let folderLooks = loadJSON(STORAGE_KEYS.FOLDER_LOOKS, {});
+      if (!folderLooks || typeof folderLooks !== 'object' || Array.isArray(folderLooks)) folderLooks = {};
+      const folderLabel = (name) => (folderLooks[name] && folderLooks[name].label) || name;
+
+      function folderIconHTML(name) {
+        const look = folderLooks[name] || {};
+        const accent = look.accent ? ` data-accent="${escapeHtml(look.accent)}"` : '';
+        const cls = look.icon || look.accent ? ' has-look' : '';
+        const inner = look.icon ? `<span class="fd-emoji">${escapeHtml(look.icon)}</span>` : SVG.folder;
+        return `<div class="recent-folder-icon${cls}"${accent}>${inner}</div>`;
+      }
+
+      const FolderLook = (() => {
+        const dlg = $('fdDialog');
+        const queue = [];
+        let cur = null, icon = '', accent = '';
+
+        function paint() {
+          const prev = $('fdPreview');
+          if (accent) prev.dataset.accent = accent; else delete prev.dataset.accent;
+          prev.innerHTML = icon ? escapeHtml(icon) : SVG.folder;
+          const icons = $('fdIcons');
+          icons.textContent = '';
+          FOLDER_ICONS.forEach((em) => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.setAttribute('role', 'radio');
+            b.setAttribute('aria-checked', String(icon === em));
+            if (em) b.textContent = em; else b.innerHTML = SVG.folder;
+            b.setAttribute('aria-label', em ? 'Icon ' + em : 'Folder icon');
+            b.title = b.getAttribute('aria-label');
+            b.addEventListener('click', () => { icon = em; paint(); });
+            icons.appendChild(b);
+          });
+          const colors = $('fdColors');
+          colors.textContent = '';
+          [{ id: '', name: 'Same as the app' }].concat(ACCENTS).forEach((a) => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            if (a.id) b.dataset.accent = a.id; else b.className = 'fd-auto';
+            b.setAttribute('role', 'radio');
+            b.setAttribute('aria-checked', String(accent === a.id));
+            b.setAttribute('aria-label', a.name);
+            b.title = a.name;
+            b.addEventListener('click', () => { accent = a.id; paint(); });
+            colors.appendChild(b);
+          });
+        }
+
+        function show(name, isNew) {
+          cur = { name, isNew };
+          const look = folderLooks[name] || {};
+          icon = look.icon || '';
+          accent = look.accent || '';
+          $('fdTitle').textContent = isNew ? 'Name this folder' : 'Edit folder';
+          $('fdSub').textContent = isNew
+            ? `You added “${name}”. Give it a name and a look. It's remembered after you reload.`
+            : `Folder on your device: “${name}”`;
+          $('fdName').value = look.label || name;
+          $('fdSkip').textContent = isNew ? 'Skip' : 'Cancel';
+          paint();
+          dlg.showModal();
+          $('fdName').focus();
+          $('fdName').select();
+        }
+
+        function next() {
+          cur = null;
+          if (queue.length && !dlg.open) show(...queue.shift());
+        }
+
+        function save(look) {
+          folderLooks[cur.name] = look;
+          saveJSON(STORAGE_KEYS.FOLDER_LOOKS, folderLooks);
+          renderRecentFolders();
+          updateReconnectUI();
+        }
+
+        $('fdForm').addEventListener('submit', (e) => {
+          e.preventDefault();
+          const label = $('fdName').value.replace(/\s+/g, ' ').trim().slice(0, 40);
+          const look = {};
+          if (label && label !== cur.name) look.label = label;
+          if (icon) look.icon = icon;
+          if (accent) look.accent = accent;
+          const wasNew = cur.isNew;
+          save(look);
+          dlg.close();
+          showToast(wasNew ? `Saved “${label || cur.name}”` : 'Folder updated');
+        });
+        // Skip / Esc on a new folder: remember that we asked, keep the real name.
+        function skip() {
+          if (cur && cur.isNew && !folderLooks[cur.name]) save({});
+          if (dlg.open) dlg.close();
+        }
+        $('fdSkip').addEventListener('click', skip);
+        dlg.addEventListener('cancel', () => { if (cur && cur.isNew && !folderLooks[cur.name]) save({}); });
+        dlg.addEventListener('close', () => setTimeout(next, 150));
+
+        return {
+          /** Ask once for a folder that was just added. */
+          askNew(name) {
+            if (folderLooks[name] || (cur && cur.name === name) || queue.some(q => q[0] === name)) return;
+            queue.push([name, true]);
+            if (!dlg.open) setTimeout(next, 350);
+          },
+          edit(name) { if (!dlg.open) show(name, false); }
+        };
+      })();
+
+      /* ---- [Keep data] ask the browser not to clear Localify's data when space runs low ---- */
+      const KeepData = (() => {
+        const st = navigator.storage;
+        const ok = !!(st && st.persist && st.persisted);
+        const hint = $('stPersistHint'), btn = $('stPersistBtn');
+
+        async function refresh() {
+          if (!ok) {
+            hint.textContent = "This browser doesn't say. Keep a backup to be safe.";
+            btn.hidden = true;
+            return false;
+          }
+          let kept = false;
+          try { kept = await st.persisted(); } catch (e) { /* treat as not kept */ }
+          hint.textContent = kept
+            ? "Kept: the browser won't clear Localify's data to free up space."
+            : 'May be cleared if the device runs low on space. Keep a backup too.';
+          btn.hidden = kept;
+          return kept;
+        }
+
+        async function request() {
+          if (!ok) return false;
+          let kept = false;
+          try { kept = (await st.persisted()) || (await st.persist()); } catch (e) { /* refused */ }
+          await refresh();
+          return kept;
+        }
+
+        btn.addEventListener('click', async () => {
+          const kept = await request();
+          showToast(kept
+            ? 'Done. Your data stays on this device.'
+            : 'The browser said no for now. It often says yes once Localify is installed or used more.');
+        });
+
+        // At startup ask quietly where the browser decides on its own (Chrome, Edge, Safari).
+        // Firefox shows a prompt, so there we wait until you add a folder or press the button.
+        const prompts = /Firefox\//.test(navigator.userAgent);
+        if (ok && !prompts) request(); else refresh();
+
+        return { request };
+      })();
+
       /* ---- Folder history (sidebar) ---- */
       function saveFolderToHistory(name, trackCount) {
         state.recentFolders = state.recentFolders.filter(f => f.name !== name);
@@ -7758,13 +7987,14 @@
         }
         dom.recentFoldersSection.style.display = 'block';
         dom.recentFoldersList.innerHTML = state.recentFolders.map(f => `
-          <div class="recent-folder-item" role="button" tabindex="0" data-folder-name="${escapeHtml(f.name)}" aria-label="Open folder ${escapeHtml(f.name)}">
-            <div class="recent-folder-icon">${SVG.folder}</div>
+          <div class="recent-folder-item" role="button" tabindex="0" data-folder-name="${escapeHtml(f.name)}" aria-label="Open folder ${escapeHtml(folderLabel(f.name))}">
+            ${folderIconHTML(f.name)}
             <div class="recent-folder-info">
-              <div class="recent-folder-name" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</div>
+              <div class="recent-folder-name" title="${escapeHtml(folderLabel(f.name) === f.name ? f.name : folderLabel(f.name) + ' (' + f.name + ')')}">${escapeHtml(folderLabel(f.name))}</div>
               <div class="recent-folder-meta">${f.trackCount} track${f.trackCount !== 1 ? 's' : ''} &bull; ${formatRelativeTime(f.lastUsed)}</div>
             </div>
-            <button class="recent-folder-remove" data-remove-folder="${escapeHtml(f.name)}" title="Remove from history" aria-label="Remove ${escapeHtml(f.name)} from history">${SVG.close}</button>
+            <button class="recent-folder-remove recent-folder-edit" data-edit-folder="${escapeHtml(f.name)}" title="Rename or restyle" aria-label="Edit ${escapeHtml(folderLabel(f.name))}">${SVG.edit}</button>
+            <button class="recent-folder-remove" data-remove-folder="${escapeHtml(f.name)}" title="Remove from list" aria-label="Remove ${escapeHtml(folderLabel(f.name))} from the list">${SVG.close}</button>
           </div>`).join('');
       }
 
@@ -7796,7 +8026,7 @@
         dom.btnReconnect.hidden = pending.length === 0;
         if (pending.length) {
           dom.reconnectLabel.textContent = pending.length === 1
-            ? `Reconnect “${pending[0].name}”`
+            ? `Reconnect “${folderLabel(pending[0].name)}”`
             : `Reconnect ${pending.length} Folders`;
         }
         if (state.tracks.length === 0) renderTracklist();
@@ -7912,6 +8142,10 @@
           if (withPath) folderName = withPath.file.webkitRelativePath.split('/')[0];
         }
         if (folderName) saveFolderToHistory(folderName, valid.length);
+        if (folderName && !opts.quiet && addedCount > 0) {   // [Folder looks] / [Keep data]
+          FolderLook.askNew(folderName);
+          KeepData.request();
+        }
 
         enrichTotal += addedCount;
         invalidateVisible();
@@ -9369,7 +9603,8 @@
         const removeBtn = e.target.closest('.recent-folder-remove');
         if (removeBtn) {
           e.stopPropagation();
-          if (removeBtn.dataset.removeFolder) removeFolderFromHistory(removeBtn.dataset.removeFolder);
+          if (removeBtn.dataset.editFolder) FolderLook.edit(removeBtn.dataset.editFolder);
+          else if (removeBtn.dataset.removeFolder) removeFolderFromHistory(removeBtn.dataset.removeFolder);
           return;
         }
         const item = e.target.closest('.recent-folder-item');

@@ -2,6 +2,8 @@
 
 ## 1.0.1 — polish
 
+- Name your folders: when you add a folder, give it your own name, icon and color. It's remembered after reloads, kept in backups, and you can change it any time from **Your Folders** in the sidebar.
+- Localify now asks the browser to keep its data, so a full device doesn't quietly clear your settings, likes and folders. **Settings → Your data** shows whether it said yes.
 - Cleaner settings: sliders now fill with your accent color as you drag them, and the equalizer and sleep timer choices sit in a tidy grid.
 - The song count and total time in the sidebar are now two small cards.
 - Compact rows are slimmer: one line per song with the artist next to the title. On phones the title gets the whole line.

@@ -28,10 +28,10 @@
 ## Getting started
 
 1. Open **`localify_offline_mp3_player.html`** in Chrome or Edge. Double-clicking it works.
-2. Click **Load Folder** and pick the folder that has your music.
+2. Click **Load Folder** and pick the folder that has your music. Localify asks you to give it a name, an icon and a color (or just skip).
 3. Press **Play**, or **Shuffle Play**.
 
-That's all. Localify remembers your likes, settings and the last song you played the next time you open it.
+That's all. Localify remembers your likes, settings, folders and the last song you played the next time you open it. Your folders stay in the sidebar under **Your Folders**. Hover one and press the pencil to rename or restyle it. After a restart, the browser may ask you to allow the folder again; in the installed app, choose **Allow on every visit** so it stops asking.
 
 > [!TIP]
 > Chrome and Edge work best. Other browsers can play music, but they can't save changes back into your files.
@@ -100,6 +100,9 @@ To move your data to another device, open **Settings → Your data**:
 
 - **Export backup** saves a small `.localify.json` file. Songs are never included.
 - **Import backup** previews the file first. You can then add it as a new profile, merge it, or replace the current one.
+- **Keep data on this device** shows whether the browser has promised not to clear Localify's data when space runs low. Localify asks for this by itself; press **Keep it** to ask again.
+
+Everything is stored in your browser on this device, never on a server. Clearing the site's data or using a private window removes it, so keep a backup.
 
 ---
 
