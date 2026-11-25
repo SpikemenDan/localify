@@ -5115,12 +5115,201 @@
       #actionBar { flex-wrap: wrap; row-gap: 10px; }
       #actionBar .btn-action-pill { white-space: nowrap; }
     }
+
+    /* ==========================================================================
+       [Lyrics] Lyrics panel (right-hand drawer on desktop, full screen on phones)
+       ========================================================================== */
+    .ly-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: var(--player-height);
+      width: min(420px, 100vw);
+      z-index: 45;
+      display: flex;
+      flex-direction: column;
+      background:
+        linear-gradient(180deg, rgba(var(--accent-rgb), 0.16) 0%, rgba(var(--accent-rgb), 0.04) 40%, transparent 70%),
+        var(--bg-surface);
+      border-left: 1px solid var(--border-subtle);
+      box-shadow: -12px 0 40px rgba(0, 0, 0, 0.35);
+      color: var(--text-primary);
+      transform: translateX(100%);
+      visibility: hidden;
+      transition: transform var(--transition-med), visibility 0s linear 250ms;
+    }
+    .ly-panel.open {
+      transform: none;
+      visibility: visible;
+      transition: transform var(--transition-med), visibility 0s;
+    }
+    .ly-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 12px 10px 20px;
+    }
+    .ly-head-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .ly-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-secondary); }
+    .ly-song { font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ly-artist { font-size: 13px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ly-icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+      transition: color var(--transition-fast), background var(--transition-fast);
+    }
+    .ly-icon-btn:hover { color: var(--text-primary); background: rgba(var(--fg-rgb), 0.08); }
+    .ly-icon-btn:focus-visible, .ly-line:focus-visible, .ly-action:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .ly-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 20px 8px;
+      min-height: 22px;
+    }
+    .ly-chip {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      background: var(--accent-dim);
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+    .ly-chip[hidden] { display: none; }
+    .ly-scroll {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding: 8px 20px 40vh;
+      scroll-padding: 30% 0;
+      -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 24px, #000 calc(100% - 48px), transparent 100%);
+              mask-image: linear-gradient(180deg, transparent 0, #000 24px, #000 calc(100% - 48px), transparent 100%);
+    }
+    .ly-scroll.plain { padding-bottom: 32px; }
+    .ly-line {
+      display: block;
+      width: 100%;
+      text-align: left;
+      font: inherit;
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.3;
+      letter-spacing: -0.01em;
+      padding: 6px 8px;
+      margin: 0 -8px;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+      overflow-wrap: anywhere;
+    }
+    .ly-line:hover { color: var(--text-secondary); background: rgba(var(--fg-rgb), 0.05); }
+    .ly-line.past { color: var(--text-secondary); }
+    .ly-line.active { color: var(--text-primary); }
+    .ly-line.gap { font-size: 18px; letter-spacing: 0.3em; }
+    .ly-plain {
+      white-space: pre-wrap;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.55;
+      color: var(--text-primary);
+      overflow-wrap: anywhere;
+      margin: 0;
+    }
+    .ly-state {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 24px 0;
+      color: var(--text-secondary);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+    .ly-state strong { color: var(--text-primary); font-size: 18px; }
+    .ly-state .ly-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .ly-spin {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2.5px solid rgba(var(--fg-rgb), 0.15);
+      border-top-color: var(--accent);
+      animation: ly-spin 0.8s linear infinite;
+    }
+    @keyframes ly-spin { to { transform: rotate(360deg); } }
+    .ly-foot {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px 14px;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .ly-foot-text { flex: 1; min-width: 0; }
+    .ly-foot a { color: var(--text-secondary); text-decoration: underline; text-underline-offset: 2px; }
+    .ly-foot a:hover { color: var(--text-primary); }
+    .ly-resync {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: var(--radius-full);
+      background: var(--accent);
+      color: var(--on-accent);
+    }
+    .ly-resync[hidden], .ly-play[hidden] { display: none; }
+    .ly-play {
+      display: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--text-primary);
+      color: var(--bg-base);
+      place-items: center;
+      flex-shrink: 0;
+    }
+    .ly-time { font-variant-numeric: tabular-nums; color: var(--text-secondary); font-size: 12px; }
+    #btnLyrics[disabled], #fsLyrics[disabled] { opacity: 0.4; cursor: default; transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .ly-panel, .ly-panel.open, .ly-line { transition: none; }
+    }
+
+    /* Phones and small tablets: a full-screen sheet above everything (incl. the full-screen player) */
+    @media (max-width: 768px) {
+      .ly-panel {
+        inset: 0;
+        width: auto;
+        z-index: 1150;
+        border-left: 0;
+        box-shadow: none;
+        background:
+          linear-gradient(180deg, rgba(var(--accent-rgb), 0.22) 0%, rgba(var(--accent-rgb), 0.06) 45%, var(--bg-base) 85%),
+          var(--bg-base);
+        transform: translateY(100%);
+        padding: var(--safe-top, 0px) var(--safe-right, 0px) var(--safe-bottom, 0px) var(--safe-left, 0px);
+      }
+      .ly-head { padding: 12px 8px 8px 16px; }
+      .ly-icon-btn { width: var(--tap, 44px); height: var(--tap, 44px); }
+      .ly-meta { padding: 0 16px 8px; }
+      .ly-scroll { padding-left: 16px; padding-right: 16px; }
+      .ly-line { font-size: 21px; }
+      .ly-foot { padding: 10px 16px 14px; }
+      .ly-play { display: grid; }
+    }
+    /* [/Lyrics] */
   </style>
 </head>
 <body>
   <!-- Hidden File Inputs for Folder and Individual Audio Loading -->
   <input type="file" id="folderInput" class="hidden-input" webkitdirectory directory multiple accept="audio/*,.mp3,.wav,.ogg,.m4a,.flac,.aac">
-  <input type="file" id="fileInput" class="hidden-input" multiple accept="audio/*,.mp3,.wav,.ogg,.m4a,.flac,.aac">
+  <input type="file" id="fileInput" class="hidden-input" multiple accept="audio/*,.mp3,.wav,.ogg,.m4a,.flac,.aac,.lrc"><!-- [Lyrics] .lrc -->
 
   <!-- Fullscreen Drag & Drop Overlay -->
   <div id="dropOverlay" class="drop-overlay" aria-hidden="true">
@@ -5915,6 +6104,12 @@
           </div>
         </div>
 
+        <!-- [Lyrics] -->
+        <button class="ctrl-btn" id="btnLyrics" aria-label="Lyrics" aria-pressed="false" aria-controls="lyricsPanel" title="Lyrics (Y)" disabled>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path><line x1="8" y1="9" x2="16" y2="9"></line><line x1="8" y1="13" x2="13" y2="13"></line></svg>
+        </button>
+        <!-- [/Lyrics] -->
+
         <button class="ctrl-btn" id="btnEditCurrent" aria-label="Edit current track" title="Edit current track (E in the track list)" disabled>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>
         </button>
@@ -5961,6 +6156,9 @@
           <span class="fs-eyebrow">Now playing</span>
           <span class="fs-context" id="fsContext">Your library</span>
         </div>
+        <button type="button" class="fs-icon-btn" id="fsLyrics" aria-label="Lyrics" aria-controls="lyricsPanel"><!-- [Lyrics] -->
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path><line x1="8" y1="9" x2="16" y2="9"></line><line x1="8" y1="13" x2="13" y2="13"></line></svg>
+        </button>
         <button type="button" class="fs-icon-btn" id="fsMore" aria-label="More actions" aria-haspopup="menu">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle></svg>
         </button>
@@ -5993,6 +6191,33 @@
       </div>
     </div>
   </div>
+
+  <!-- [Lyrics] Lyrics panel -->
+  <aside class="ly-panel" id="lyricsPanel" role="dialog" aria-labelledby="lyEyebrow" aria-describedby="lySong" inert>
+    <div class="ly-head">
+      <div class="ly-head-text">
+        <span class="ly-eyebrow" id="lyEyebrow">Lyrics</span>
+        <span class="ly-song" id="lySong">Not Playing</span>
+        <span class="ly-artist" id="lyArtist"></span>
+      </div>
+      <button type="button" class="ly-icon-btn" id="lyClose" aria-label="Close lyrics" title="Close (Y)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+    <div class="ly-meta">
+      <span class="ly-chip" id="lySource" hidden></span>
+      <button type="button" class="ly-resync" id="lyResync" hidden>Back to Current Line</button>
+    </div>
+    <div class="ly-scroll" id="lyScroll" tabindex="-1">
+      <div id="lyBody" aria-live="polite"></div>
+    </div>
+    <div class="ly-foot">
+      <button type="button" class="ly-play" id="lyPlay" aria-label="Play"></button>
+      <span class="ly-foot-text" id="lyFoot">Synced lyrics: tap a line to jump there.</span>
+      <span class="ly-time" id="lyTime"></span>
+    </div>
+  </aside>
+  <!-- [/Lyrics] -->
 
   <div class="looks-menu-backdrop" id="looksMenuBackdrop" hidden></div>
   <div class="looks-menu" id="looksMenu" role="menu" aria-label="Track actions" hidden></div>
@@ -6249,6 +6474,20 @@
         </div>
       </section>
       <!-- [/PWA] -->
+
+      <!-- [Lyrics] settings -->
+      <section class="settings-section" id="setLyrics" aria-labelledby="setLyricsTitle">
+        <h3 class="settings-section-title" id="setLyricsTitle">Lyrics</h3>
+        <div class="settings-row">
+          <span class="settings-label" id="setLyOnlineLabel">Find Lyrics Online<span class="settings-hint">When you open Lyrics (press Y), asks LRCLIB (lrclib.net) for the song's words. Only the song's title, artist, album and length are sent. No file names, folders or audio. Also needs Look up songs online below.</span></span>
+          <button type="button" class="switch" id="setLyOnline" role="switch" aria-checked="true" aria-labelledby="setLyOnlineLabel"></button>
+        </div>
+        <div class="settings-row">
+          <span class="settings-label" id="setLyCacheLabel">Saved Lyrics<span class="settings-hint" id="setLyCacheHint">Lyrics are saved on this device so they work offline. A .lrc file next to a song, or lyrics in its tags, are used first and never sent anywhere.</span></span>
+          <button type="button" class="btn-secondary" id="setLyClear">Clear</button>
+        </div>
+      </section>
+      <!-- [/Lyrics] settings -->
 
       <!-- [AI Tagger] Tidy names & tags -->
       <section class="settings-section" aria-labelledby="setTaggerTitle">
@@ -7319,7 +7558,7 @@
           const pending = [];
           for await (const entry of handle.values()) {
             if (entry.kind === 'file') {
-              if (!AUDIO_EXTENSIONS.has(fileExt(entry.name))) continue;
+              if (!AUDIO_EXTENSIONS.has(fileExt(entry.name)) && !Lyrics.isLrcName(entry.name)) continue;   // [Lyrics] keep .lrc files
               pending.push(entry.getFile().then(
                 file => entries.push({ file, folderName: parentName || folderName, path: prefix + entry.name }),
                 () => {}
@@ -7499,6 +7738,7 @@
        * opts.folderName: root folder to record in Recent Folders.
        */
       function ingestFiles(fileEntries, opts = {}) {
+        Lyrics.indexLrc(fileEntries);   // [Lyrics]
         const valid = fileEntries.filter(entry => isAudioFile(entry.file));
         if (valid.length === 0) {
           if (!opts.quiet) showToast('No supported audio files found.');
@@ -7634,7 +7874,7 @@
           const traverse = async (fsEntry, parentFolder, path) => {
             if (!fsEntry) return;
             if (fsEntry.isFile) {
-              if (!AUDIO_EXTENSIONS.has(fileExt(fsEntry.name))) return;
+              if (!AUDIO_EXTENSIONS.has(fileExt(fsEntry.name)) && !Lyrics.isLrcName(fsEntry.name)) return;   // [Lyrics] keep .lrc files
               await new Promise((resolve) => {
                 fsEntry.file((file) => {
                   entries.push({ file, folderName: parentFolder, path: path + fsEntry.name });
@@ -8556,6 +8796,7 @@
 
       /* ---- Current-track UI ---- */
       function updateCurrentTrackUI() {
+        try { Lyrics.onTrackChange(); } catch (e) { /* [Lyrics] module not set up yet */ }
         updatePlayerBarUI();
         updateNowPlayingUI();
         updateMediaSession();
@@ -9182,6 +9423,7 @@
           closeMobileSidebar();
           closeSettings();   // [Settings]
           closeFocusPop();   // [Focus]
+          Lyrics.close();    // [Lyrics]
           return;
         }
         if (isTypingTarget(target)) return;
@@ -9222,6 +9464,7 @@
           case ']': e.preventDefault(); setPlaybackSpeed(state.playbackRate + 0.1, true); break;
           case ',': e.preventDefault(); openSettings(); break;   // [Settings]
           case 't': case 'T': e.preventDefault(); toggleFocusPop(); break;   // [Focus]
+          case 'y': case 'Y': e.preventDefault(); Lyrics.toggle(); break;   // [Lyrics]
           default: break;
         }
       });
@@ -9689,6 +9932,7 @@
         if (sleep.mode !== 'off') setSleepTimer('off');
         resetPitchFocusSettings();   // [Pitch]/[Focus]
         Tagger.resetPrefs();   // [AI Tagger]
+        Lyrics.resetPrefs();   // [Lyrics]
         setPlaybackSpeed(1);
         syncSettingsUI();
         showToast('Settings reset');
@@ -9714,6 +9958,7 @@
       }
 
       function syncSettingsUI() {
+        try { Lyrics.syncSettings(); } catch (e) { /* [Lyrics] module not set up yet */ }
         const { appearance, fx, prefs } = settings;
         setRadioGroup(setDom.mode, appearance.mode);
         setRadioGroup(setDom.accent, appearance.accent);
@@ -15948,6 +16193,597 @@
       })();
 
       /* [/Looks] helpers */
+
+      /* ========================================================================
+         [Lyrics] Lyrics for the current song.
+         Order: a matching .lrc file in the loaded folder → USLT/SYLT tags →
+         lyrics saved on this device (IndexedDB) → LRCLIB (lrclib.net), if allowed.
+         Only title, artist, album text and duration are ever sent to LRCLIB.
+         Test seam: window.__LOCALIFY_LRCLIB_STUB__ = (path, params) => ({ status, json })
+         ======================================================================== */
+      const Lyrics = (() => {
+        const PREFS_KEY = 'localify_lyrics_v1';            // { online }
+        const DEFAULTS = { online: true };
+        const API = 'https://lrclib.net/api';
+        const DB_NAME = 'localify-lyrics', STORE = 'lyrics';
+        const RETRY_NONE_MS = 3 * 24 * 3600 * 1000;       // "not found" is re-checked after 3 days
+        const LEAD = 0.15;                                 // show a line slightly early
+        const USER_SCROLL_MS = 5000;
+
+        let prefs = { ...DEFAULTS, ...(loadJSON(PREFS_KEY, {}) || {}) };
+        const savePrefs = () => saveJSON(PREFS_KEY, prefs);
+
+        const ui = {
+          panel: $('lyricsPanel'), btn: $('btnLyrics'), fsBtn: $('fsLyrics'), close: $('lyClose'),
+          song: $('lySong'), artist: $('lyArtist'), source: $('lySource'), resync: $('lyResync'),
+          scroll: $('lyScroll'), body: $('lyBody'), foot: $('lyFoot'), time: $('lyTime'), play: $('lyPlay'),
+          setOnline: $('setLyOnline'), setHint: $('setLyCacheHint'), setClear: $('setLyClear')
+        };
+        const CACHE_HINT = ui.setHint.textContent;
+        const mobile = window.matchMedia('(max-width: 768px)');
+
+        let isOpen = false, opener = null;
+        let loadedId = null, stale = true, loadToken = 0, loadTimer = 0;
+        let view = null;          // { kind, lines?, text?, source, q? }
+        let lineEls = [], activeIdx = -2, raf = 0, userScrollAt = 0;
+
+        const current = () => state.trackMap.get(state.currentTrackId) || null;
+
+        /* ---------------- Local .lrc files ---------------- */
+        const lrcByPath = new Map(), lrcByName = new Map();
+        const stripExt = (s) => s.replace(/\.[^./]+$/, '').toLowerCase();
+        const isLrcName = (name) => /\.lrc$/i.test(name || '');
+        function indexLrc(entries) {
+          for (const e of entries) {
+            if (!e || !e.file || !isLrcName(e.file.name)) continue;
+            const p = e.path || e.file.webkitRelativePath || e.file.name;
+            lrcByPath.set(stripExt(p), e.file);
+            lrcByName.set(stripExt(e.file.name), e.file);
+          }
+        }
+        function lrcFor(track) {
+          if (track.rootName && track.relPath) {
+            const f = lrcByPath.get(stripExt(`${track.rootName}/${track.relPath}`));
+            if (f) return f;
+          }
+          return lrcByName.get(stripExt(track.fileName)) || null;
+        }
+        async function readText(blob) {
+          const b = new Uint8Array(await blob.arrayBuffer());
+          let s;
+          try { s = new TextDecoder('utf-8', { fatal: true }).decode(b); }
+          catch (e) { s = new TextDecoder('windows-1252').decode(b); }
+          return s.replace(/^﻿/, '');
+        }
+
+        /* ---------------- LRC parsing ---------------- */
+        const TIME_TAG = /\[(\d{1,3}):(\d{1,2}(?:[.:]\d{1,3})?)\]/g;
+        function parseLrc(text) {
+          let offset = 0;
+          const lines = [], plain = [];
+          for (const raw of String(text).split(/\r?\n|\r/)) {
+            const m = raw.match(/^((?:\s*\[\d{1,3}:\d{1,2}(?:[.:]\d{1,3})?\])+)(.*)$/);
+            if (m) {
+              const words = m[2].replace(/[<\[]\d{1,3}:\d{1,2}(?:[.:]\d{1,3})?[>\]]/g, '').replace(/\s{2,}/g, ' ').trim();
+              let t;
+              TIME_TAG.lastIndex = 0;
+              while ((t = TIME_TAG.exec(m[1]))) {
+                lines.push({ t: (+t[1]) * 60 + parseFloat(t[2].replace(':', '.')), text: words });
+              }
+              continue;
+            }
+            const off = raw.match(/^\s*\[offset:\s*([+-]?\d+)\s*\]/i);
+            if (off) { offset = +off[1] / 1000; continue; }
+            if (/^\s*\[[a-z#]+:.*\]\s*$/i.test(raw)) continue;   // [ar:], [ti:], [by:] …
+            plain.push(raw);
+          }
+          lines.forEach(l => { l.t = Math.max(0, l.t - offset); });
+          lines.sort((a, b) => a.t - b.t);
+          return { lines, plain: plain.join('\n').trim() };
+        }
+        function fromText(text, source) {
+          const p = parseLrc(text);
+          if (p.lines.filter(l => l.text).length >= 2) return { kind: 'synced', lines: p.lines, source };
+          const plain = p.plain || p.lines.map(l => l.text).join('\n').trim();
+          return plain ? { kind: 'plain', text: plain, source } : null;
+        }
+
+        /* ---------------- Embedded tags (ID3v2 USLT / SYLT) ---------------- */
+        function decodeRaw(enc, bytes) {
+          if (enc === 1) {
+            let label = 'utf-16le', s = 0;
+            if (bytes[0] === 0xfe && bytes[1] === 0xff) { label = 'utf-16be'; s = 2; }
+            else if (bytes[0] === 0xff && bytes[1] === 0xfe) s = 2;
+            return getDecoder(label).decode(bytes.subarray(s));
+          }
+          if (enc === 2) return getDecoder('utf-16be').decode(bytes);
+          if (enc === 3) return getDecoder('utf-8').decode(bytes);
+          return getDecoder('windows-1252').decode(bytes);
+        }
+        const termLen = (enc) => (enc === 1 || enc === 2 ? 2 : 1);
+        async function fromTags(track) {
+          const isMp3 = fileExt(track.fileName) === 'mp3' || (track.file && track.file.type === 'audio/mpeg');
+          if (!isMp3 || !track.file) return null;
+          const head = new Uint8Array(await track.file.slice(0, 10).arrayBuffer());
+          if (head.length < 10 || head[0] !== 0x49 || head[1] !== 0x44 || head[2] !== 0x33) return null;
+          const major = head[3], flags = head[5], size = syncsafe(head, 6);
+          if (major < 2 || major > 4 || size <= 0 || size > 32 * 1024 * 1024) return null;
+          let body = new Uint8Array(await track.file.slice(10, 10 + size).arrayBuffer());
+          const tagUnsync = (flags & 0x80) !== 0;
+          if (tagUnsync && major < 4) body = removeUnsync(body);
+          let pos = 0;
+          if (major === 3 && (flags & 0x40)) pos = 4 + u32(body, 0);
+          else if (major === 4 && (flags & 0x40)) pos = syncsafe(body, 0);
+          const idLen = major === 2 ? 3 : 4, hdrLen = major === 2 ? 6 : 10;
+          let uslt = null, sylt = null;
+          while (pos + hdrLen <= body.length) {
+            if (body[pos] === 0) break;
+            const id = String.fromCharCode.apply(null, body.subarray(pos, pos + idLen));
+            if (!/^[A-Z0-9]{3,4}$/.test(id)) break;
+            let fsize;
+            if (major === 2) fsize = (body[pos + 3] << 16) | (body[pos + 4] << 8) | body[pos + 5];
+            else if (major === 4) fsize = syncsafe(body, pos + 4);
+            else fsize = u32(body, pos + 4);
+            const fmt = major >= 3 ? body[pos + 9] : 0;
+            const start = pos + hdrLen, end = start + fsize;
+            if (fsize <= 0 || end > body.length) break;
+            pos = end;
+            const isU = id === 'USLT' || id === 'ULT', isS = id === 'SYLT' || id === 'SLT';
+            if (!isU && !isS) continue;
+            let data = body.subarray(start, end);
+            if (major === 3) { if (fmt & 0xc0) continue; if (fmt & 0x20) data = data.subarray(1); }
+            if (major === 4) {
+              if (fmt & 0x0c) continue;
+              if (fmt & 0x40) data = data.subarray(1);
+              if (fmt & 0x01) data = data.subarray(4);
+              if ((fmt & 0x02) || tagUnsync) data = removeUnsync(data);
+            }
+            if (data.length < 5) continue;
+            const enc = data[0];
+            if (isU && !uslt) {
+              const d = findTerminator(data, 4, enc);
+              const text = decodeRaw(enc, data.subarray(d + termLen(enc))).replace(/\u0000/g, '').trim();
+              if (text) uslt = text;
+            } else if (isS && !sylt && data[4] === 2 && data.length > 6) {   // 2 = milliseconds
+              let p = findTerminator(data, 6, enc) + termLen(enc);
+              const parts = [];
+              while (p < data.length) {
+                const e2 = findTerminator(data, p, enc);
+                const txt = decodeRaw(enc, data.subarray(p, e2));
+                p = e2 + termLen(enc);
+                if (p + 4 > data.length) break;
+                parts.push({ t: u32(data, p) / 1000, text: txt });
+                p += 4;
+              }
+              // Syllable-level SYLT marks new lines with a leading newline
+              const byLine = parts.some(x => /^[\r\n]/.test(x.text));
+              const lines = [];
+              for (const x of parts) {
+                if (!byLine || /^[\r\n]/.test(x.text) || !lines.length) lines.push({ t: x.t, text: x.text.replace(/^[\r\n]+/, '') });
+                else lines[lines.length - 1].text += x.text;
+              }
+              lines.forEach(l => { l.text = l.text.trim(); });
+              if (lines.filter(l => l.text).length >= 2) sylt = lines.sort((a, b) => a.t - b.t);
+            }
+          }
+          if (sylt) return { kind: 'synced', lines: sylt, source: 'tags' };
+          if (uslt) return fromText(uslt, 'tags');
+          return null;
+        }
+
+        /* ---------------- Saved lyrics (IndexedDB, per profile) ---------------- */
+        let dbp = null;
+        function db() {
+          if (!dbp) {
+            dbp = new Promise((res, rej) => {
+              const r = indexedDB.open(DB_NAME, 1);
+              r.onupgradeneeded = () => { if (!r.result.objectStoreNames.contains(STORE)) r.result.createObjectStore(STORE); };
+              r.onsuccess = () => res(r.result);
+              r.onerror = () => rej(r.error);
+            });
+            dbp.catch(() => { dbp = null; });
+          }
+          return dbp;
+        }
+        async function idb(mode, fn) {
+          const d = await db();
+          return new Promise((res, rej) => {
+            const tx = d.transaction(STORE, mode);
+            const req = fn(tx.objectStore(STORE));
+            tx.oncomplete = () => res(req ? req.result : undefined);
+            tx.onerror = () => rej(tx.error);
+            tx.onabort = () => rej(tx.error);
+          });
+        }
+        const prefix = () => nsKey('localify_lyrics') + '|';
+        const range = () => IDBKeyRange.bound(prefix(), prefix() + '￿');
+        const cacheKey = (t) => `${prefix()}${t.likeKey}|${t.size}`;
+        const cacheGet = (t) => idb('readonly', s => s.get(cacheKey(t))).catch(() => null);
+        const cachePut = (t, v) => idb('readwrite', s => s.put(v, cacheKey(t))).catch(() => {});
+        const cacheCount = () => idb('readonly', s => s.count(range())).catch(() => 0);
+        const cacheClear = () => idb('readwrite', s => s.delete(range()));
+
+        /* ---------------- LRCLIB ---------------- */
+        const JUNK = /\s*[\(\[][^\)\]]*\b(official|video|lyrics?|audio|visuali[sz]er|hd|hq|4k|mv|m\/v|explicit|clean)\b[^\)\]]*[\)\]]/gi;
+        const cleanTitle = (s) => String(s || '').replace(JUNK, '').replace(/\s+/g, ' ').trim();
+        const normName = (s) => String(s || '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+
+        function queryFor(track) {
+          let d = null;
+          try { d = AutoFill._test.details()[AutoFill._test.keyOf(track)]; } catch (e) { d = null; }
+          const f = (d && typeof d === 'object' && d.f) || {};
+          const checked = d === 'ok';
+          const title = cleanTitle(f.title || track.title);
+          // track.artist / album fall back to the folder name; never send a folder name
+          let artist = f.artist || track.artist || '';
+          if (!f.artist && !checked && artist === track.folder) artist = '';
+          let album = f.album || track.album || '';
+          if (!f.album && !checked && album === track.folder) album = '';
+          let duration = track.duration || 0;
+          if (track.id === state.currentTrackId && Number.isFinite(audio.duration) && audio.duration > 0) duration = audio.duration;
+          return { title, artist, album, duration: Math.round(duration) };
+        }
+        const sig = (q) => [q.title, q.artist, q.album].map(normName).join('|');
+
+        async function call(path, params) {
+          const stub = window.__LOCALIFY_LRCLIB_STUB__;
+          if (typeof stub === 'function') return await stub(path, params);
+          const ctl = new AbortController();
+          const timer = setTimeout(() => ctl.abort(), 12000);
+          try {
+            const res = await fetch(`${API}${path}?${new URLSearchParams(params)}`, {
+              credentials: 'omit', referrerPolicy: 'no-referrer', cache: 'no-store', signal: ctl.signal
+            });
+            if (res.status === 404) return { status: 404, json: null };
+            if (!res.ok) throw new Error(`LRCLIB ${res.status}`);
+            return { status: 200, json: await res.json() };
+          } finally { clearTimeout(timer); }
+        }
+        const hasWords = (r) => r && (r.instrumental || r.syncedLyrics || r.plainLyrics);
+        function toView(r) {
+          if (r.syncedLyrics) { const v = fromText(r.syncedLyrics, 'lrclib'); if (v) return v; }
+          if (r.plainLyrics && r.plainLyrics.trim()) return { kind: 'plain', text: r.plainLyrics.trim(), source: 'lrclib' };
+          if (r.instrumental) return { kind: 'instrumental', source: 'lrclib' };
+          return null;
+        }
+        async function lookup(q) {
+          if (q.artist) {
+            const p = { track_name: q.title, artist_name: q.artist };
+            if (q.album) p.album_name = q.album;
+            if (q.duration) p.duration = q.duration;
+            const r = await call('/get', p);
+            if (r.status === 200 && hasWords(r.json)) return toView(r.json);
+          }
+          const sp = q.artist ? { track_name: q.title, artist_name: q.artist } : { q: q.title };
+          const r = await call('/search', sp);
+          const list = r.status === 200 && Array.isArray(r.json) ? r.json.filter(hasWords) : [];
+          const qa = normName(q.artist), qt = normName(q.title);
+          let best = null, bestScore = -Infinity;
+          for (const x of list.slice(0, 20)) {
+            const diff = q.duration && x.duration ? Math.abs(x.duration - q.duration) : null;
+            if (diff !== null && diff > 8) continue;
+            let s = (x.syncedLyrics ? 3 : 0) + (x.plainLyrics ? 1 : 0);
+            if (normName(x.trackName) === qt) s += 3;
+            const xa = normName(x.artistName);
+            if (qa && xa && (xa === qa || xa.includes(qa) || qa.includes(xa))) s += 4;
+            else if (!qa && xa && qt.includes(xa)) s += 2;
+            if (diff !== null) s += 2 - diff / 4;
+            if (s > bestScore) { bestScore = s; best = x; }
+          }
+          // Without an artist, only trust a close title + length match
+          if (best && !q.artist && (normName(best.trackName) !== qt || !q.duration)) best = null;
+          return best ? toView(best) : null;
+        }
+
+        async function onlineBlock() {
+          if (!prefs.online) return 'off';
+          let tp = null;
+          try { tp = Tagger.internals.prefs(); } catch (e) { tp = null; }
+          if (tp && tp.musicbrainz === false) return 'lookupsOff';
+          if (navigator.onLine === false) return 'offline';
+          if (tp && tp.onlineOnly) {
+            try { if (!(await AutoFill._test.isOnline())) return 'offline'; } catch (e) { /* try anyway */ }
+          }
+          return null;
+        }
+
+        /* ---------------- Loading ---------------- */
+        async function load(track, force) {
+          const token = ++loadToken;
+          const live = () => token === loadToken && isOpen && state.currentTrackId === track.id;
+          loadedId = track.id;
+          stale = false;
+          show({ kind: 'loading' });
+          try {
+            const lrc = lrcFor(track);
+            if (lrc) {
+              const v = fromText(await readText(lrc), 'file');
+              if (v) { if (live()) show(v); return; }
+            }
+            const tags = await fromTags(track).catch(() => null);
+            if (!live()) return;
+            if (tags) { show(tags); return; }
+
+            const q = queryFor(track);
+            const saved = await cacheGet(track);
+            if (!live()) return;
+            if (saved && saved.kind !== 'none') { show({ ...saved, saved: true }); return; }
+            const sameQuery = saved && saved.sig === sig(q);
+            if (saved && !force && sameQuery && Date.now() - saved.at < RETRY_NONE_MS) { show({ kind: 'none', q }); return; }
+
+            if (!q.title) { show({ kind: 'none', q }); return; }
+            const block = await onlineBlock();
+            if (!live()) return;
+            if (block) { show({ kind: block, q }); return; }
+
+            show({ kind: 'loading', online: true });
+            let v;
+            try { v = await lookup(q); }
+            catch (e) { if (live()) show({ kind: 'error', q }); return; }
+            const entry = v ? { ...v, at: Date.now(), sig: sig(q) } : { kind: 'none', at: Date.now(), sig: sig(q) };
+            await cachePut(track, entry);
+            if (live()) show(v || { kind: 'none', q });
+          } catch (e) {
+            if (live()) show({ kind: 'error' });
+          }
+        }
+
+        function scheduleLoad(force) {
+          clearTimeout(loadTimer);
+          const t = current();
+          if (!t) { loadedId = null; show({ kind: 'idle' }); return; }
+          loadTimer = setTimeout(() => { const now = current(); if (now) load(now, force); }, force ? 0 : 250);
+        }
+
+        /* ---------------- Rendering ---------------- */
+        const SOURCE = { lrclib: 'LRCLIB', file: '.lrc File', tags: 'Song Tags' };
+        function header() {
+          const t = current();
+          ui.song.textContent = t ? t.title : 'Not Playing';
+          ui.artist.textContent = t ? (t.artist || '') : '';
+        }
+        function stateHTML(title, text, actions) {
+          return `<div class="ly-state"><strong>${escapeHtml(title)}</strong>${text ? `<span>${escapeHtml(text)}</span>` : ''}` +
+            (actions ? `<div class="ly-actions">${actions}</div>` : '') + '</div>';
+        }
+        const btn = (act, label, primary) => `<button type="button" class="ly-action ${primary ? 'btn-primary' : 'btn-secondary'}" data-ly="${act}">${escapeHtml(label)}</button>`;
+
+        function show(v) {
+          view = v;
+          lineEls = [];
+          activeIdx = -2;
+          header();
+          ui.scroll.classList.toggle('plain', v.kind !== 'synced');
+          ui.resync.hidden = true;
+          let chip = '';
+          let foot = '';
+          switch (v.kind) {
+            case 'synced': {
+              const frag = document.createDocumentFragment();
+              v.lines.forEach((l, i) => {
+                const b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'ly-line' + (l.text ? '' : ' gap');
+                b.textContent = l.text || '♪';
+                b.dataset.i = i;
+                b.setAttribute('aria-label', `${formatTime(l.t)}: ${l.text || 'instrumental break'}`);
+                frag.appendChild(b);
+                lineEls.push(b);
+              });
+              ui.body.replaceChildren(frag);
+              ui.body.setAttribute('aria-live', 'off');
+              chip = `Synced · ${SOURCE[v.source] || ''}`;
+              foot = 'Tap a line to jump there.';
+              break;
+            }
+            case 'plain': {
+              const p = document.createElement('p');
+              p.className = 'ly-plain';
+              p.textContent = v.text;
+              ui.body.replaceChildren(p);
+              chip = `Not Synced · ${SOURCE[v.source] || ''}`;
+              foot = "These lyrics aren't timed to the song.";
+              break;
+            }
+            default: {
+              ui.body.setAttribute('aria-live', 'polite');
+              const t = current();
+              const html = {
+                idle: () => stateHTML('Nothing playing', 'Play a song to see its lyrics.'),
+                loading: () => `<div class="ly-state"><div class="ly-spin" aria-hidden="true"></div><span>${v.online ? 'Looking up lyrics…' : 'Finding lyrics…'}</span></div>`,
+                instrumental: () => stateHTML('Instrumental', 'This song has no words.'),
+                none: () => stateHTML('No lyrics found', t ? `Nothing for “${(v.q && v.q.title) || t.title}”${v.q && v.q.artist ? ' by ' + v.q.artist : ''}. Add a .lrc file with the same name next to the song to use your own.` : '', btn('retry', 'Search Again')),
+                offline: () => stateHTML("You're offline", 'Lyrics you opened before still work. These will load when you\'re back online.', btn('retry', 'Try Again')),
+                off: () => stateHTML('Online lyrics are off', 'Turn on Find Lyrics Online in Settings to look them up.', btn('settings', 'Open Settings', true)),
+                lookupsOff: () => stateHTML('Online lookups are off', 'Turn on Look up songs online in Settings → Tidy names & tags to find lyrics.', btn('settings', 'Open Settings', true)),
+                error: () => stateHTML("Couldn't reach LRCLIB", 'The lyrics service may be busy. Try again in a moment.', btn('retry', 'Try Again'))
+              }[v.kind];
+              ui.body.innerHTML = html ? html() : '';
+            }
+          }
+          if (v.saved) chip += ' · Saved';
+          ui.source.textContent = chip;
+          ui.source.hidden = !chip;
+          if (v.source === 'lrclib') ui.foot.innerHTML = `${escapeHtml(foot)} Lyrics from <a href="https://lrclib.net" target="_blank" rel="noopener noreferrer">LRCLIB</a>.`;
+          else ui.foot.textContent = foot;
+          ui.scroll.scrollTop = 0;
+          tick(true);
+        }
+
+        /* ---------------- Sync ---------------- */
+        function indexAt(time) {
+          const lines = view && view.lines;
+          if (!lines) return -1;
+          let lo = 0, hi = lines.length - 1, ans = -1;
+          while (lo <= hi) {
+            const mid = (lo + hi) >> 1;
+            if (lines[mid].t <= time + LEAD) { ans = mid; lo = mid + 1; } else hi = mid - 1;
+          }
+          return ans;
+        }
+        function scrollToLine(i, smooth) {
+          const el = lineEls[Math.max(0, i)];
+          if (!el) return;
+          const sr = ui.scroll.getBoundingClientRect(), er = el.getBoundingClientRect();
+          const top = ui.scroll.scrollTop + (er.top - sr.top) - ui.scroll.clientHeight * 0.33;
+          ui.scroll.scrollTo({ top: Math.max(0, top), behavior: smooth && !prefersReducedMotion() ? 'smooth' : 'auto' });
+        }
+        function tick(force) {
+          const t = audio.currentTime || 0;
+          const d = audio.duration;
+          ui.time.textContent = current() ? `${formatTime(t)} / ${formatTime(Number.isFinite(d) ? d : 0)}` : '';
+          ui.play.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${state.isPlaying ? SVG.pauseInner : SVG.playInner}</svg>`;
+          ui.play.setAttribute('aria-label', state.isPlaying ? 'Pause' : 'Play');
+          if (!view || view.kind !== 'synced' || state.currentTrackId !== loadedId) return;
+          const i = indexAt(t);
+          if (i === activeIdx && !force) return;
+          if (lineEls[activeIdx]) lineEls[activeIdx].classList.remove('active');
+          lineEls.forEach((el, k) => el.classList.toggle('past', k < i));
+          if (lineEls[i]) lineEls[i].classList.add('active');
+          activeIdx = i;
+          const userScrolling = Date.now() - userScrollAt < USER_SCROLL_MS;
+          ui.resync.hidden = !userScrolling;
+          if (!userScrolling) scrollToLine(i, !force);
+        }
+        function loop() {
+          if (!isOpen) return;
+          tick(false);
+          if (!ui.resync.hidden && Date.now() - userScrollAt >= USER_SCROLL_MS) { ui.resync.hidden = true; scrollToLine(activeIdx, true); }
+          raf = requestAnimationFrame(loop);
+        }
+        const markUserScroll = () => { if (view && view.kind === 'synced') { userScrollAt = Date.now(); ui.resync.hidden = false; } };
+        ui.scroll.addEventListener('wheel', markUserScroll, { passive: true });
+        ui.scroll.addEventListener('touchmove', markUserScroll, { passive: true });
+        ui.resync.addEventListener('click', () => { userScrollAt = 0; ui.resync.hidden = true; scrollToLine(activeIdx, true); });
+
+        ui.body.addEventListener('click', (e) => {
+          const line = e.target.closest('.ly-line');
+          if (line && view && view.lines) {
+            const l = view.lines[+line.dataset.i];
+            if (!l) return;
+            userScrollAt = 0;
+            seekTo(l.t);
+            if (!state.isPlaying) togglePlayPause();
+            tick(true);
+            return;
+          }
+          const a = e.target.closest('[data-ly]');
+          if (!a) return;
+          if (a.dataset.ly === 'retry') scheduleLoad(true);
+          if (a.dataset.ly === 'settings') { close(false); openSettings({ section: 'setLyrics' }); }
+        });
+
+        /* ---------------- Open / close ---------------- */
+        function syncButtons() {
+          const has = !!current();
+          ui.btn.disabled = !has && !isOpen;
+          ui.btn.classList.toggle('active', isOpen);
+          ui.btn.setAttribute('aria-pressed', String(isOpen));
+          ui.fsBtn.disabled = !has;
+        }
+        function open(from) {
+          if (isOpen) return;
+          isOpen = true;
+          opener = from || document.activeElement;
+          ui.panel.inert = false;
+          ui.panel.classList.add('open');
+          syncButtons();
+          header();
+          const t = current();
+          if (!t) show({ kind: 'idle' });
+          else if (stale || loadedId !== t.id) scheduleLoad(false);
+          else tick(true);
+          ui.close.focus({ preventScroll: true });
+          cancelAnimationFrame(raf);
+          raf = requestAnimationFrame(loop);
+        }
+        function close(restoreFocus = true) {
+          if (!isOpen) return;
+          isOpen = false;
+          cancelAnimationFrame(raf);
+          clearTimeout(loadTimer);
+          loadToken++;                         // drop any lookup that is still running
+          if (view && view.kind === 'loading') stale = true;
+          ui.panel.classList.remove('open');
+          const hadFocus = ui.panel.contains(document.activeElement);
+          ui.panel.inert = true;
+          syncButtons();
+          if (restoreFocus && hadFocus) {
+            const back = opener && opener.isConnected && !opener.disabled && opener.offsetParent !== null ? opener : dom.btnPlayPause;
+            back.focus({ preventScroll: true });
+          }
+        }
+        const toggle = (from) => (isOpen ? close() : open(from));
+
+        ui.btn.addEventListener('click', (e) => toggle(e.currentTarget));
+        ui.fsBtn.addEventListener('click', (e) => open(e.currentTarget));
+        ui.close.addEventListener('click', () => close());
+        ui.play.addEventListener('click', () => togglePlayPause());
+        ui.panel.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(); return; }
+          if (e.key !== 'Tab' || !mobile.matches) return;   // phones: full-screen sheet keeps focus inside
+          const f = Array.from(ui.panel.querySelectorAll('button, a[href]')).filter(n => n.offsetParent !== null && !n.disabled);
+          if (!f.length) return;
+          const i = f.indexOf(document.activeElement);
+          if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); }
+          else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); }
+        });
+
+        /** Called from updateCurrentTrackUI (song changed, or its details were filled in). */
+        let lastSig = '';
+        function onTrackChange() {
+          syncButtons();
+          const t = current();
+          if (!isOpen) { if (!t || t.id !== loadedId) stale = true; return; }
+          header();
+          if (!t) { loadedId = null; show({ kind: 'idle' }); return; }
+          if (t.id !== loadedId) { lastSig = sig(queryFor(t)); scheduleLoad(false); return; }
+          // Same song, new details (auto-fill finished): retry if nothing was found
+          const s = sig(queryFor(t));
+          if (s !== lastSig) {
+            lastSig = s;
+            if (view && ['none', 'offline', 'error'].includes(view.kind)) scheduleLoad(false);
+          }
+        }
+
+        window.addEventListener('online', () => { if (isOpen && view && ['offline', 'error'].includes(view.kind)) scheduleLoad(true); });
+        onPlayers('play', () => tick(true));
+        onPlayers('pause', () => tick(true));
+        onPlayers('seeked', () => { userScrollAt = 0; tick(true); });
+
+        /* ---------------- Settings ---------------- */
+        async function syncSettings() {
+          setSwitch(ui.setOnline, prefs.online);
+          const n = await cacheCount();
+          ui.setHint.textContent = n ? `${CACHE_HINT} ${n} ${n === 1 ? 'song' : 'songs'} saved.` : CACHE_HINT;
+          ui.setClear.disabled = !n;
+        }
+        ui.setOnline.addEventListener('click', () => {
+          prefs.online = !prefs.online;
+          savePrefs();
+          syncSettings();
+          if (prefs.online && isOpen && view && ['off', 'none', 'error'].includes(view.kind)) scheduleLoad(true);
+        });
+        ui.setClear.addEventListener('click', async () => {
+          try { await cacheClear(); showToast('Saved lyrics cleared'); } catch (e) { showToast("Couldn't clear saved lyrics"); }
+          stale = true;
+          syncSettings();
+        });
+        function resetPrefs() {
+          prefs = { ...DEFAULTS };
+          savePrefs();
+          syncSettings();
+        }
+
+        syncButtons();
+        return {
+          open, close, toggle, onTrackChange, indexLrc, isLrcName, syncSettings, resetPrefs,
+          isOpen: () => isOpen,
+          _test: { parseLrc, fromTags, queryFor, lookup, cacheCount, lrcFor, view: () => view }
+        };
+      })();
+      window.LocalifyLyrics = Lyrics._test;
+      /* [/Lyrics] */
 
       /* ========================================================================
          Init
