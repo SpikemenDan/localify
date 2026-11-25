@@ -878,6 +878,26 @@
     .pl-hero-emoji { font-size: 72px; line-height: 1; }
     .pl-delete { margin-right: auto; color: var(--danger) !important; }
     .pl-delete[hidden] { display: none !important; }
+
+    /* [SD export] copy playlists to a microSD card for the breadboard player */
+    .sd-intro { margin: 0 0 14px; color: var(--text-secondary); font-size: 13px; line-height: 1.5; }
+    .sd-intro a { color: var(--accent); }
+    .sd-lists { display: flex; flex-direction: column; gap: 2px; max-height: 240px; overflow-y: auto;
+      margin: 0 0 12px; padding: 4px; border: 1px solid var(--border-subtle); border-radius: 10px; }
+    .sd-lists label, .sd-option { display: flex; align-items: center; gap: 10px; padding: 8px 10px;
+      border-radius: 8px; cursor: pointer; font-size: 14px; }
+    .sd-lists label:hover, .sd-option:hover { background: var(--bg-highlight); }
+    .sd-lists input, .sd-option input { width: 16px; height: 16px; accent-color: var(--accent); flex: 0 0 auto; margin: 0; }
+    .sd-lists .sd-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sd-lists .sd-count { color: var(--text-secondary); font-size: 12px; font-variant-numeric: tabular-nums; }
+    .sd-empty { padding: 10px; color: var(--text-secondary); font-size: 13px; }
+    .sd-option small { display: block; color: var(--text-secondary); font-size: 12px; margin-top: 2px; }
+    .sd-status { margin: 10px 0 0; font-size: 13px; line-height: 1.5; color: var(--text-secondary); min-height: 1.5em; overflow-wrap: anywhere; }
+    .sd-status[data-tone="ok"] { color: var(--text-primary); }
+    .sd-status[data-tone="bad"] { color: #f87171; }
+    .sd-bar { height: 6px; border-radius: 3px; background: var(--bg-highlight); overflow: hidden; margin-top: 10px; }
+    .sd-bar[hidden] { display: none; }
+    .sd-bar > i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .2s; }
     .looks-menu-item .pl-chev { flex: 0; color: var(--text-secondary); }
     .looks-menu-item .pl-icon { flex: 0 0 22px; width: 22px; height: 22px; font-size: 13px; border-radius: 6px; }
     .looks-menu-item .pl-icon svg { width: 13px; height: 13px; color: var(--accent); }
@@ -6632,6 +6652,11 @@
           </label>
           <input type="file" id="bkFile" class="visually-hidden-input" accept=".json,application/json" aria-labelledby="bkImportLabel">
         </div>
+
+        <div class="settings-row">
+          <span class="settings-label">Export to SD card<span class="settings-hint">Copies your playlists, and the songs in them, to a microSD card for the ESP32 breadboard player.</span></span>
+          <button type="button" class="btn-secondary" id="sdOpen">Export…</button>
+        </div>
       </section>
       <!-- [/Backup] -->
 
@@ -6863,6 +6888,22 @@
         <button type="button" class="btn-ghost pl-delete" id="plDelete" hidden>Delete playlist</button>
         <button type="button" class="btn-secondary" id="plCancel">Cancel</button>
         <button type="submit" class="btn-primary" id="plSave">Create</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- [SD export] Copy playlists to a microSD card -->
+  <dialog class="lp-dialog" id="sdDialog" aria-labelledby="sdTitle">
+    <form id="sdForm" method="dialog" novalidate>
+      <h2 class="lp-dialog-title" id="sdTitle">Export to SD card</h2>
+      <p class="sd-intro">For the ESP32 breadboard player. Put the microSD card in this computer, pick the playlists, then choose the card itself (not a folder on it). Songs go into <b>music</b> and playlists into <b>playlists</b>. <a href="https://github.com/SpikemenDan/localify/blob/main/docs/BREADBOARD.md" target="_blank" rel="noopener">How to build the player</a></p>
+      <div class="sd-lists" id="sdLists" role="group" aria-label="Playlists to export"></div>
+      <label class="sd-option"><input type="checkbox" id="sdCopy" checked> <span>Copy the songs too<small>Songs already on the card are skipped. Only MP3 and WAV play on the player.</small></span></label>
+      <div class="sd-bar" id="sdBar" hidden><i></i></div>
+      <p class="sd-status" id="sdStatus" role="status" aria-live="polite"></p>
+      <div class="lp-dialog-actions">
+        <button type="button" class="btn-secondary" id="sdCancel">Close</button>
+        <button type="submit" class="btn-primary" id="sdGo">Choose SD card</button>
       </div>
     </form>
   </dialog>
@@ -8201,6 +8242,198 @@
           create: (track) => openDialog(null, track),
           isView: (view) => !!fromView(view)
         };
+      })();
+
+      /* ---- [SD export] playlists (and their songs) onto a microSD card for the ESP32 player ---- */
+      const SdExport = (() => {
+        const dlg = $('sdDialog');
+        const PLAYABLE = /\.(mp3|wav)$/i;
+        let busy = false, stop = false;
+
+        /** Plain-ASCII, FAT-safe file or folder name (the player can't always open other letters).
+         *  Accents are dropped (é → e); names that lose other letters get a short code so they stay unique. */
+        function safe(name, keepExt) {
+          const orig = String(name || '');
+          let n = orig.normalize('NFKD').replace(/[̀-ͯ]/g, '');
+          const lossy = /[^\x20-\x7e]/.test(n);
+          n = n.replace(/[^\x20-\x7e]/g, '_').replace(/[<>:"/\\|?*]/g, '_').replace(/_{2,}/g, '_');
+          let ext = '';
+          if (keepExt) {
+            const m = n.match(/\.[A-Za-z0-9]{1,5}$/);
+            if (m) { ext = m[0].toLowerCase(); n = n.slice(0, -ext.length); }
+          }
+          n = n.replace(/[. ]+$/, '').trim();
+          if (lossy) n = (n.replace(/^[_ .]+|[_ .]+$/g, '') || 'song') + ' ' + hashString(orig).toString(36);
+          if (!n || n === '.' || n === '..') n = '_';
+          return n.slice(0, 100) + ext;
+        }
+
+        function sources() {
+          const liked = state.tracks.filter(t => state.likedKeys.has(t.likeKey));
+          const out = [{ id: 'liked', name: 'Liked Songs', tracks: liked, keys: state.likedKeys.size }];
+          for (const p of Playlists.all()) out.push({ id: p.id, name: p.name, tracks: Playlists.tracksOf(p, state.tracks), keys: p.keys.length });
+          return out;
+        }
+
+        /** Where a song lives on the card, as path parts under /music. */
+        function cardParts(t) {
+          const rel = (t.relPath || t.fileName).split('/').filter(Boolean);
+          return [safe(t.rootName || t.folder || 'Files')].concat(rel.map((p, i) => safe(p, i === rel.length - 1)));
+        }
+
+        function setStatus(msg, tone) {
+          const el = $('sdStatus');
+          el.textContent = msg || '';
+          if (tone) el.dataset.tone = tone; else delete el.dataset.tone;
+        }
+        function setBar(frac) {
+          const bar = $('sdBar');
+          bar.hidden = frac == null;
+          if (frac != null) bar.firstElementChild.style.width = Math.round(frac * 100) + '%';
+        }
+
+        function open() {
+          if (dlg.open) return;
+          const box = $('sdLists');
+          const lists = sources();
+          box.innerHTML = lists.map(l => `
+            <label><input type="checkbox" value="${escapeHtml(l.id)}"${l.tracks.length ? ' checked' : ''}>
+              <span class="sd-name">${escapeHtml(l.name)}</span>
+              <span class="sd-count">${l.tracks.length}${l.keys > l.tracks.length ? ' of ' + l.keys : ''} songs</span></label>`).join('');
+          setBar(null);
+          if (!('showDirectoryPicker' in window)) setStatus('Exporting needs Chrome or Edge on a computer.', 'bad');
+          else if (!state.tracks.length) setStatus('Load the folder with your songs first, so Localify can copy them.', 'bad');
+          else setStatus('');
+          $('sdGo').disabled = !('showDirectoryPicker' in window);
+          dlg.showModal();
+        }
+
+        async function dirPath(root, parts) {
+          let d = root;
+          for (const p of parts) d = await d.getDirectoryHandle(p, { create: true });
+          return d;
+        }
+
+        async function writeText(dir, name, text) {
+          const fh = await dir.getFileHandle(name, { create: true });
+          const w = await fh.createWritable();
+          await w.write(new Blob([text], { type: 'audio/x-mpegurl' }));
+          await w.close();
+        }
+
+        async function copyTrack(root, t, parts) {
+          const dir = await dirPath(root, ['music'].concat(parts.slice(0, -1)));
+          const name = parts[parts.length - 1];
+          try {
+            const have = await (await dir.getFileHandle(name)).getFile();
+            if (have.size === t.file.size) return 'skip';
+          } catch (e) { /* not there yet */ }
+          const fh = await dir.getFileHandle(name, { create: true });
+          const w = await fh.createWritable();
+          try { await w.write(t.file); await w.close(); }
+          catch (e) { try { await w.abort(); } catch (_) { /* ignore */ } throw e; }
+          return 'copied';
+        }
+
+        function m3u(name, tracks) {
+          const lines = ['#EXTM3U', '#PLAYLIST:' + name];
+          for (const t of tracks) {
+            const dur = t.duration > 0 ? Math.round(t.duration) : -1;
+            const label = (t.artist ? t.artist + ' - ' : '') + (t.title || t.fileName);
+            lines.push(`#EXTINF:${dur},${label.replace(/[\r\n]+/g, ' ')}`);
+            lines.push('/music/' + cardParts(t).join('/'));
+          }
+          return lines.join('\n') + '\n';
+        }
+
+        async function run() {
+          if (busy) return;
+          const picked = new Set(Array.from($('sdLists').querySelectorAll('input:checked')).map(i => i.value));
+          const lists = sources().filter(l => picked.has(l.id));
+          if (!lists.length) { setStatus('Pick at least one playlist.', 'bad'); return; }
+
+          let root;
+          try { root = await window.showDirectoryPicker({ id: 'localify-sd', mode: 'readwrite' }); }
+          catch (e) { if (e && e.name !== 'AbortError') setStatus("Couldn't open that place: " + e.message, 'bad'); return; }
+
+          busy = true; stop = false;
+          $('sdGo').disabled = true;
+          $('sdCancel').textContent = 'Stop';
+          const copySongs = $('sdCopy').checked;
+          let copied = 0, already = 0, failed = 0, wrongType = 0;
+          try {
+            // Each song once, even when it's in several playlists.
+            const songs = new Map();
+            const playable = lists.map(l => {
+              const ok = [];
+              for (const t of l.tracks) {
+                if (!PLAYABLE.test(t.fileName)) { wrongType++; continue; }
+                ok.push(t);
+                if (t.file) songs.set(t.id, t);
+              }
+              return { name: l.name, tracks: ok };
+            });
+
+            if (copySongs) {
+              let i = 0;
+              for (const t of songs.values()) {
+                if (stop) break;
+                i++;
+                setStatus(`Copying ${i} of ${songs.size}: ${t.title || t.fileName}`);
+                setBar((i - 1) / songs.size);
+                try { (await copyTrack(root, t, cardParts(t))) === 'skip' ? already++ : copied++; }
+                catch (e) {
+                  failed++;
+                  if (e && (e.name === 'QuotaExceededError' || /space/i.test(e.message || ''))) {
+                    setStatus('The SD card is full. Free up some space, or export fewer playlists.', 'bad');
+                    stop = true;
+                  }
+                }
+              }
+            }
+
+            if (!stop) {
+              setStatus('Writing playlists…');
+              const plDir = await root.getDirectoryHandle('playlists', { create: true });
+              const used = new Set();
+              for (const l of playable) {
+                let base = safe(l.name), fname = base + '.m3u', n = 2;
+                while (used.has(fname.toLowerCase())) fname = `${base} ${n++}.m3u`;
+                used.add(fname.toLowerCase());
+                await writeText(plDir, fname, m3u(l.name, l.tracks));
+              }
+              setBar(1);
+              const bits = [`${playable.length} playlist${playable.length === 1 ? '' : 's'} written`];
+              if (copySongs) bits.push(`${copied} song${copied === 1 ? '' : 's'} copied`);
+              if (already) bits.push(`${already} already on the card`);
+              let msg = 'Done: ' + bits.join(', ') + '.';
+              if (wrongType) msg += ` ${wrongType} song${wrongType === 1 ? " isn't" : "s aren't"} MP3 or WAV, so ${wrongType === 1 ? 'it was' : 'they were'} left out.`;
+              if (failed) msg += ` ${failed} couldn't be copied.`;
+              msg += ' Eject the card safely before taking it out.';
+              setStatus(msg, failed ? 'bad' : 'ok');
+              showToast('SD card ready');
+            } else if (!/full/.test($('sdStatus').textContent)) {
+              setStatus(`Stopped. ${copied} song${copied === 1 ? '' : 's'} copied so far; run it again to finish.`, 'bad');
+              setBar(null);
+            }
+          } catch (e) {
+            setStatus('Export stopped: ' + (e && e.message ? e.message : e), 'bad');
+            setBar(null);
+          } finally {
+            busy = false;
+            $('sdGo').disabled = false;
+            $('sdGo').textContent = 'Export again';
+            $('sdCancel').textContent = 'Close';
+          }
+        }
+
+        $('sdOpen').addEventListener('click', open);
+        $('sdForm').addEventListener('submit', (e) => { e.preventDefault(); run(); });
+        $('sdCancel').addEventListener('click', () => { if (busy) stop = true; else dlg.close(); });
+        dlg.addEventListener('cancel', (e) => { if (busy) { e.preventDefault(); stop = true; } });
+        dlg.addEventListener('close', () => { $('sdGo').textContent = 'Choose SD card'; });
+
+        return { open };
       })();
 
       /* ---- [Keep data] ask the browser not to clear Localify's data when space runs low ---- */

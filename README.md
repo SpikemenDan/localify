@@ -19,6 +19,7 @@
 - [Lock-in focus timer](#lock-in-focus-timer)
 - [Profiles and backups](#profiles-and-backups)
 - [Install it as an app](#install-it-as-an-app)
+- [Breadboard player (ESP32)](#breadboard-player-esp32)
 - [Keyboard shortcuts](#keyboard-shortcuts)
 - [Privacy](#privacy)
 - [Troubleshooting](#troubleshooting)
@@ -52,6 +53,7 @@ That's all. Localify remembers your likes, settings, folders and the last song y
 | 😴 **Sleep timer** | Fades out after 15, 30, 45 or 60 minutes, or at the end of the song. |
 | ✂️ **Audio editor** | Trim, cut, silence, reverse, fade in/out, gain, normalize, speed and EQ. Press **E** on a song. |
 | 🔊 **Audacity** | On Windows, send a song straight to Audacity (set up under **Settings → Integrations**). |
+| 📟 **SD card export** | Copy playlists and their songs to a microSD card for the [ESP32 breadboard player](#breadboard-player-esp32). **Settings → Your data → Export to SD card**. |
 
 Find everything else in **Settings** (the gear icon, or press **,**).
 
@@ -101,6 +103,7 @@ To move your data to another device, open **Settings → Your data**:
 
 - **Export backup** saves a small `.localify.json` file. Songs are never included.
 - **Import backup** previews the file first. You can then add it as a new profile, merge it, or replace the current one.
+- **Export to SD card** copies your playlists and their MP3/WAV songs to a microSD card for the [breadboard player](#breadboard-player-esp32).
 - **Keep data on this device** shows whether the browser has promised not to clear Localify's data when space runs low. Localify asks for this by itself; press **Keep it** to ask again.
 
 Everything is stored in your browser on this device, never on a server. Clearing the site's data or using a private window removes it, so keep a backup.
@@ -118,6 +121,18 @@ If Localify is published at a web address, you can install it so it opens like a
 | **iPhone / iPad** (Safari) | **Share** → **Add to Home Screen**. You'll pick songs again after restarting, because iOS doesn't let web apps remember folders. |
 
 Publishing it yourself? See [docs/DEPLOY.md](docs/DEPLOY.md).
+
+---
+
+## Breadboard player (ESP32)
+
+Take your playlists away from the computer on a small music player you build yourself: an ESP32, a microSD card, a MAX98357A amp with a speaker, four buttons, and a colour screen (ST7789 or ST7735) or a 16×2 / 20×4 character LCD.
+
+1. Build it and upload the code in [`firmware/`](firmware). The [breadboard guide](docs/BREADBOARD.md) has the parts list, wiring and steps.
+2. In Localify, **Settings → Your data → Export to SD card**, pick the playlists, and choose the card.
+3. Put the card in the player. It shows your playlists, Liked Songs and All Songs.
+
+Exporting needs Chrome or Edge on a computer.
 
 ---
 
