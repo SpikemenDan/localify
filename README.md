@@ -64,16 +64,18 @@ Messy file names like `shape_of_you_FINAL (1).mp3` get cleaned up automatically.
 
 - **New songs are filled in for you.** Title, artist, album, year, genre and album cover are looked up when you add them.
 - **Offline? No problem.** Songs added without internet go to the **Unsorted** list and are filled in once you're back online.
+- **Songs with useless names are recognised by their sound.** If the name and tags don't say what a song is, Localify can identify it from a fingerprint of its sound (needs a free AcoustID key, see below).
 - **It asks when it isn't sure.** When the chip at the top says *questions*, click it and answer a few quick ones together.
 - **Your files are safe.** Nothing in the files changes until you press **Apply** in Tidy, and you can undo from there.
 
-To tidy one song by hand, select it and press **I**, or use the **⋯** menu on its row.
+To tidy one song by hand, select it and press **I**, or use the **⋯** menu on its row. To identify a song by its sound, choose **Identify by sound** from the **⋯** menu, or press **By Sound** on its row in Tidy.
 
 **Settings → Tidy names & tags** lets you:
 
 - choose the file name pattern (for example `{artist} - {title}`)
 - turn online lookups or AI suggestions on or off
 - let Localify write details straight into your files automatically
+- add an **AcoustID key** so songs can be identified by their sound. Get one free at [acoustid.org/new-application](https://acoustid.org/new-application) and paste it in. The key is saved in your profile (and its backups).
 
 > [!NOTE]
 > The AI model is about **500 MB** and downloads **once**, the first time it's needed. It runs on your own computer. Remove it any time with **Remove model**.
@@ -151,6 +153,7 @@ Publishing it yourself? See [docs/DEPLOY.md](docs/DEPLOY.md).
 - 💾 **Your likes, settings and profiles** stay in your browser on this device.
 - 🌐 **Online lookups** send only a song's title and artist text to MusicBrainz and iTunes. No file names, folders or audio are sent. You can turn this off.
 - 🎤 **Lyrics lookups** send only a song's title, artist, album text and length to LRCLIB (lrclib.net), and only when you open the lyrics panel. `.lrc` files and lyrics in your tags are never sent. Turn it off with **Settings → Lyrics → Find Lyrics Online**.
+- 🔊 **Identify by sound** (only with your own AcoustID key) sends a short fingerprint of the first two minutes and the song's length to AcoustID. The fingerprint is worked out on your computer; the audio itself is never sent.
 - 🤖 **The AI** runs on your own computer and only sees names and tags, never the audio.
 
 ---
