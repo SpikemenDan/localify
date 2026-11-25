@@ -49,7 +49,7 @@ That's all. Localify remembers your likes, settings, folders and the last song y
 | 🎤 **Lyrics** | Press **Y** or tap the lyrics icon. Synced lyrics highlight as the song plays; tap a line to jump there. Uses a matching `.lrc` file or the song's own tags first, then looks them up on [LRCLIB](https://lrclib.net). Lyrics you've opened are saved for offline use. |
 | 🌈 **Visualizer** | A full-screen visualizer that moves with the music. |
 | 🎚️ **Sound** | Equalizer presets (Bass boost, Vocal, Treble boost, Loudness) or your own Bass/Mid/Treble, volume leveling and crossfade. |
-| ⏩ **Speed & pitch** | Playback speed with one-tap **Nightcore**, **Daycore** and **Slowed + reverb** presets. Turn *Change pitch with speed* off to keep the original key. |
+| ⏩ **Speed & pitch** | Playback speed from 0.25x to 3x, plus a **Reverb** slider. Turn *Change pitch with speed* off to keep the original key. |
 | 😴 **Sleep timer** | Fades out after 15, 30, 45 or 60 minutes, or at the end of the song. |
 | ✂️ **Audio editor** | Trim, cut, silence, reverse, fade in/out, gain, normalize, speed and EQ. Press **E** on a song. |
 | 🔊 **Audacity** | On Windows, send a song straight to Audacity (set up under **Settings → Integrations**). |

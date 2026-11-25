@@ -6,7 +6,7 @@
 - Folders you **drag onto the page** are now remembered after a reload too, like ones opened with **Load Folder**. 
 - **Firefox and Safari keep your songs after a reload.** They can't reopen folders, so Localify saves its own copy of your songs in the browser and loads them from there. Single songs added with **Add Files** are kept the same way in every browser.
 - **Pick up where you left off**: after a reload, the song you were playing is ready at the same spot, with your Up Next order (including songs you queued) and the list it came from.
-- **A cleaner speed and sound menu**: speed, vibes (Nightcore, Daycore, Slowed + reverb) and the pitch and reverb switches now sit in their own sections, with a short line under each switch saying what it does.
+- **A cleaner speed and sound menu**: speed and sound now sit in their own sections, and reverb is a slider (0 to 100%) instead of an on/off switch. The Nightcore, Daycore and Slowed + reverb buttons are gone: set the speed and reverb yourself. Each setting has a short line saying what it does.
 - Buttons, menus and headings now use sentence case ("Load folder", "Up next", "Shuffle play").
 - Notices now have a short title, an icon and a line of detail.
 - **All Tracks shows each song's folder** (its name and icon) next to the artist.

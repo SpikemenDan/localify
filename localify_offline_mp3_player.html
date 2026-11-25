@@ -2762,7 +2762,7 @@
     /* [/Settings] panel */
 
     /* ==========================================================================
-       [Pitch] Nightcore / daycore presets in the speed popover
+       [Pitch] Pitch toggle and reverb amount in the speed popover
        ========================================================================== */
     .speed-popover {
       width: 264px;
@@ -2774,50 +2774,6 @@
       font-weight: 700;
       color: var(--text-secondary);
       font-variant-numeric: tabular-nums;
-    }
-
-    .pitch-presets {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-    }
-
-    .pitch-preset-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1px;
-      padding: 7px 4px;
-      border-radius: var(--radius-sm);
-      background: rgba(var(--fg-rgb), 0.05);
-      border: 1px solid var(--border-subtle);
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text-primary);
-      cursor: pointer;
-      transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
-    }
-
-    .pitch-preset-btn small {
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--text-muted);
-    }
-
-    .pitch-preset-btn:hover {
-      background: var(--bg-highlight);
-      border-color: rgba(var(--fg-rgb), 0.2);
-    }
-
-    .pitch-preset-btn.active {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: var(--on-accent);
-    }
-
-    .pitch-preset-btn.active small {
-      color: var(--on-accent);
-      opacity: 0.8;
     }
 
     .pitch-toggle-row {
@@ -2909,38 +2865,6 @@
       color: var(--on-accent);
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
     }
-    .speed-popover .pitch-presets { gap: 8px; }
-    .speed-popover .pitch-preset-btn {
-      align-items: flex-start;
-      gap: 2px;
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid rgba(var(--fg-rgb), 0.08);
-      background: rgba(var(--fg-rgb), 0.04);
-      text-align: left;
-    }
-    .speed-popover .pp-name {
-      font-size: 13px;
-      font-weight: 700;
-      line-height: 1.2;
-      white-space: nowrap;
-    }
-    .speed-popover .pitch-preset-btn small {
-      font-size: 11px;
-      font-weight: 500;
-    }
-    .speed-popover .pitch-preset-btn:hover {
-      background: rgba(var(--fg-rgb), 0.08);
-      border-color: rgba(var(--fg-rgb), 0.16);
-    }
-    .speed-popover .pitch-preset-btn.active {
-      background: var(--accent-dim);
-      border-color: var(--accent);
-      color: var(--text-primary);
-      box-shadow: inset 0 0 0 1px var(--accent);
-    }
-    .speed-popover .pitch-preset-btn.active .pp-name { color: var(--accent); }
-    .speed-popover .pitch-preset-btn.active small { color: var(--text-secondary); opacity: 1; }
     .sp-card {
       border-radius: 12px;
       background: rgba(var(--fg-rgb), 0.04);
@@ -2954,6 +2878,24 @@
     .speed-popover .pitch-toggle-row + .pitch-toggle-row {
       border-top: 1px solid rgba(var(--fg-rgb), 0.08);
     }
+    .speed-popover .reverb-row {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+    }
+    .reverb-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .reverb-value {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      font-variant-numeric: tabular-nums;
+    }
+    .reverb-value.on { color: var(--accent); }
     .sp-row-text {
       display: flex;
       flex-direction: column;
@@ -6515,17 +6457,7 @@
               </div>
             </section>
 
-            <!-- [Pitch] one-tap vibes + pitch/reverb toggles -->
-            <section class="sp-section">
-              <h3 class="sp-label">Vibes</h3>
-              <div class="pitch-presets" id="pitchPresets" role="group" aria-label="Vibes">
-                <button type="button" class="pitch-preset-btn" data-preset="normal"><span class="pp-name">Normal</span><small>1x · as recorded</small></button>
-                <button type="button" class="pitch-preset-btn" data-preset="nightcore"><span class="pp-name">Nightcore</span><small>1.25x · higher</small></button>
-                <button type="button" class="pitch-preset-btn" data-preset="daycore"><span class="pp-name">Daycore</span><small>0.8x · deeper</small></button>
-                <button type="button" class="pitch-preset-btn" data-preset="slowedrev"><span class="pp-name">Slowed + reverb</span><small>0.85x · dreamy</small></button>
-              </div>
-            </section>
-
+            <!-- [Pitch] pitch toggle + reverb amount -->
             <section class="sp-section">
               <h3 class="sp-label">Sound</h3>
               <div class="sp-card">
@@ -6536,12 +6468,15 @@
                   </span>
                   <button type="button" class="switch" id="pitchToggle" role="switch" aria-checked="true" aria-labelledby="pitchToggleLabel"></button>
                 </div>
-                <div class="pitch-toggle-row">
-                  <span class="sp-row-text">
-                    <span id="reverbToggleLabel">Reverb</span>
-                    <span class="sp-hint">Adds the echo of a big room</span>
+                <div class="pitch-toggle-row reverb-row">
+                  <span class="reverb-head">
+                    <span class="sp-row-text">
+                      <label for="reverbSlider">Reverb</label>
+                      <span class="sp-hint">Adds the echo of a big room</span>
+                    </span>
+                    <span class="reverb-value" id="reverbValue" aria-hidden="true">Off</span>
                   </span>
-                  <button type="button" class="switch" id="reverbToggle" role="switch" aria-checked="false" aria-labelledby="reverbToggleLabel"></button>
+                  <input type="range" class="speed-range-slider" id="reverbSlider" min="0" max="100" step="5" value="0" aria-valuetext="Off">
                 </div>
               </div>
             </section>
@@ -11098,7 +11033,7 @@
           if (!Number.isNaN(target)) setPlaybackSpeed(target, true);
         });
       }
-      if (dom.btnSpeedReset) dom.btnSpeedReset.addEventListener('click', () => setPlaybackSpeed(1, true));
+      if (dom.btnSpeedReset) dom.btnSpeedReset.addEventListener('click', () => { setPitchReverb(0); setPlaybackSpeed(1, true); });
       window.addEventListener('click', (e) => {
         if (dom.speedPopover && dom.speedPopover.classList.contains('visible') &&
             (!dom.speedControlWrap || !dom.speedControlWrap.contains(e.target))) {
@@ -11941,31 +11876,34 @@
       /* [/Settings] */
 
       /* ========================================================================
-         [Pitch] Speed that changes pitch (nightcore / daycore) + slowed reverb
+         [Pitch] Speed that changes pitch + adjustable reverb
          - "Change pitch with speed" = preservesPitch off on both players.
-         - Presets set rate (+ reverb). Reverb is a ConvolverNode wet/dry mix that
+         - Reverb (0-100 %) is a ConvolverNode wet/dry mix that
            sits after the sleep-fade gain: fx.sleep -> revIn -> dry/wet -> duck.
          - No independent pitch shift: that needs an AudioWorklet phase vocoder /
            granular shifter, which is a lot of code and adds audible artifacts.
          Functions here are hoisted and touch no block-level const before init,
          because createPlayer() calls setPreservesPitch/loadPitchSettings early.
          ======================================================================== */
-      var PITCH_PRESETS = {
-        normal:    { name: 'Normal',          short: '1x',         rate: 1,    reverb: false },
-        nightcore: { name: 'Nightcore',       short: 'Nightcore',  rate: 1.25, reverb: false },
-        daycore:   { name: 'Daycore',         short: 'Daycore',    rate: 0.8,  reverb: false },
-        slowedrev: { name: 'Slowed + reverb', short: 'Slowed+rev', rate: 0.85, reverb: true }
-      };
-      var PITCH_REV_WET = 0.42;
-      var PITCH_REV_DRY = 0.78;
-      var pitchCfg = null;   // { pitchWithSpeed, reverb }
+      // Reverb amount 0-100. At 50 the mix is wet 0.42 / dry 0.78 (the old on/off switch).
+      var PITCH_REV_WET_MAX = 0.84;
+      var PITCH_REV_DRY_DROP = 0.44;
+      var PITCH_REV_OLD_ON = 50;   // what a saved "reverb: true" becomes
+      var pitchCfg = null;   // { pitchWithSpeed, reverb: 0-100 }
       var pitchFx = null;    // { ctx, revIn, dry, wet, duck, conv, convTimer }
       var pitchIR = null;    // cached impulse response { rate, buffer }
       var pitchDom = null;
 
       function loadPitchSettings() {
         const s = loadJSON(STORAGE_KEYS.PITCH, null) || {};
-        return { pitchWithSpeed: s.pitchWithSpeed !== false, reverb: !!s.reverb };
+        let rev = s.reverb === true ? PITCH_REV_OLD_ON : Number(s.reverb);
+        if (!Number.isFinite(rev)) rev = 0;
+        return { pitchWithSpeed: s.pitchWithSpeed !== false, reverb: Math.min(100, Math.max(0, Math.round(rev))) };
+      }
+
+      function pitchReverbMix(amount) {
+        const k = Math.min(100, Math.max(0, amount)) / 100;
+        return { wet: PITCH_REV_WET_MAX * k, dry: 1 - PITCH_REV_DRY_DROP * k };
       }
 
       function pitchSettings() {
@@ -12000,17 +11938,6 @@
         return 12 * Math.log2(rate);
       }
 
-      function activePitchPreset() {
-        const cfg = pitchSettings();
-        const rate = state.playbackRate;
-        for (const id of Object.keys(PITCH_PRESETS)) {
-          const p = PITCH_PRESETS[id];
-          if (Math.abs(p.rate - rate) < 0.005 && p.reverb === cfg.reverb &&
-              (id === 'normal' || cfg.pitchWithSpeed)) return id;
-        }
-        return null;
-      }
-
       function pitchUpdateUI() {
         if (!pitchDom) return;
         const cfg = pitchSettings();
@@ -12022,22 +11949,20 @@
         else readout = `${st > 0 ? '+' : '−'}${Math.abs(st).toFixed(1)} semitones ${st > 0 ? 'higher' : 'lower'}`;
         pitchDom.readout.textContent = readout;
 
-        const active = activePitchPreset();
-        pitchDom.presets.querySelectorAll('.pitch-preset-btn').forEach(btn => {
-          btn.classList.toggle('active', btn.dataset.preset === active);
-          btn.setAttribute('aria-pressed', String(btn.dataset.preset === active));
-        });
         setSwitch(pitchDom.toggle, cfg.pitchWithSpeed);
-        setSwitch(pitchDom.reverb, cfg.reverb);
+        const revText = cfg.reverb > 0 ? `${cfg.reverb}%` : 'Off';
+        if (+pitchDom.reverb.value !== cfg.reverb) pitchDom.reverb.value = cfg.reverb;
+        pitchDom.reverb.setAttribute('aria-valuetext', revText);
+        pitchDom.reverbValue.textContent = revText;
+        pitchDom.reverbValue.classList.toggle('on', cfg.reverb > 0);
 
-        // Speed button shows the preset name when one is active (or "+rev" when reverb is on)
-        const named = active && active !== 'normal' ? PITCH_PRESETS[active].short : null;
+        // Speed button shows "+rev" when reverb is on
         const btn = dom.btnSpeed;
-        if (named) btn.textContent = named;
-        else if (cfg.reverb) btn.textContent = `${+rate.toFixed(2)}x+rev`;
-        btn.classList.toggle('pitch-named', !!named || cfg.reverb);
-        btn.classList.toggle('modified', rate !== 1 || cfg.reverb);
-        btn.setAttribute('aria-label', `Playback speed ${+rate.toFixed(2)}x${named ? ` (${PITCH_PRESETS[active].name})` : ''}${cfg.reverb ? ', reverb on' : ''}`);
+        const rev = cfg.reverb > 0;
+        if (rev) btn.textContent = `${+rate.toFixed(2)}x+rev`;
+        btn.classList.toggle('pitch-named', rev);
+        btn.classList.toggle('modified', rate !== 1 || rev);
+        btn.setAttribute('aria-label', `Playback speed ${+rate.toFixed(2)}x${rev ? `, reverb ${cfg.reverb}%` : ''}`);
       }
 
       function setPitchWithSpeed(on) {
@@ -12048,24 +11973,12 @@
         syncPitchFocusSettingsUI();
       }
 
-      function setPitchReverb(on) {
-        pitchSettings().reverb = !!on;
+      function setPitchReverb(amount) {
+        const v = Math.min(100, Math.max(0, Math.round(Number(amount) || 0)));
+        pitchSettings().reverb = v;
         savePitchSettings();
         applyPitchReverb();
         updateSpeedUI();
-      }
-
-      function applyPitchPreset(id) {
-        const p = PITCH_PRESETS[id];
-        if (!p) return;
-        const cfg = pitchSettings();
-        cfg.reverb = p.reverb;
-        if (id !== 'normal') cfg.pitchWithSpeed = true;   // the vibe needs the pitch shift
-        savePitchSettings();
-        applyPitchReverb();
-        setPlaybackSpeed(p.rate);   // -> applyPitchToPlayers + updateSpeedUI
-        syncPitchFocusSettingsUI();
-        showToast(id === 'normal' ? 'Speed: Normal' : `${p.name} on`);
       }
 
       /* ---- Audio graph: reverb wet/dry + focus duck ---- */
@@ -12091,10 +12004,11 @@
         fx.revIn = revIn;
         fx.duck = duck;
 
-        const on = pitchSettings().reverb;
-        dry.gain.value = on ? PITCH_REV_DRY : 1;
-        wet.gain.value = on ? PITCH_REV_WET : 0;
-        if (on) pitchEnsureConvolver();
+        const amount = pitchSettings().reverb;
+        const mix = pitchReverbMix(amount);
+        dry.gain.value = mix.dry;
+        wet.gain.value = mix.wet;
+        if (amount > 0) pitchEnsureConvolver();
         if (focusRun && focusRun.ringing) duck.gain.value = focusSettings().duck / 100;
         return revIn;
       }
@@ -12136,16 +12050,18 @@
       function applyPitchReverb() {
         if (!pitchFx) return;   // graph not built yet: buildPitchFocusChain reads the setting
         const { ctx, dry, wet } = pitchFx;
-        if (pitchSettings().reverb) {
+        const amount = pitchSettings().reverb;
+        if (amount > 0) {
+          const mix = pitchReverbMix(amount);
           pitchEnsureConvolver();
-          pfRamp(ctx, wet.gain, PITCH_REV_WET, 0.25);
-          pfRamp(ctx, dry.gain, PITCH_REV_DRY, 0.25);
+          pfRamp(ctx, wet.gain, mix.wet, 0.12);
+          pfRamp(ctx, dry.gain, mix.dry, 0.12);
         } else {
           pfRamp(ctx, wet.gain, 0, 0.25);
           pfRamp(ctx, dry.gain, 1, 0.25);
           clearTimeout(pitchFx.convTimer);
           pitchFx.convTimer = setTimeout(() => {   // let the tail ring out, then free the convolver
-            if (!pitchFx.conv || pitchSettings().reverb) return;
+            if (!pitchFx.conv || pitchSettings().reverb > 0) return;
             try { pitchFx.revIn.disconnect(pitchFx.conv); pitchFx.conv.disconnect(); } catch (e) {}
             pitchFx.conv = null;
           }, 4000);
@@ -12799,9 +12715,9 @@
         const g = (id) => document.getElementById(id);
         pitchDom = {
           readout: g('pitchReadout'),
-          presets: g('pitchPresets'),
           toggle: g('pitchToggle'),
-          reverb: g('reverbToggle'),
+          reverb: g('reverbSlider'),
+          reverbValue: g('reverbValue'),
           setPitch: g('setPitch')
         };
         focusDom = {
@@ -12825,12 +12741,8 @@
         const d = focusDom;
 
         /* Pitch controls (speed popover + Settings mirror) */
-        pitchDom.presets.addEventListener('click', (e) => {
-          const b = e.target.closest('.pitch-preset-btn');
-          if (b) applyPitchPreset(b.dataset.preset);
-        });
         pitchDom.toggle.addEventListener('click', () => setPitchWithSpeed(!pitchSettings().pitchWithSpeed));
-        pitchDom.reverb.addEventListener('click', () => setPitchReverb(!pitchSettings().reverb));
+        pitchDom.reverb.addEventListener('input', () => setPitchReverb(pitchDom.reverb.value));
         pitchDom.setPitch.addEventListener('click', () => setPitchWithSpeed(!pitchSettings().pitchWithSpeed));
 
         /* Focus popover */
