@@ -212,7 +212,7 @@ Use Chrome or Edge, and allow Localify to edit the folder when it asks.
 
 They're still saved. After a reload, the browser asks once more before Localify may open your folders. Click anywhere on the page and choose **Allow** (or **Allow on every visit**, so it stops asking), and the songs from all your folders come back.
 
-Songs added with **Add Files** (single files, not a folder) can't be reopened after a reload. Use **Load Folder**, or drag the whole folder onto the page, to keep them. In browsers other than Chrome and Edge, folders can't be reopened at all.
+**Firefox and Safari** can't reopen folders, so Localify saves its own copy of the songs you add (in the browser's private storage, about the size of your music) and loads them from there after a reload. The same goes for single songs added with **Add Files** in any browser. Removing a folder from **Your Folders**, or clearing the library, deletes the copy.
 </details>
 
 <details>

@@ -3,7 +3,9 @@
 ## 1.0.1 — polish
 
 - **Your songs come back after a reload or an update.** The browser asks again before Localify may open your folders; now one click anywhere asks for all of them at once, and every folder's songs return to All Tracks.
-- Folders you **drag onto the page** are now remembered after a reload too, like ones opened with **Load Folder**. Songs added as single files still aren't, and Localify says so.
+- Folders you **drag onto the page** are now remembered after a reload too, like ones opened with **Load Folder**. 
+- **Firefox and Safari keep your songs after a reload.** They can't reopen folders, so Localify saves its own copy of your songs in the browser and loads them from there. Single songs added with **Add Files** are kept the same way in every browser.
+- Notices now have a short title, an icon and a line of detail.
 - **All Tracks shows each song's folder** (its name and icon) next to the artist.
 - **Pick many songs at once**: <kbd>Ctrl</kbd>+<kbd>A</kbd>, <kbd>Ctrl</kbd>+click and <kbd>Shift</kbd>+click, then play, queue, like, add to a playlist or remove them together from the bar at the bottom. New keys in the song list: <kbd>Q</kbd> (add to queue), <kbd>Shift</kbd>+<kbd>Q</kbd> (play next), <kbd>Delete</kbd> and <kbd>Esc</kbd>.
 - **Your own pictures and icons** for playlists and folders: upload a picture (it's cropped square), or type or paste any emoji.
