@@ -2841,7 +2841,8 @@
       font-weight: 700;
       color: var(--text-muted);
     }
-    .speed-popover .speed-slider-row { gap: 8px; }
+    /* Inset to match the reverb slider inside .sp-card (1px border + 12px padding) */
+    .speed-popover .speed-slider-row { gap: 8px; padding: 0 13px; box-sizing: border-box; }
     .speed-popover .speed-range-slider { height: 6px; }
     .speed-popover .speed-range-slider::-webkit-slider-thumb { width: 16px; height: 16px; }
     .speed-popover .speed-range-slider::-moz-range-thumb { width: 16px; height: 16px; }
