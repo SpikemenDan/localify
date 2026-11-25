@@ -74,3 +74,31 @@ Then open <http://localhost:8000/>. Locally the service worker's version is `dev
 makes it fetch fresh files first (so a normal reload shows your edits) and fall back to
 the cache only when the server is stopped. The deployed version is cache-first instead,
 and each deploy gets a new version, which is what triggers the "Reload" bar.
+
+## Outside services the app talks to
+
+The player works fully offline. These are contacted only when the matching feature is
+on and the device is online, and never receive audio, file names or folders:
+
+| Service | Used for | What is sent | Turn off in |
+| --- | --- | --- | --- |
+| `musicbrainz.org`, `coverartarchive.org` | Song details and album covers | Title and artist text | Settings → Tidy names & tags → Look up songs online |
+| `itunes.apple.com` | Second opinion on details and covers | Title and artist text | Same as above |
+| `lrclib.net` | Lyrics | Title, artist, album text and song length | Settings → Lyrics → Find Lyrics Online |
+| `api.acoustid.org` | Identify a song by its sound | Audio fingerprint and song length (only with the user's own key) | Remove the key in Settings → Tidy names & tags |
+| `cdn.jsdelivr.net`, `huggingface.co` | Downloading the AI model and the fingerprint library, once | Nothing personal | Settings → Tidy names & tags → AI suggestions |
+
+## Launch checklist
+
+Before telling people about the address:
+
+- [ ] `main` is pushed and the **Deploy to GitHub Pages** run is green.
+- [ ] The site opens at `https://<user>.github.io/<repo>/` and redirects to the player.
+- [ ] Install works on at least one phone and one computer, and the app opens with Wi-Fi off.
+- [ ] Pushing a small change shows **"A new version of Localify is ready — Reload"** in the installed app.
+- [ ] Load a folder, play, like a song, open lyrics (**Y**) and the focus timer (**T**).
+- [ ] Add a messy-named song while online and check it's filled in; add one offline and check it lands in **Unsorted**.
+- [ ] Export a backup and import it into a new profile.
+- [ ] Sharing the address in a chat app shows the Localify icon and description. If the
+      address isn't `https://spikemendan.github.io/localify/`, update the `og:url` and
+      `og:image` tags at the top of `index.html` and `localify_offline_mp3_player.html`.
