@@ -2,6 +2,8 @@
 
 ## 1.0.1 — polish
 
+- **Your songs come back after a reload or an update.** The browser asks again before Localify may open your folders; now one click anywhere asks for all of them at once, and every folder's songs return to All Tracks.
+- **All Tracks shows each song's folder** (its name and icon) next to the artist.
 - **Pick many songs at once**: <kbd>Ctrl</kbd>+<kbd>A</kbd>, <kbd>Ctrl</kbd>+click and <kbd>Shift</kbd>+click, then play, queue, like, add to a playlist or remove them together from the bar at the bottom. New keys in the song list: <kbd>Q</kbd> (add to queue), <kbd>Shift</kbd>+<kbd>Q</kbd> (play next), <kbd>Delete</kbd> and <kbd>Esc</kbd>.
 - **Your own pictures and icons** for playlists and folders: upload a picture (it's cropped square), or type or paste any emoji.
 - The *Auto* and *?* tags on songs are gone. Hover a song to see a small dot instead, or open its **⋯** menu to answer a question or see what Localify filled in.

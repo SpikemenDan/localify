@@ -208,6 +208,12 @@ Use Chrome or Edge, and allow Localify to edit the folder when it asks.
 </details>
 
 <details>
+<summary><b>My songs are gone after a reload or update</b></summary>
+
+They're still saved. After a reload, the browser asks once more before Localify may open your folders. Click anywhere on the page and choose **Allow** (or **Allow on every visit**, so it stops asking), and the songs from all your folders come back.
+</details>
+
+<details>
 <summary><b>My likes or playlists disappeared</b></summary>
 
 You may be in a different profile. Click the avatar in the top-right to switch. Likes and playlists are also saved per browser, so a different browser or device starts fresh unless you import a backup.

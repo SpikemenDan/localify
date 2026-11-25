@@ -920,6 +920,16 @@
       background: rgba(var(--accent-rgb), 0.16);
     }
     .fd-preview svg { width: 26px; height: 26px; }
+    /* All Tracks: the folder a song came from */
+    .track-artist.has-src { display: flex; align-items: center; min-width: 0; }
+    .track-artist-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 0 1 auto; }
+    .track-src { display: inline-flex; align-items: center; gap: 4px; margin-left: 6px; color: var(--text-muted); font-size: 0.92em; min-width: 0; flex: 0 1 auto; max-width: 70%; }
+    .track-src::before { content: '·'; margin-right: 4px; }
+    .track-src svg { width: 12px; height: 12px; flex: none; }
+    .track-src[data-accent] svg { color: var(--accent); }
+    .track-src-emoji { font-size: 11px; line-height: 1; }
+    .track-src-pic { width: 13px; height: 13px; border-radius: 3px; overflow: hidden; flex: none; display: inline-block; }
+    .track-src-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
     /* Your own pictures and icons */
     .fd-preview, .pl-icon, .recent-folder-icon { overflow: hidden; }
     .look-img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: inherit; }
@@ -8755,6 +8765,11 @@
           dom.folderInput.click();
           return;
         }
+        if (state.pendingReconnect.some(p => p.name === folderName)) {
+          await reconnectPendingFolders();
+          closeMobileSidebar();
+          return;
+        }
         const handle = await getFolderHandle(folderName);
         if (handle && await ensureReadPermission(handle, true)) {
           await loadFolderFromHandle(handle);
@@ -8802,7 +8817,23 @@
         saveJSON(STORAGE_KEYS.SESSION_FOLDERS, state.sessionFolders);
         state.pendingReconnect = needClick;
         updateReconnectUI();
-        if (state.tracks.length > 0) showToast(`Restored ${state.tracks.length} tracks`);
+        if (needClick.length) {
+          // After a reload (an update, or reopening the app) the browser asks once more
+          // before Localify may read your folders. That needs a click, so the first click
+          // anywhere asks for every folder at once. "Allow on every visit" stops the question.
+          showToast(needClick.length === 1
+            ? `Click anywhere to bring back the songs in “${folderLabel(needClick[0].name)}”.`
+            : `Click anywhere to bring back the songs in your ${needClick.length} folders.`);
+          const onFirstClick = (e) => {
+            document.removeEventListener('pointerdown', onFirstClick, true);
+            if (!state.pendingReconnect.length) return;
+            if (e.target.closest && e.target.closest('#btnReconnect, [data-remove-folder], [data-edit-folder]')) return;
+            reconnectPendingFolders();
+          };
+          document.addEventListener('pointerdown', onFirstClick, true);
+        } else if (state.tracks.length > 0) {
+          showToast(`Restored ${state.tracks.length} tracks`);
+        }
       }
 
       function updateReconnectUI() {
@@ -8817,20 +8848,31 @@
         if (state.tracks.length === 0) renderTracklist();
       }
 
+      let reconnecting = false;
       async function reconnectPendingFolders() {
+        if (reconnecting || !state.pendingReconnect.length) return;
+        reconnecting = true;
         const pending = state.pendingReconnect.slice();
-        state.pendingReconnect = [];
         const denied = [];
-        for (const item of pending) {
-          if (await ensureReadPermission(item.handle, true)) {
-            await loadFolderFromHandle(item.handle);
-          } else {
-            denied.push(item);
+        let added = 0, back = 0;
+        try {
+          for (const item of pending) {
+            if (await ensureReadPermission(item.handle, true)) {
+              added += await loadFolderFromHandle(item.handle, { quiet: true });
+              back++;
+            } else {
+              denied.push(item);
+            }
           }
+        } finally {
+          reconnecting = false;
         }
         state.pendingReconnect = denied;
         updateReconnectUI();
-        if (denied.length) showToast('Access was not granted. You can pick the folder again.');
+        renderAll();
+        if (denied.length && back) showToast(`${back} of ${pending.length} folders are back. Press Reconnect for the rest.`);
+        else if (denied.length) showToast('Localify wasn’t allowed to open the folder. Press Reconnect to try again.');
+        else if (added) showToast(`Your songs are back: ${added} from ${back} ${back === 1 ? 'folder' : 'folders'}.`);
       }
 
       function setLoadingState(loading) {
@@ -9903,7 +9945,9 @@
             const reconnect = state.pendingReconnect.length > 0;
             dom.emptyTitle.textContent = reconnect ? 'Welcome Back' : 'Your Offline Music Player Is Ready';
             dom.emptyDesc.textContent = reconnect
-              ? 'Reconnect your folder or pick another.'
+              ? (state.pendingReconnect.length === 1
+                ? 'Your folder is still saved. Click anywhere, then Allow, to bring its songs back.'
+                : `Your ${state.pendingReconnect.length} folders are still saved. Click anywhere, then Allow, to bring all their songs back.`)
               : 'Pick a folder or drop audio files. It all stays on your device.';
             dom.emptyActions.style.display = 'flex';
           } else if (state.searchQuery.trim() !== '') {
@@ -10010,7 +10054,9 @@
               <div class="track-thumb">${artHTML(track, 18)}${AutoFill.badgeHTML(track)}</div>
               <div class="track-text">
                 <div class="track-name" title="${escapeHtml(track.title)}">${escapeHtml(track.title)}</div>
-                <div class="track-artist" title="${escapeHtml(track.artist)}">${escapeHtml(track.artist)}</div>
+                ${(() => { const src = trackSourceHTML(track); return src
+                  ? `<div class="track-artist has-src"><span class="track-artist-name" title="${escapeHtml(track.artist)}">${escapeHtml(track.artist)}</span>${src}</div>`
+                  : `<div class="track-artist" title="${escapeHtml(track.artist)}">${escapeHtml(track.artist)}</div>`; })()}
               </div>
             </div>
             <div class="track-album" title="${escapeHtml(album)}${track.year ? ' (' + track.year + ')' : ''}">${escapeHtml(album)}</div>
@@ -10022,6 +10068,18 @@
               <button class="btn-like${isLiked ? ' liked' : ''}" data-like-id="${track.id}" tabindex="-1" aria-pressed="${isLiked}" aria-label="${isLiked ? 'Remove from' : 'Add to'} Liked Songs">${SVG.heart}</button>
             </div>
             <div class="track-dur">${track.duration ? formatTime(track.duration) : '--:--'}</div>`;
+      }
+
+      /** In All Tracks, which of your folders a song came from (its own name and icon). */
+      function trackSourceHTML(track) {
+        if (state.activeView !== 'all') return '';
+        const name = track.rootName || track.folder;
+        if (!name) return '';
+        const look = folderLooks[name] || {};
+        const pic = LookArt.img(look.image);
+        const icon = pic ? `<span class="track-src-pic">${pic}</span>` : look.icon ? `<span class="track-src-emoji">${escapeHtml(look.icon)}</span>` : SVG.folder;
+        const label = folderLabel(name);
+        return `<span class="track-src" title="From your folder “${escapeHtml(label)}”"${look.accent ? ` data-accent="${escapeHtml(look.accent)}"` : ''}>${icon}<span class="track-src-name">${escapeHtml(label)}</span></span>`;
       }
 
       /** Re-render one track wherever it currently appears (list row, Up Next). */
