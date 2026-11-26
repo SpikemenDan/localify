@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><!-- [Looks] safe areas -->
-  <title>Localify — offline MP3 player</title>
+  <title>Localify — Offline MP3 Player</title>
   <!-- [PWA] Installable-app metadata. The manifest <link> is added by the [PWA] script only on
        http(s), so opening this file straight from disk (file://) doesn't log a CORS error. -->
   <!-- [Launch] Link previews when the site address is shared (chat apps, social posts). -->
   <meta name="description" content="A music player for the songs already on your device. No account, no uploads. Works offline.">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Localify">
-  <meta property="og:title" content="Localify — offline music player">
+  <meta property="og:title" content="Localify — Offline Music Player">
   <meta property="og:description" content="A music player for the songs already on your device. No account, no uploads. Works offline.">
   <meta property="og:url" content="https://spikemendan.github.io/localify/">
   <meta property="og:image" content="https://spikemendan.github.io/localify/icons/icon-512.png">
@@ -920,7 +920,7 @@
       background: rgba(var(--accent-rgb), 0.16);
     }
     .fd-preview svg { width: 26px; height: 26px; }
-    /* All tracks: the folder a song came from */
+    /* All Tracks: the folder a song came from */
     .track-artist.has-src { display: flex; align-items: center; min-width: 0; }
     .track-artist-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 0 1 auto; }
     .track-src { display: inline-flex; align-items: center; gap: 4px; margin-left: 6px; color: var(--text-muted); font-size: 0.92em; min-width: 0; flex: 0 1 auto; max-width: 70%; }
@@ -1607,7 +1607,7 @@
     }
 
     /* ==========================================================================
-       Now playing / Visualizer View
+       Now Playing / Visualizer View
        ========================================================================== */
     .now-playing-view {
       display: none;
@@ -2047,7 +2047,7 @@
       gap: 10px;
     }
 
-    /* Speed control & Popover */
+    /* Speed Control & Popover */
     .speed-control-wrap {
       position: relative;
     }
@@ -3874,7 +3874,7 @@
     }
 
     /* ==========================================================================
-       Track actions (Edit / Open in Audacity) in rows and Now playing
+       Track actions (Edit / Open in Audacity) in rows and Now Playing
        ========================================================================== */
     .row-actions {
       display: flex;
@@ -3953,7 +3953,7 @@
     }
 
     /* ==========================================================================
-       Audio editor dialog
+       Audio Editor dialog
        ========================================================================== */
     .ed-dialog {
       width: min(1120px, calc(100vw - 32px));
@@ -4973,7 +4973,7 @@
     .looks-menu-title { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .looks-menu-sub { font-size: 13px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    /* --- Mobile full-screen Now playing --- */
+    /* --- Mobile full-screen Now Playing --- */
     .fs-player {
       position: fixed;
       inset: 0;
@@ -5672,7 +5672,7 @@
         <polyline points="17 8 12 3 7 8"></polyline>
         <line x1="12" y1="3" x2="12" y2="15"></line>
       </svg>
-      <h2>Drop music folder or audio files</h2>
+      <h2>Drop Music Folder or Audio Files</h2>
       <p>Supports MP3, WAV, OGG, M4A, FLAC, and AAC — 100% offline in your browser.</p>
     </div>
   </div>
@@ -5681,7 +5681,7 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- =====================================================================
-       Audio editor dialog (built-in editor)
+       Audio Editor dialog (built-in editor)
        ===================================================================== -->
   <dialog id="editorDialog" class="ed-dialog" aria-labelledby="edTitle" aria-describedby="edSubtitle">
     <div class="ed-head">
@@ -5690,24 +5690,24 @@
         <div class="ed-subtitle" id="edSubtitle"></div>
       </div>
       <button type="button" class="btn-secondary ed-btn" id="edAudacity" title="Open the original file in Audacity (Shift+click to change the folder path)">Open in Audacity</button>
-      <button type="button" class="ed-icon-btn" id="edClose" aria-label="Close editor" title="Close (Esc)">
+      <button type="button" class="ed-icon-btn" id="edClose" aria-label="Close Editor" title="Close (Esc)">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
       </button>
     </div>
 
     <div class="ed-body">
       <div class="ed-transport">
-        <button type="button" class="ed-icon-btn ed-play" id="edPlay" aria-label="Play preview" title="Play / pause preview (Space)" disabled>
+        <button type="button" class="ed-icon-btn ed-play" id="edPlay" aria-label="Play Preview" title="Play / pause preview (Space)" disabled>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" id="edPlayIcon"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
         </button>
-        <button type="button" class="ed-icon-btn" id="edStop" aria-label="Stop preview" title="Stop" disabled>
+        <button type="button" class="ed-icon-btn" id="edStop" aria-label="Stop Preview" title="Stop" disabled>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="1.5"></rect></svg>
         </button>
         <span class="ed-readout" id="edTime"><strong>0:00.000</strong> / 0:00.000</span>
-        <span class="ed-readout" id="edSel">No selection</span>
+        <span class="ed-readout" id="edSel">No Selection</span>
         <span class="ed-spacer"></span>
         <div class="ed-zoom" role="group" aria-label="Zoom">
-          <button type="button" class="ed-icon-btn" id="edZoomOut" aria-label="Zoom out" title="Zoom out (−)" disabled>
+          <button type="button" class="ed-icon-btn" id="edZoomOut" aria-label="Zoom Out" title="Zoom out (−)" disabled>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
           </button>
           <button type="button" class="ed-icon-btn" id="edZoomIn" aria-label="Zoom in" title="Zoom in (+, or Ctrl + mouse wheel)" disabled>
@@ -5725,16 +5725,16 @@
           <div id="edOverlayText">Decoding audio…</div>
         </div>
       </div>
-      <input type="range" class="speed-range-slider ed-scroll" id="edScroll" min="0" max="1000" step="1" value="0" aria-label="Scroll waveform" disabled>
+      <input type="range" class="speed-range-slider ed-scroll" id="edScroll" min="0" max="1000" step="1" value="0" aria-label="Scroll Waveform" disabled>
       <div class="ed-hint" id="edScope">Edits apply to the whole file. Drag on the waveform to select a range.</div>
 
       <fieldset class="ed-ops" id="edOps" disabled>
-        <legend class="sr-only">Edit operations</legend>
+        <legend class="sr-only">Edit Operations</legend>
         <div class="ed-group" role="group" aria-labelledby="edGEdit">
           <div class="ed-group-title" id="edGEdit">Edit</div>
           <div class="ed-btn-row">
-            <button type="button" class="btn-secondary ed-btn" data-op="trim" title="Keep only the selection">Trim to selection</button>
-            <button type="button" class="btn-secondary ed-btn" data-op="delete" title="Remove the selection (Delete)">Delete selection</button>
+            <button type="button" class="btn-secondary ed-btn" data-op="trim" title="Keep Only the Selection">Trim to Selection</button>
+            <button type="button" class="btn-secondary ed-btn" data-op="delete" title="Remove the selection (Delete)">Delete Selection</button>
             <button type="button" class="btn-secondary ed-btn" data-op="silence">Silence</button>
             <button type="button" class="btn-secondary ed-btn" data-op="reverse">Reverse</button>
           </div>
@@ -5743,7 +5743,7 @@
           <div class="ed-group-title" id="edGFade">Fades</div>
           <div class="ed-btn-row">
             <button type="button" class="btn-secondary ed-btn" data-op="fadeIn" title="Fade in across the selection (no selection: the first 3 seconds)">Fade in</button>
-            <button type="button" class="btn-secondary ed-btn" data-op="fadeOut" title="Fade out across the selection (no selection: the last 3 seconds)">Fade out</button>
+            <button type="button" class="btn-secondary ed-btn" data-op="fadeOut" title="Fade out across the selection (no selection: the last 3 seconds)">Fade Out</button>
           </div>
         </div>
         <div class="ed-group" role="group" aria-labelledby="edGVol">
@@ -5753,7 +5753,7 @@
             <output id="edGainOut" for="edGain">0.0 dB</output>
           </label>
           <div class="ed-btn-row">
-            <button type="button" class="btn-secondary ed-btn" data-op="gain">Apply gain</button>
+            <button type="button" class="btn-secondary ed-btn" data-op="gain">Apply Gain</button>
             <button type="button" class="btn-secondary ed-btn" data-op="normalize" title="Scale so the loudest peak is at -1 dBFS">Normalize (−1 dB)</button>
           </div>
         </div>
@@ -5764,8 +5764,8 @@
             <output id="edSpeedOut" for="edSpeed">1.00×</output>
           </label>
           <div class="ed-btn-row">
-            <label class="ed-check"><input type="checkbox" id="edKeepPitch" checked> Keep pitch</label>
-            <button type="button" class="btn-secondary ed-btn" data-op="speed">Apply speed</button>
+            <label class="ed-check"><input type="checkbox" id="edKeepPitch" checked> Keep Pitch</label>
+            <button type="button" class="btn-secondary ed-btn" data-op="speed">Apply Speed</button>
           </div>
         </div>
         <div class="ed-group" role="group" aria-labelledby="edGEq">
@@ -5789,7 +5789,7 @@
       <button type="button" class="btn-ghost" id="edUndo" title="Undo (Ctrl+Z)" disabled>Undo</button>
       <button type="button" class="btn-ghost" id="edRedo" title="Redo (Ctrl+Shift+Z or Ctrl+Y)" disabled>Redo</button>
       <div class="ed-status" id="edStatus" role="status" aria-live="polite"></div>
-      <label class="ed-check"><input type="checkbox" id="edAddToLibrary"> Add export to library</label>
+      <label class="ed-check"><input type="checkbox" id="edAddToLibrary"> Add Export to Library</label>
       <button type="button" class="btn-primary" id="edExport" disabled>Export WAV</button>
     </div>
   </dialog>
@@ -5804,32 +5804,32 @@
       <button type="button" class="btn-ghost tg-close" id="tgClose" aria-label="Close">Close</button>
     </div>
     <div class="tg-toolbar">
-      <label class="tg-field"><span>Songs</span><select id="tgScope" aria-label="Which songs to tidy"></select></label>
+      <label class="tg-field"><span>Songs</span><select id="tgScope" aria-label="Which Songs to Tidy"></select></label>
       <span class="tg-field">
         <button type="button" class="switch" id="tgAi" role="switch" aria-checked="false" aria-labelledby="tgAiLabel" aria-describedby="tgAiStatus"></button>
-        <span id="tgAiLabel">AI suggestions</span>
+        <span id="tgAiLabel">AI Suggestions</span>
         <span class="tg-ai-status" id="tgAiStatus" aria-live="polite"></span>
         <button type="button" class="tg-linkbtn" id="tgAiStop" hidden>Stop</button>
       </span>
       <span class="tg-field"><span>Name</span><code id="tgTemplate"></code><button type="button" class="tg-linkbtn" id="tgTemplateEdit">Change</button></span>
-      <label class="tg-check"><input type="checkbox" id="tgShowSame"> Show tidy songs</label>
+      <label class="tg-check"><input type="checkbox" id="tgShowSame"> Show Tidy Songs</label>
     </div>
     <div class="tg-consent" id="tgConsent" hidden role="region" aria-label="AI model download">
       <strong>Download the AI model?</strong>
       <div id="tgConsentText"></div>
       <div class="tg-consent-actions">
         <button type="button" class="btn-primary" id="tgConsentYes">Download</button>
-        <button type="button" class="btn-secondary" id="tgConsentNo">Use rules only</button>
+        <button type="button" class="btn-secondary" id="tgConsentNo">Use Rules Only</button>
       </div>
     </div>
     <div class="tg-body">
-      <div class="tg-list" id="tgList" role="list" aria-label="Suggested changes"></div>
+      <div class="tg-list" id="tgList" role="list" aria-label="Suggested Changes"></div>
       <div class="tg-empty" id="tgEmpty" hidden></div>
     </div>
     <div class="tg-foot">
       <span class="tg-status" id="tgStatus" aria-live="polite"></span>
-      <button type="button" class="btn-ghost" id="tgUndo" hidden>Undo last batch</button>
-      <button type="button" class="btn-secondary" id="tgAcceptAll">Accept all</button>
+      <button type="button" class="btn-ghost" id="tgUndo" hidden>Undo Last Batch</button>
+      <button type="button" class="btn-secondary" id="tgAcceptAll">Accept All</button>
       <button type="button" class="btn-primary" id="tgApply" disabled>Apply</button>
     </div>
   </dialog>
@@ -5841,7 +5841,7 @@
         <h2 id="qaTitle">Questions About Your Songs</h2>
         <div class="tg-sub" id="qaCount"></div>
       </div>
-      <button type="button" class="btn-ghost tg-close" id="qaClose">Stop for now</button>
+      <button type="button" class="btn-ghost tg-close" id="qaClose">Stop for Now</button>
     </div>
     <div class="af-qa-body">
       <div class="af-qa-song">
@@ -5850,14 +5850,14 @@
           <div class="tg-fname" id="qaName"></div>
           <div class="tg-sub" id="qaFile"></div>
         </div>
-        <button type="button" class="btn-secondary af-qa-play" id="qaPlay" aria-pressed="false">Play preview</button>
+        <button type="button" class="btn-secondary af-qa-play" id="qaPlay" aria-pressed="false">Play Preview</button>
       </div>
       <div id="qaAsk">
         <h3 class="af-qa-q" id="qaQuestion"></h3>
         <p class="tg-sub" id="qaWhy"></p>
-        <div class="af-qa-opts" id="qaOptions" role="group" aria-label="Suggested answers"></div>
+        <div class="af-qa-opts" id="qaOptions" role="group" aria-label="Suggested Answers"></div>
         <form class="af-qa-free" id="qaFreeForm">
-          <input type="text" id="qaFree" autocomplete="off" aria-label="Your answer" maxlength="200">
+          <input type="text" id="qaFree" autocomplete="off" aria-label="Your Answer" maxlength="200">
           <button type="submit" class="btn-primary">Save</button>
         </form>
       </div>
@@ -5869,7 +5869,7 @@
     </div>
     <div class="tg-foot">
       <button type="button" class="btn-ghost" id="qaSkip">Skip</button>
-      <button type="button" class="btn-secondary" id="qaLeave">Leave as is</button>
+      <button type="button" class="btn-secondary" id="qaLeave">Leave as Is</button>
     </div>
   </dialog>
   <!-- [/AI Tagger] -->
@@ -5880,7 +5880,7 @@
   <!-- Main Application Shell -->
   <div class="app-shell">
     <!-- Left Sidebar -->
-    <aside id="sidebar" class="sidebar" aria-label="Library navigation">
+    <aside id="sidebar" class="sidebar" aria-label="Library Navigation">
       <div class="sidebar-card">
         <div class="brand">
           <div class="brand-icon" aria-hidden="true">
@@ -5943,11 +5943,11 @@
       </div>
 
       <div class="sidebar-card sidebar-library">
-        <!-- [Playlists] Liked songs first, then your own playlists -->
+        <!-- [Playlists] Liked Songs first, then your own playlists -->
         <section class="sidebar-playlists" aria-labelledby="plHeading">
           <div class="sidebar-section-title">
             <span id="plHeading">Playlists</span>
-            <button type="button" class="pl-add-btn" id="btnNewPlaylist" title="New playlist" aria-label="New playlist">
+            <button type="button" class="pl-add-btn" id="btnNewPlaylist" title="New Playlist" aria-label="New Playlist">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             </button>
           </div>
@@ -5965,7 +5965,7 @@
 
         <div class="sidebar-section-title">
           <span>Your Local Library</span>
-          <button class="btn-ghost" id="btnClearLibrary" title="Clear loaded tracks" style="padding: 2px 6px;">Clear</button>
+          <button class="btn-ghost" id="btnClearLibrary" title="Clear Loaded Tracks" style="padding: 2px 6px;">Clear</button>
         </div>
 
         <div class="sidebar-actions">
@@ -5973,7 +5973,7 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
             </svg>
-            <span>Select music folder</span>
+            <span>Select Music Folder</span>
           </button>
 
           <button class="btn-secondary" id="btnAddFilesSide">
@@ -5981,7 +5981,7 @@
               <line x1="12" y1="5" x2="12" y2="19"></line>
               <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
-            <span>Add audio files</span>
+            <span>Add Audio Files</span>
           </button>
         </div>
 
@@ -5989,7 +5989,7 @@
         <div id="recentFoldersSection" class="recent-folders-section" style="display: none;">
           <div class="sidebar-section-title">
             <span>Your Folders</span>
-            <button class="btn-ghost" id="btnClearFolderHistory" title="Clear folder history" style="padding: 2px 6px;">Clear</button>
+            <button class="btn-ghost" id="btnClearFolderHistory" title="Clear Folder History" style="padding: 2px 6px;">Clear</button>
           </div>
           <div class="recent-folders-list" id="recentFoldersList"></div>
         </div>
@@ -6003,7 +6003,7 @@
             </div>
             <div class="stat-item">
               <span class="stat-value" id="statDuration">0m</span>
-              <span class="stat-label">Total time</span>
+              <span class="stat-label">Total Time</span>
             </div>
           </div>
 
@@ -6017,14 +6017,14 @@
                 <line x1="18" y1="8" x2="18.01" y2="8"></line>
                 <line x1="8" y1="16" x2="16" y2="16"></line>
               </svg>
-              <span>Keyboard shortcuts</span>
+              <span>Keyboard Shortcuts</span>
               <svg class="shortcuts-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
             </summary>
             <div class="shortcuts-table">
               <div class="shortcut-row">
-                <span>Play / pause</span>
+                <span>Play / Pause</span>
                 <div class="shortcut-keys"><span class="kbd">Space</span></div>
               </div>
               <div class="shortcut-row">
@@ -6032,7 +6032,7 @@
                 <div class="shortcut-keys"><span class="kbd">←</span><span class="kbd">→</span></div>
               </div>
               <div class="shortcut-row">
-                <span>Previous / next</span>
+                <span>Previous / Next</span>
                 <div class="shortcut-keys"><span class="kbd">Shift</span><span class="kbd">←/→</span></div>
               </div>
               <div class="shortcut-row">
@@ -6040,7 +6040,7 @@
                 <div class="shortcut-keys"><span class="kbd">S</span></div>
               </div>
               <div class="shortcut-row">
-                <span>Repeat mode</span>
+                <span>Repeat Mode</span>
                 <div class="shortcut-keys"><span class="kbd">R</span></div>
               </div>
               <div class="shortcut-row">
@@ -6048,11 +6048,11 @@
                 <div class="shortcut-keys"><span class="kbd">[</span><span class="kbd">]</span></div>
               </div>
               <div class="shortcut-row">
-                <span>Mute / unmute</span>
+                <span>Mute / Unmute</span>
                 <div class="shortcut-keys"><span class="kbd">M</span></div>
               </div>
               <div class="shortcut-row">
-                <span>Like current song</span>
+                <span>Like Current Song</span>
                 <div class="shortcut-keys"><span class="kbd">L</span></div>
               </div>
               <div class="shortcut-row">
@@ -6072,19 +6072,19 @@
                 <div class="shortcut-keys"><span class="kbd">T</span></div>
               </div>
               <div class="shortcut-row">
-                <span>Move in list / play</span>
+                <span>Move in List / Play</span>
                 <div class="shortcut-keys"><span class="kbd">↑</span><span class="kbd">↓</span><span class="kbd">Enter</span></div>
               </div>
               <div class="shortcut-row">
-                <span>Select all songs</span>
+                <span>Select All Songs</span>
                 <div class="shortcut-keys"><span class="kbd">Ctrl</span><span class="kbd">A</span></div>
               </div>
               <div class="shortcut-row">
-                <span>Pick songs</span>
+                <span>Pick Songs</span>
                 <div class="shortcut-keys"><span class="kbd">Ctrl</span><span class="kbd">Click</span></div>
               </div>
               <div class="shortcut-row">
-                <span>Pick a range</span>
+                <span>Pick a Range</span>
                 <div class="shortcut-keys"><span class="kbd">Shift</span><span class="kbd">Click</span></div>
               </div>
               <div class="shortcut-row">
@@ -6092,15 +6092,15 @@
                 <div class="shortcut-keys"><span class="kbd">Shift</span><span class="kbd">↑/↓</span></div>
               </div>
               <div class="shortcut-row">
-                <span>Add to queue / play next</span>
+                <span>Add to Queue / Play Next</span>
                 <div class="shortcut-keys"><span class="kbd">Q</span><span class="kbd">Shift Q</span></div>
               </div>
               <div class="shortcut-row">
-                <span>Remove from playlist</span>
+                <span>Remove from Playlist</span>
                 <div class="shortcut-keys"><span class="kbd">Del</span></div>
               </div>
               <div class="shortcut-row">
-                <span>Clear selection</span>
+                <span>Clear Selection</span>
                 <div class="shortcut-keys"><span class="kbd">Esc</span></div>
               </div>
             </div>
@@ -6113,7 +6113,7 @@
     <main class="main-view" id="mainView">
       <!-- Sticky Top Bar -->
       <header class="topbar">
-        <button class="mobile-menu-btn" id="btnMobileMenu" aria-label="Open menu">
+        <button class="mobile-menu-btn" id="btnMobileMenu" aria-label="Open Menu">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
             <line x1="3" y1="6" x2="21" y2="6"></line>
             <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -6127,7 +6127,7 @@
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
           <input type="text" id="searchInput" class="search-input" placeholder="Search tracks, artists or folders…" autocomplete="off">
-          <button id="searchClear" class="search-clear" aria-label="Clear search">
+          <button id="searchClear" class="search-clear" aria-label="Clear Search">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -6135,8 +6135,8 @@
           </button>
         </div>
 
-        <select id="sortSelect" class="sort-select" aria-label="Sort tracks">
-          <option value="default">Sort: Folder order</option>
+        <select id="sortSelect" class="sort-select" aria-label="Sort Tracks">
+          <option value="default">Sort: Folder Order</option>
           <option value="title">Sort: Title (A–Z)</option>
           <option value="artist">Sort: Artist (A–Z)</option>
           <option value="album">Sort: Album</option>
@@ -6151,7 +6151,7 @@
           <span id="afChipText"></span>
         </button>
         <!-- [Settings] Sleep-timer indicator + gear button -->
-        <button type="button" class="sleep-indicator" id="sleepIndicator" hidden title="Sleep timer active (click to change)" aria-label="Sleep timer active">
+        <button type="button" class="sleep-indicator" id="sleepIndicator" hidden title="Sleep timer active (click to change)" aria-label="Sleep Timer Active">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
           <span id="sleepIndicatorText">30:00</span>
         </button>
@@ -6160,7 +6160,7 @@
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"></circle><path d="M12 9v4l2.5 2.5"></path><path d="M9.5 2.5h5"></path><path d="M12 2.5V5"></path></svg>
           <span class="focus-btn-text" id="focusBtnText"></span>
         </button>
-        <button type="button" class="settings-btn" id="btnSettings" title="Settings ( , )" aria-label="Open settings" aria-haspopup="dialog" aria-expanded="false" aria-controls="settingsPanel">
+        <button type="button" class="settings-btn" id="btnSettings" title="Settings ( , )" aria-label="Open Settings" aria-haspopup="dialog" aria-expanded="false" aria-controls="settingsPanel">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="12" cy="12" r="3"></circle>
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
@@ -6178,7 +6178,7 @@
 
       <!-- Scrollable View Container -->
       <div class="main-scroll" id="mainScroll">
-        <!-- Library View (All tracks / Liked songs) -->
+        <!-- Library View (All Tracks / Liked Songs) -->
         <section id="libraryView">
           <div class="hero-banner" id="heroBanner">
             <button type="button" class="looks-hero-back" id="looksHeroBack" hidden aria-label="Back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg><span id="looksHeroBackLabel">Albums</span></button><!-- [Looks] -->
@@ -6190,7 +6190,7 @@
               </svg>
             </div>
             <div class="hero-meta">
-              <span class="hero-type" id="heroType">Local playlist</span>
+              <span class="hero-type" id="heroType">Local Playlist</span>
               <h1 class="hero-title" id="heroTitle">All Tracks</h1>
               <div class="hero-subtitle" id="heroSubtitle">
                 <span>0 songs</span>
@@ -6202,7 +6202,7 @@
 
           <!-- Action Bar -->
           <div class="action-bar" id="actionBar" style="display: none;">
-            <button class="btn-play-hero" id="btnPlayHero" aria-label="Play or pause playlist">
+            <button class="btn-play-hero" id="btnPlayHero" aria-label="Play or Pause Playlist">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" id="heroPlayIcon">
                 <polygon points="6 4 20 12 6 20 6 4"></polygon>
               </svg>
@@ -6216,14 +6216,14 @@
                 <line x1="15" y1="15" x2="21" y2="21"></line>
                 <line x1="4" y1="4" x2="9" y2="9"></line>
               </svg>
-              <span>Shuffle play</span>
+              <span>Shuffle Play</span>
             </button>
 
             <button class="btn-action-pill" id="btnAddMoreHero">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
               </svg>
-              <span>Load folder</span>
+              <span>Load Folder</span>
             </button>
 
             <!-- [AI Tagger] -->
@@ -6242,7 +6242,7 @@
                 <circle cx="18" cy="16" r="3"></circle>
               </svg>
             </div>
-            <h2 class="empty-title" id="emptyTitle">Your offline music player is ready</h2>
+            <h2 class="empty-title" id="emptyTitle">Your Offline Music Player Is Ready</h2>
             <p class="empty-desc" id="emptyDesc">
               Pick a folder or drop audio files. It all stays on your device.
             </p>
@@ -6252,20 +6252,20 @@
                   <polyline points="23 4 23 10 17 10"></polyline>
                   <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
                 </svg>
-                <span id="reconnectLabel">Reconnect folder</span>
+                <span id="reconnectLabel">Reconnect Folder</span>
               </button>
               <button class="btn-primary" id="btnSelectFolderEmpty">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
                 </svg>
-                <span>Select music folder</span>
+                <span>Select Music Folder</span>
               </button>
               <button class="btn-secondary" id="btnAddFilesEmpty">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="12" y1="5" x2="12" y2="19"></line>
                   <line x1="5" y1="12" x2="19" y2="12"></line>
                 </svg>
-                <span>Add audio files</span>
+                <span>Add Audio Files</span>
               </button>
             </div>
             <div class="empty-actions" id="looksEmptyCtaWrap" hidden><button type="button" class="btn-primary" id="looksEmptyCta"></button></div><!-- [Looks] -->
@@ -6305,7 +6305,7 @@
           </div>
         </section>
 
-        <!-- Now playing & Web Audio Visualizer View -->
+        <!-- Now Playing & Web Audio Visualizer View -->
         <section id="nowPlayingView" class="now-playing-view">
           <div class="np-grid">
             <div class="np-art-card">
@@ -6316,13 +6316,13 @@
                   <circle cx="18" cy="16" r="3"></circle>
                 </svg>
               </div>
-              <div class="np-track-title" id="npTitle">No track playing</div>
+              <div class="np-track-title" id="npTitle">No Track Playing</div>
               <div class="np-track-artist" id="npArtist">Select a track to start listening</div>
-              <div class="np-track-album" id="npAlbum">Local library</div>
+              <div class="np-track-album" id="npAlbum">Local Library</div>
               <div class="np-edit-actions" id="npEditActions" hidden>
-                <button type="button" class="btn-secondary ed-btn" id="btnNpEdit" title="Open this track in the built-in editor">Edit audio</button>
+                <button type="button" class="btn-secondary ed-btn" id="btnNpEdit" title="Open this track in the built-in editor">Edit Audio</button>
                 <button type="button" class="btn-secondary ed-btn" id="btnNpAudacity" title="Open the original file in Audacity (Shift+click to change the folder path)">Open in Audacity</button>
-                <button type="button" class="btn-secondary ed-btn" id="btnNpTidy" title="Clean up this song's file name and tags">Tidy name &amp; tags</button>
+                <button type="button" class="btn-secondary ed-btn" id="btnNpTidy" title="Clean up this song's file name and tags">Tidy Name &amp; Tags</button>
               </div>
             </div>
 
@@ -6331,7 +6331,7 @@
                 <div class="visualizer-header">
                   <div class="visualizer-title">
                     <span class="live-dot"></span>
-                    <span>Audio spectrum visualizer</span>
+                    <span>Audio Spectrum Visualizer</span>
                   </div>
                   <button class="btn-ghost" id="btnVisStyle">Style: Bars</button>
                 </div>
@@ -6358,10 +6358,10 @@
     </main>
 
     <!-- Fixed Bottom Player Bar -->
-    <footer class="player-bar" aria-label="Audio player controls">
+    <footer class="player-bar" aria-label="Audio Player Controls">
       <!-- Left: Current Track Info -->
       <div class="player-left">
-        <div class="player-art" id="playerArt" title="Open now playing & visualizer">
+        <div class="player-art" id="playerArt" title="Open Now Playing & Visualizer">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#727272" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 18V5l12-2v13"></path>
             <circle cx="6" cy="18" r="3"></circle>
@@ -6369,10 +6369,10 @@
           </svg>
         </div>
         <div class="player-meta">
-          <div class="player-title" id="playerTitle">Not playing</div>
+          <div class="player-title" id="playerTitle">Not Playing</div>
           <div class="player-subtitle" id="playerSubtitle">Select a folder to begin</div>
         </div>
-        <button class="btn-like" id="btnLikeCurrent" aria-label="Like current song" title="Like song" style="margin-left: 4px; display: none;">
+        <button class="btn-like" id="btnLikeCurrent" aria-label="Like Current Song" title="Like Song" style="margin-left: 4px; display: none;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
           </svg>
@@ -6382,7 +6382,7 @@
       <!-- Center: Playback Buttons + Progress Bar -->
       <div class="player-center">
         <div class="control-buttons">
-          <button class="ctrl-btn" id="btnShuffle" aria-label="Toggle shuffle" title="Shuffle (S)">
+          <button class="ctrl-btn" id="btnShuffle" aria-label="Toggle Shuffle" title="Shuffle (S)">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="16 3 21 3 21 8"></polyline>
               <line x1="4" y1="20" x2="21" y2="3"></line>
@@ -6392,27 +6392,27 @@
             </svg>
           </button>
 
-          <button class="ctrl-btn" id="btnPrev" aria-label="Previous track" title="Previous (Shift+Left)">
+          <button class="ctrl-btn" id="btnPrev" aria-label="Previous Track" title="Previous (Shift+Left)">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
               <polygon points="19 20 9 12 19 4 19 20"></polygon>
               <rect x="5" y="4" width="2.5" height="16" rx="1"></rect>
             </svg>
           </button>
 
-          <button class="ctrl-play" id="btnPlayPause" aria-label="Play or pause" title="Play/Pause (Space)">
+          <button class="ctrl-play" id="btnPlayPause" aria-label="Play or Pause" title="Play/Pause (Space)">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" id="playPauseIcon">
               <polygon points="6 4 20 12 6 20 6 4"></polygon>
             </svg>
           </button>
 
-          <button class="ctrl-btn" id="btnNext" aria-label="Next track" title="Next (Shift+Right)">
+          <button class="ctrl-btn" id="btnNext" aria-label="Next Track" title="Next (Shift+Right)">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
               <polygon points="5 4 15 12 5 20 5 4"></polygon>
               <rect x="16.5" y="4" width="2.5" height="16" rx="1"></rect>
             </svg>
           </button>
 
-          <button class="ctrl-btn" id="btnRepeat" aria-label="Cycle repeat mode" title="Repeat: Off (R)">
+          <button class="ctrl-btn" id="btnRepeat" aria-label="Cycle Repeat Mode" title="Repeat: Off (R)">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="17 1 21 5 17 9"></polyline>
               <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
@@ -6425,7 +6425,7 @@
 
         <div class="progress-row">
           <span class="time-label" id="timeCurrent">0:00</span>
-          <div class="slider-wrap" id="seekSlider" tabindex="0" role="slider" aria-label="Seek audio position" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="slider-wrap" id="seekSlider" tabindex="0" role="slider" aria-label="Seek Audio Position" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
             <div class="slider-track">
               <div class="slider-fill" id="seekFill"></div>
             </div>
@@ -6437,7 +6437,7 @@
 
       <!-- Right: Speed, Visualizer Toggle, Volume -->
       <div class="player-right">
-        <!-- Speed control with Popover -->
+        <!-- Speed Control with Popover -->
         <div class="speed-control-wrap" id="speedControlWrap">
           <button class="speed-btn" id="btnSpeed" title="Playback speed (click to adjust)" aria-haspopup="true" aria-expanded="false">1x</button>
           
@@ -6456,7 +6456,7 @@
                   <span>3x</span>
                 </div>
               </div>
-              <div class="speed-presets-grid" id="speedPresetsGrid" role="group" aria-label="Quick speeds">
+              <div class="speed-presets-grid" id="speedPresetsGrid" role="group" aria-label="Quick Speeds">
                 <button class="speed-preset-btn" data-speed="0.5">0.5x</button>
                 <button class="speed-preset-btn" data-speed="0.75">0.75x</button>
                 <button class="speed-preset-btn active" data-speed="1">1x</button>
@@ -6474,8 +6474,8 @@
               <div class="sp-card">
                 <div class="pitch-toggle-row">
                   <span class="sp-row-text">
-                    <span id="pitchToggleLabel">Change pitch with speed</span>
-                    <span class="pitch-readout" id="pitchReadout" aria-live="polite">Original pitch</span>
+                    <span id="pitchToggleLabel">Change Pitch with Speed</span>
+                    <span class="pitch-readout" id="pitchReadout" aria-live="polite">Original Pitch</span>
                   </span>
                   <button type="button" class="switch" id="pitchToggle" role="switch" aria-checked="true" aria-labelledby="pitchToggleLabel"></button>
                 </div>
@@ -6493,7 +6493,7 @@
             </section>
             <!-- [/Pitch] -->
 
-            <button class="speed-reset-btn" id="btnSpeedReset"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>Reset to normal</button>
+            <button class="speed-reset-btn" id="btnSpeedReset"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>Reset to Normal</button>
           </div>
         </div>
 
@@ -6503,11 +6503,11 @@
         </button>
         <!-- [/Lyrics] -->
 
-        <button class="ctrl-btn" id="btnEditCurrent" aria-label="Edit current track" title="Edit current track (E in the track list)" disabled>
+        <button class="ctrl-btn" id="btnEditCurrent" aria-label="Edit Current Track" title="Edit current track (E in the track list)" disabled>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>
         </button>
 
-        <button class="ctrl-btn" id="btnVisualizerToggle" aria-label="Toggle Now Playing visualizer" title="Now Playing & visualizer">
+        <button class="ctrl-btn" id="btnVisualizerToggle" aria-label="Toggle Now Playing Visualizer" title="Now Playing & Visualizer">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="4" y1="20" x2="4" y2="10"></line>
             <line x1="10" y1="20" x2="10" y2="4"></line>
@@ -6517,7 +6517,7 @@
         </button>
 
         <div class="volume-control">
-          <button class="ctrl-btn" id="btnMute" aria-label="Mute or unmute" title="Mute (M)">
+          <button class="ctrl-btn" id="btnMute" aria-label="Mute or Unmute" title="Mute (M)">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="volumeIcon">
               <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
               <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
@@ -6537,22 +6537,22 @@
   </div>
 
   <!-- ======================================================================
-       [Looks] Mobile full-screen Now playing + track actions menu
+       [Looks] Mobile full-screen Now Playing + track actions menu
        ====================================================================== -->
   <div class="fs-player" id="fsPlayer" role="dialog" aria-modal="true" aria-label="Now Playing" hidden>
     <div class="fs-sheet" id="fsSheet">
       <div class="fs-head">
-        <button type="button" class="fs-icon-btn" id="fsClose" aria-label="Close now playing">
+        <button type="button" class="fs-icon-btn" id="fsClose" aria-label="Close Now Playing">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
         </button>
         <div class="fs-head-text">
           <span class="fs-eyebrow">Now Playing</span>
-          <span class="fs-context" id="fsContext">Your library</span>
+          <span class="fs-context" id="fsContext">Your Library</span>
         </div>
         <button type="button" class="fs-icon-btn" id="fsLyrics" aria-label="Lyrics" aria-controls="lyricsPanel"><!-- [Lyrics] -->
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path><line x1="8" y1="9" x2="16" y2="9"></line><line x1="8" y1="13" x2="13" y2="13"></line></svg>
         </button>
-        <button type="button" class="fs-icon-btn" id="fsMore" aria-label="More actions" aria-haspopup="menu">
+        <button type="button" class="fs-icon-btn" id="fsMore" aria-label="More Actions" aria-haspopup="menu">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle></svg>
         </button>
       </div>
@@ -6562,7 +6562,7 @@
       <div class="fs-bottom">
         <div class="fs-info">
           <div class="fs-text">
-            <div class="fs-title" id="fsTitle">Not playing</div>
+            <div class="fs-title" id="fsTitle">Not Playing</div>
             <div class="fs-artist" id="fsArtist"></div>
           </div>
           <button type="button" class="btn-like fs-like" id="fsLike" aria-pressed="false" aria-label="Add to Liked Songs">
@@ -6574,11 +6574,11 @@
           <div class="fs-times"><span id="fsCur">0:00</span><span id="fsDur">0:00</span></div>
         </div>
         <div class="fs-controls">
-          <button type="button" class="fs-ctrl" id="fsShuffle" aria-label="Toggle shuffle"></button>
-          <button type="button" class="fs-ctrl" id="fsPrev" aria-label="Previous track"></button>
+          <button type="button" class="fs-ctrl" id="fsShuffle" aria-label="Toggle Shuffle"></button>
+          <button type="button" class="fs-ctrl" id="fsPrev" aria-label="Previous Track"></button>
           <button type="button" class="fs-play" id="fsPlay" aria-label="Play"></button>
-          <button type="button" class="fs-ctrl" id="fsNext" aria-label="Next track"></button>
-          <button type="button" class="fs-ctrl" id="fsRepeat" aria-label="Cycle repeat mode"></button>
+          <button type="button" class="fs-ctrl" id="fsNext" aria-label="Next Track"></button>
+          <button type="button" class="fs-ctrl" id="fsRepeat" aria-label="Cycle Repeat Mode"></button>
         </div>
         <p class="fs-hint" aria-hidden="true">Swipe the cover to skip · Swipe down to close</p>
       </div>
@@ -6590,16 +6590,16 @@
     <div class="ly-head">
       <div class="ly-head-text">
         <span class="ly-eyebrow" id="lyEyebrow">Lyrics</span>
-        <span class="ly-song" id="lySong">Not playing</span>
+        <span class="ly-song" id="lySong">Not Playing</span>
         <span class="ly-artist" id="lyArtist"></span>
       </div>
-      <button type="button" class="ly-icon-btn" id="lyClose" aria-label="Close lyrics" title="Close (Y)">
+      <button type="button" class="ly-icon-btn" id="lyClose" aria-label="Close Lyrics" title="Close (Y)">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
       </button>
     </div>
     <div class="ly-meta">
       <span class="ly-chip" id="lySource" hidden></span>
-      <button type="button" class="ly-resync" id="lyResync" hidden>Back to current line</button>
+      <button type="button" class="ly-resync" id="lyResync" hidden>Back to Current Line</button>
     </div>
     <div class="ly-scroll" id="lyScroll" tabindex="-1">
       <div id="lyBody" aria-live="polite"></div>
@@ -6613,16 +6613,16 @@
   <!-- [/Lyrics] -->
 
   <div class="looks-menu-backdrop" id="looksMenuBackdrop" hidden></div>
-  <div class="looks-menu" id="looksMenu" role="menu" aria-label="Track actions" hidden></div>
-  <div class="sel-bar" id="selBar" role="toolbar" aria-label="Selected songs" hidden>
+  <div class="looks-menu" id="looksMenu" role="menu" aria-label="Track Actions" hidden></div>
+  <div class="sel-bar" id="selBar" role="toolbar" aria-label="Selected Songs" hidden>
     <span class="sel-count" id="selCount" aria-live="polite"></span>
     <button type="button" class="sel-btn" data-sel="play" title="Play the selected songs (Enter)">Play</button>
-    <button type="button" class="sel-btn" data-sel="next" title="Play next (Shift+Q)">Play next</button>
-    <button type="button" class="sel-btn" data-sel="queue" title="Add to queue (Q)">Add to queue</button>
+    <button type="button" class="sel-btn" data-sel="next" title="Play next (Shift+Q)">Play Next</button>
+    <button type="button" class="sel-btn" data-sel="queue" title="Add to queue (Q)">Add to Queue</button>
     <button type="button" class="sel-btn" data-sel="like" id="selLike" title="Like or unlike (L)">Like</button>
-    <button type="button" class="sel-btn" data-sel="pl" aria-haspopup="menu">Add to playlist</button>
+    <button type="button" class="sel-btn" data-sel="pl" aria-haspopup="menu">Add to Playlist</button>
     <button type="button" class="sel-btn" data-sel="remove" id="selRemove" title="Remove from here (Delete)" hidden>Remove</button>
-    <button type="button" class="sel-btn sel-x" data-sel="clear" aria-label="Clear selection" title="Clear selection (Esc)">✕</button>
+    <button type="button" class="sel-btn sel-x" data-sel="clear" aria-label="Clear Selection" title="Clear selection (Esc)">✕</button>
   </div>
   <!-- [/Looks] -->
 
@@ -6633,7 +6633,7 @@
   <aside id="settingsPanel" class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" inert>
     <div class="settings-header">
       <h2 id="settingsTitle">Settings</h2>
-      <button type="button" class="settings-close" id="btnSettingsClose" title="Close (Esc)" aria-label="Close settings">
+      <button type="button" class="settings-close" id="btnSettingsClose" title="Close (Esc)" aria-label="Close Settings">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
       </button>
     </div>
@@ -6662,12 +6662,12 @@
         </div>
 
         <div class="settings-row stacked">
-          <span class="settings-label" id="setAccentLabel">Accent color</span>
+          <span class="settings-label" id="setAccentLabel">Accent Color</span>
           <div class="accent-swatches" id="setAccent" role="radiogroup" aria-labelledby="setAccentLabel"></div>
         </div>
 
         <div class="settings-row">
-          <span class="settings-label" id="setCompactLabel">Compact rows<span class="settings-hint">Fit more songs.</span></span>
+          <span class="settings-label" id="setCompactLabel">Compact Rows<span class="settings-hint">Fit more songs.</span></span>
           <button type="button" class="switch" id="setCompact" role="switch" aria-checked="false" aria-labelledby="setCompactLabel"></button>
         </div>
       </section>
@@ -6680,9 +6680,9 @@
           <span class="settings-label" id="setEqLabel">Equalizer</span>
           <div class="segmented wrap" id="setEqPreset" role="radiogroup" aria-labelledby="setEqLabel">
             <button type="button" role="radio" data-value="flat">Flat</button>
-            <button type="button" role="radio" data-value="bass">Bass boost</button>
+            <button type="button" role="radio" data-value="bass">Bass Boost</button>
             <button type="button" role="radio" data-value="vocal">Vocal</button>
-            <button type="button" role="radio" data-value="treble">Treble boost</button>
+            <button type="button" role="radio" data-value="treble">Treble Boost</button>
             <button type="button" role="radio" data-value="loudness">Loudness</button>
             <button type="button" role="radio" data-value="custom" disabled>Custom</button>
           </div>
@@ -6694,7 +6694,7 @@
         </div>
 
         <div class="settings-row">
-          <span class="settings-label" id="setLevelingLabel">Volume leveling<span class="settings-hint">Evens out loud and quiet songs.</span></span>
+          <span class="settings-label" id="setLevelingLabel">Volume Leveling<span class="settings-hint">Evens out loud and quiet songs.</span></span>
           <button type="button" class="switch" id="setLeveling" role="switch" aria-checked="false" aria-labelledby="setLevelingLabel"></button>
         </div>
 
@@ -6707,20 +6707,20 @@
         </div>
 
         <div class="settings-row stacked">
-          <span class="settings-label" id="setSleepLabel">Sleep timer<span class="settings-hint" id="setSleepHint">Fades out at the end.</span></span>
+          <span class="settings-label" id="setSleepLabel">Sleep Timer<span class="settings-hint" id="setSleepHint">Fades out at the end.</span></span>
           <div class="segmented wrap" id="setSleep" role="radiogroup" aria-labelledby="setSleepLabel">
             <button type="button" role="radio" data-value="off">Off</button>
             <button type="button" role="radio" data-value="15">15 min</button>
             <button type="button" role="radio" data-value="30">30 min</button>
             <button type="button" role="radio" data-value="45">45 min</button>
             <button type="button" role="radio" data-value="60">60 min</button>
-            <button type="button" role="radio" data-value="track">End of track</button>
+            <button type="button" role="radio" data-value="track">End of Track</button>
           </div>
         </div>
 
         <div class="settings-row stacked">
           <div class="settings-row-head">
-            <label class="settings-label" for="setSpeed">Default playback speed</label>
+            <label class="settings-label" for="setSpeed">Default Playback Speed</label>
             <span class="settings-value" id="setSpeedValue">1x</span>
           </div>
           <input type="range" class="speed-range-slider" id="setSpeed" min="0.25" max="3" step="0.05" value="1">
@@ -6728,7 +6728,7 @@
 
         <!-- [Pitch] mirror of the speed-popover toggle -->
         <div class="settings-row">
-          <span class="settings-label" id="setPitchLabel">Change pitch with speed<span class="settings-hint">On: faster sounds higher (nightcore), slower sounds deeper (daycore). Off: keeps the original key.</span></span>
+          <span class="settings-label" id="setPitchLabel">Change Pitch with Speed<span class="settings-hint">On: faster sounds higher (nightcore), slower sounds deeper (daycore). Off: keeps the original key.</span></span>
           <button type="button" class="switch" id="setPitch" role="switch" aria-checked="true" aria-labelledby="setPitchLabel"></button>
         </div>
       </section>
@@ -6742,7 +6742,7 @@
 
           <div class="as-pending" id="asPending" hidden role="status">
             <span>Enter where <strong id="asPendingRoot"></strong> is on this PC, then open <strong id="asPendingTitle"></strong>.</span>
-            <button type="button" class="btn-primary as-open-btn" id="asOpenPending">Save and open</button>
+            <button type="button" class="btn-primary as-open-btn" id="asOpenPending">Save and Open</button>
           </div>
 
           <ol class="as-steps">
@@ -6756,7 +6756,7 @@
 
           <div class="as-helper" id="asHelper" hidden>
             <div class="settings-row-head">
-              <span class="settings-label as-sub">Helper line</span>
+              <span class="settings-label as-sub">Helper Line</span>
               <button type="button" class="btn-ghost as-copy" id="asCopy">Copy</button>
             </div>
             <code class="as-preview" id="asPreview"></code>
@@ -6768,23 +6768,23 @@
         <h3 class="settings-section-title" id="setFocusTitle">Lock-In Timer</h3>
 
         <div class="settings-row">
-          <span class="settings-label">Focus timer<span class="settings-hint" id="setFocusStatus">Music dips and an alarm rings when time's up.</span></span>
+          <span class="settings-label">Focus Timer<span class="settings-hint" id="setFocusStatus">Music dips and an alarm rings when time's up.</span></span>
           <button type="button" class="btn-secondary" id="setFocusOpen">Open</button>
         </div>
 
         <div class="settings-row stacked">
-          <span class="settings-label" id="setFocusSoundLabel">Alarm sound</span>
+          <span class="settings-label" id="setFocusSoundLabel">Alarm Sound</span>
           <div class="focus-sound-list" id="setFocusSound" role="radiogroup" aria-labelledby="setFocusSoundLabel">
-            <div class="focus-sound"><button type="button" role="radio" data-value="chime">Soft chime</button><button type="button" class="focus-preview" data-preview="chime" aria-label="Preview soft chime">▶</button></div>
-            <div class="focus-sound"><button type="button" role="radio" data-value="bell">Bell</button><button type="button" class="focus-preview" data-preview="bell" aria-label="Preview bell">▶</button></div>
-            <div class="focus-sound"><button type="button" role="radio" data-value="marimba">Marimba</button><button type="button" class="focus-preview" data-preview="marimba" aria-label="Preview marimba">▶</button></div>
-            <div class="focus-sound"><button type="button" role="radio" data-value="beep">Digital beep</button><button type="button" class="focus-preview" data-preview="beep" aria-label="Preview digital beep">▶</button></div>
-            <div class="focus-sound"><button type="button" role="radio" data-value="rise">Gentle rise</button><button type="button" class="focus-preview" data-preview="rise" aria-label="Preview gentle rise">▶</button></div>
-            <div class="focus-sound"><button type="button" role="radio" data-value="gong">Gong</button><button type="button" class="focus-preview" data-preview="gong" aria-label="Preview gong">▶</button></div>
-            <div class="focus-sound focus-sound-custom"><button type="button" role="radio" data-value="custom" id="setFocusCustomRadio">My own sound<small id="setFocusCustomName">No file chosen</small></button><button type="button" class="focus-preview" data-preview="custom" aria-label="Preview my own sound">▶</button></div>
+            <div class="focus-sound"><button type="button" role="radio" data-value="chime">Soft Chime</button><button type="button" class="focus-preview" data-preview="chime" aria-label="Preview Soft Chime">▶</button></div>
+            <div class="focus-sound"><button type="button" role="radio" data-value="bell">Bell</button><button type="button" class="focus-preview" data-preview="bell" aria-label="Preview Bell">▶</button></div>
+            <div class="focus-sound"><button type="button" role="radio" data-value="marimba">Marimba</button><button type="button" class="focus-preview" data-preview="marimba" aria-label="Preview Marimba">▶</button></div>
+            <div class="focus-sound"><button type="button" role="radio" data-value="beep">Digital Beep</button><button type="button" class="focus-preview" data-preview="beep" aria-label="Preview Digital Beep">▶</button></div>
+            <div class="focus-sound"><button type="button" role="radio" data-value="rise">Gentle Rise</button><button type="button" class="focus-preview" data-preview="rise" aria-label="Preview Gentle Rise">▶</button></div>
+            <div class="focus-sound"><button type="button" role="radio" data-value="gong">Gong</button><button type="button" class="focus-preview" data-preview="gong" aria-label="Preview Gong">▶</button></div>
+            <div class="focus-sound focus-sound-custom"><button type="button" role="radio" data-value="custom" id="setFocusCustomRadio">My Own Sound<small id="setFocusCustomName">No File Chosen</small></button><button type="button" class="focus-preview" data-preview="custom" aria-label="Preview My Own Sound">▶</button></div>
           </div>
           <div class="focus-custom-actions">
-            <button type="button" class="btn-secondary" id="setFocusPickFile">Choose sound file…</button>
+            <button type="button" class="btn-secondary" id="setFocusPickFile">Choose Sound File…</button>
             <button type="button" class="btn-ghost" id="setFocusClearFile" hidden>Remove</button>
             <input type="file" id="setFocusFile" accept="audio/*" hidden>
           </div>
@@ -6792,7 +6792,7 @@
 
         <div class="settings-row stacked">
           <div class="settings-row-head">
-            <label class="settings-label" for="setFocusAlarmVol">Alarm volume</label>
+            <label class="settings-label" for="setFocusAlarmVol">Alarm Volume</label>
             <span class="settings-value" id="setFocusAlarmVolValue">80%</span>
           </div>
           <input type="range" class="speed-range-slider" id="setFocusAlarmVol" min="0" max="100" step="5" value="80">
@@ -6800,14 +6800,14 @@
 
         <div class="settings-row stacked">
           <div class="settings-row-head">
-            <label class="settings-label" for="setFocusDuck">Music volume while ringing<span class="settings-hint">Fades back up when you stop the alarm.</span></label>
+            <label class="settings-label" for="setFocusDuck">Music Volume While Ringing<span class="settings-hint">Fades back up when you stop the alarm.</span></label>
             <span class="settings-value" id="setFocusDuckValue">15%</span>
           </div>
           <input type="range" class="speed-range-slider" id="setFocusDuck" min="0" max="100" step="5" value="15">
         </div>
 
         <div class="settings-row">
-          <span class="settings-label" id="setFocusNotifyLabel">Desktop notification<span class="settings-hint" id="setFocusNotifyHint">Alerts you even in the background.</span></span>
+          <span class="settings-label" id="setFocusNotifyLabel">Desktop Notification<span class="settings-hint" id="setFocusNotifyHint">Alerts you even in the background.</span></span>
           <button type="button" class="switch" id="setFocusNotify" role="switch" aria-checked="false" aria-labelledby="setFocusNotifyLabel"></button>
         </div>
 
@@ -6825,17 +6825,17 @@
         <h3 class="settings-section-title" id="setGeneralTitle">General</h3>
 
         <div class="settings-row">
-          <span class="settings-label" id="setResumeLabel">Resume last track on startup<span class="settings-hint">Pick up where you left off.</span></span>
+          <span class="settings-label" id="setResumeLabel">Resume Last Track on Startup<span class="settings-hint">Pick up where you left off.</span></span>
           <button type="button" class="switch" id="setResume" role="switch" aria-checked="true" aria-labelledby="setResumeLabel"></button>
         </div>
 
         <div class="settings-row">
-          <span class="settings-label" id="setConfirmClearLabel">Confirm before clearing folder history</span>
+          <span class="settings-label" id="setConfirmClearLabel">Confirm Before Clearing Folder History</span>
           <button type="button" class="switch" id="setConfirmClear" role="switch" aria-checked="true" aria-labelledby="setConfirmClearLabel"></button>
         </div>
 
         <div class="settings-row">
-          <span class="settings-label">Reset all settings<span class="settings-hint">Keeps your library and likes.</span></span>
+          <span class="settings-label">Reset All Settings<span class="settings-hint">Keeps your library and likes.</span></span>
           <button type="button" class="btn-secondary settings-danger" id="btnResetSettings">Reset</button>
         </div>
       </section>
@@ -6850,20 +6850,20 @@
         </div>
 
         <div class="settings-row">
-          <span class="settings-label">Keep data on this device<span class="settings-hint" id="stPersistHint">Checking…</span></span>
-          <button type="button" class="btn-secondary" id="stPersistBtn" hidden>Keep it</button>
+          <span class="settings-label">Keep Data on This Device<span class="settings-hint" id="stPersistHint">Checking…</span></span>
+          <button type="button" class="btn-secondary" id="stPersistBtn" hidden>Keep It</button>
         </div>
 
         <div class="settings-row stacked">
-          <span class="settings-label">Export backup<span class="settings-hint">Saves likes, settings and history to a <b>.localify.json</b> file you can move to another device. Songs are never included.</span></span>
+          <span class="settings-label">Export Backup<span class="settings-hint">Saves likes, settings and history to a <b>.localify.json</b> file you can move to another device. Songs are never included.</span></span>
           <div class="bk-actions">
-            <button type="button" class="btn-secondary" id="bkExportCurrent">This profile</button>
-            <button type="button" class="btn-secondary" id="bkExportAll">All profiles</button>
+            <button type="button" class="btn-secondary" id="bkExportCurrent">This Profile</button>
+            <button type="button" class="btn-secondary" id="bkExportAll">All Profiles</button>
           </div>
         </div>
 
         <div class="settings-row stacked">
-          <span class="settings-label" id="bkImportLabel">Import backup<span class="settings-hint">Preview first, then add it as a new profile, merge it into this one, or replace this one.</span></span>
+          <span class="settings-label" id="bkImportLabel">Import Backup<span class="settings-hint">Preview first, then add it as a new profile, merge it into this one, or replace this one.</span></span>
           <label class="bk-drop" id="bkDrop" for="bkFile">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
             <span>Drop a <b>.localify.json</b> file here, or <u>choose a file</u></span>
@@ -6872,7 +6872,7 @@
         </div>
 
         <div class="settings-row">
-          <span class="settings-label">Export to SD card<span class="settings-hint">Copies your playlists, and the songs in them, to a microSD card for the ESP32 breadboard player.</span></span>
+          <span class="settings-label">Export to SD Card<span class="settings-hint">Copies your playlists, and the songs in them, to a microSD card for the ESP32 breadboard player.</span></span>
           <button type="button" class="btn-secondary" id="sdOpen">Export…</button>
         </div>
       </section>
@@ -6883,7 +6883,7 @@
         <h3 class="settings-section-title" id="setAppTitle">App</h3>
         <div class="settings-row">
           <span class="settings-label">Install Localify<span class="settings-hint" id="pwaInstallHint">Open Localify from its web address to install it as an app.</span></span>
-          <button type="button" class="btn-primary" id="pwaInstallBtn" hidden>Install app</button>
+          <button type="button" class="btn-primary" id="pwaInstallBtn" hidden>Install App</button>
         </div>
       </section>
       <!-- [/PWA] -->
@@ -6892,11 +6892,11 @@
       <section class="settings-section" id="setLyrics" aria-labelledby="setLyricsTitle">
         <h3 class="settings-section-title" id="setLyricsTitle">Lyrics</h3>
         <div class="settings-row">
-          <span class="settings-label" id="setLyOnlineLabel">Find lyrics online<span class="settings-hint">When you open Lyrics (press Y), asks LRCLIB (lrclib.net) for the song's words. Only the song's title, artist, album and length are sent. No file names, folders or audio. Also needs Look up songs online below.</span></span>
+          <span class="settings-label" id="setLyOnlineLabel">Find Lyrics Online<span class="settings-hint">When you open Lyrics (press Y), asks LRCLIB (lrclib.net) for the song's words. Only the song's title, artist, album and length are sent. No file names, folders or audio. Also needs Look up songs online below.</span></span>
           <button type="button" class="switch" id="setLyOnline" role="switch" aria-checked="true" aria-labelledby="setLyOnlineLabel"></button>
         </div>
         <div class="settings-row">
-          <span class="settings-label" id="setLyCacheLabel">Saved lyrics<span class="settings-hint" id="setLyCacheHint">Lyrics are saved on this device so they work offline. A .lrc file next to a song, or lyrics in its tags, are used first and never sent anywhere.</span></span>
+          <span class="settings-label" id="setLyCacheLabel">Saved Lyrics<span class="settings-hint" id="setLyCacheHint">Lyrics are saved on this device so they work offline. A .lrc file next to a song, or lyrics in its tags, are used first and never sent anywhere.</span></span>
           <button type="button" class="btn-secondary" id="setLyClear">Clear</button>
         </div>
       </section>
@@ -6907,9 +6907,9 @@
         <h3 class="settings-section-title" id="setTaggerTitle">Tidy Names &amp; Tags</h3>
 
         <div class="settings-row stacked">
-          <label class="settings-label" for="setTgTemplate">File name template<span class="settings-hint">Use {artist}, {title}, {album}, {year}, {genre} and {track}. The extension is kept.</span></label>
+          <label class="settings-label" for="setTgTemplate">File Name Template<span class="settings-hint">Use {artist}, {title}, {album}, {year}, {genre} and {track}. The extension is kept.</span></label>
           <input type="text" class="tg-settings-input" id="setTgTemplate" spellcheck="false" autocomplete="off" maxlength="120" aria-describedby="setTgExample">
-          <div class="tg-chips" id="setTgPresets" aria-label="Template presets"></div>
+          <div class="tg-chips" id="setTgPresets" aria-label="Template Presets"></div>
           <div class="tg-example" id="setTgExample" aria-live="polite"></div>
         </div>
 
@@ -6922,30 +6922,30 @@
         </div>
 
         <div class="settings-row">
-          <span class="settings-label" id="setTgAiLabel">AI suggestions<span class="settings-hint" id="setTgAiHint">A small model that runs in this browser. It sees only names and tags, never the audio. Downloads once when you first use it.</span></span>
+          <span class="settings-label" id="setTgAiLabel">AI Suggestions<span class="settings-hint" id="setTgAiHint">A small model that runs in this browser. It sees only names and tags, never the audio. Downloads once when you first use it.</span></span>
           <button type="button" class="switch" id="setTgAi" role="switch" aria-checked="false" aria-labelledby="setTgAiLabel"></button>
         </div>
 
         <div class="settings-row tg-model-row">
           <span class="settings-hint" id="setTgModel" aria-live="polite"></span>
-          <button type="button" class="btn-secondary" id="setTgRemoveModel" disabled>Remove model</button>
+          <button type="button" class="btn-secondary" id="setTgRemoveModel" disabled>Remove Model</button>
         </div>
 
         <div class="settings-row">
-          <span class="settings-label" id="setAfAutoLabel">Fill in song details automatically<span class="settings-hint">New songs get a title, artist, album and more in your library. Your files aren't changed until you press Apply in Tidy.</span></span>
+          <span class="settings-label" id="setAfAutoLabel">Fill in Song Details Automatically<span class="settings-hint">New songs get a title, artist, album and more in your library. Your files aren't changed until you press Apply in Tidy.</span></span>
           <button type="button" class="switch" id="setAfAuto" role="switch" aria-checked="true" aria-labelledby="setAfAutoLabel"></button>
         </div>
         <div class="settings-row">
-          <span class="settings-label" id="setAfOnlineLabel">Only run when online<span class="settings-hint">Songs added while offline are marked Unsorted and filled in once you're back online.</span></span>
+          <span class="settings-label" id="setAfOnlineLabel">Only Run When Online<span class="settings-hint">Songs added while offline are marked Unsorted and filled in once you're back online.</span></span>
           <button type="button" class="switch" id="setAfOnline" role="switch" aria-checked="true" aria-labelledby="setAfOnlineLabel"></button>
         </div>
         <div class="settings-row">
-          <span class="settings-label" id="setAfMbLabel">Look up songs online<span class="settings-hint">Asks MusicBrainz and iTunes for missing details, genres and album covers. Only the song's title and artist text are sent (to musicbrainz.org and itunes.apple.com). No file names, folders or audio are sent. Covers come from coverartarchive.org or Apple and are shown in your library only. With an AcoustID key, songs can also be identified by a fingerprint of their sound.</span></span>
+          <span class="settings-label" id="setAfMbLabel">Look Up Songs Online<span class="settings-hint">Asks MusicBrainz and iTunes for missing details, genres and album covers. Only the song's title and artist text are sent (to musicbrainz.org and itunes.apple.com). No file names, folders or audio are sent. Covers come from coverartarchive.org or Apple and are shown in your library only. With an AcoustID key, songs can also be identified by a fingerprint of their sound.</span></span>
           <button type="button" class="switch" id="setAfMb" role="switch" aria-checked="true" aria-labelledby="setAfMbLabel"></button>
         </div>
         <!-- [AcoustID] -->
         <div class="settings-row stacked">
-          <label class="settings-label" for="setAidKey">AcoustID key<span class="settings-hint" id="setAidHint">Identifies songs by their sound when the name and tags don't say. <a href="https://acoustid.org/new-application" target="_blank" rel="noopener noreferrer">Get a free key</a>, then paste it here. Only a fingerprint and the song's length go to api.acoustid.org, never the audio. The key stays in this profile and its backups.</span></label>
+          <label class="settings-label" for="setAidKey">AcoustID Key<span class="settings-hint" id="setAidHint">Identifies songs by their sound when the name and tags don't say. <a href="https://acoustid.org/new-application" target="_blank" rel="noopener noreferrer">Get a Free Key</a>, then paste it here. Only a fingerprint and the song's length go to api.acoustid.org, never the audio. The key stays in this profile and its backups.</span></label>
           <div class="aid-key-row">
             <input type="text" class="tg-settings-input" id="setAidKey" spellcheck="false" autocomplete="off" autocapitalize="off" maxlength="64" placeholder="Paste your application key" aria-describedby="setAidHint setAidStatus">
             <button type="button" class="btn-secondary" id="setAidCheck" disabled>Check</button>
@@ -6954,7 +6954,7 @@
         </div>
         <!-- [/AcoustID] -->
         <div class="settings-row">
-          <span class="settings-label" id="setAfApplyLabel">Auto-apply to files<span class="settings-hint">Writes filled-in details straight into the files, only in folders you've already allowed Localify to edit. Undo from Tidy names &amp; tags.</span></span>
+          <span class="settings-label" id="setAfApplyLabel">Auto-Apply to Files<span class="settings-hint">Writes filled-in details straight into the files, only in folders you've already allowed Localify to edit. Undo from Tidy names &amp; tags.</span></span>
           <button type="button" class="switch" id="setAfApply" role="switch" aria-checked="false" aria-labelledby="setAfApplyLabel"></button>
         </div>
       </section>
@@ -6988,12 +6988,12 @@
         <span>min</span>
         <button type="button" class="btn-primary" id="focusStart">Start</button>
       </div>
-      <button type="button" class="focus-link" id="focusAlarmLink">Alarm: <span id="focusAlarmName">Soft chime</span> · Change</button>
+      <button type="button" class="focus-link" id="focusAlarmLink">Alarm: <span id="focusAlarmName">Soft Chime</span> · Change</button>
     </div>
 
     <div class="focus-running" id="focusRunning" hidden>
       <div class="focus-big" id="focusBig">25:00</div>
-      <div class="focus-state" id="focusState">Locked in</div>
+      <div class="focus-state" id="focusState">Locked In</div>
       <div class="focus-progress"><div class="focus-progress-bar" id="focusProgress"></div></div>
       <div class="focus-actions">
         <button type="button" class="btn-secondary" id="focusPause">Pause</button>
@@ -7008,11 +7008,11 @@
       <div class="focus-alert-icon" aria-hidden="true">
         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>
       </div>
-      <h2 id="focusAlertTitle">Time's up</h2>
+      <h2 id="focusAlertTitle">Time's Up</h2>
       <p id="focusAlertText">Your 25-minute lock-in is done.</p>
       <div class="focus-alert-actions">
-        <button type="button" class="btn-secondary" id="focusSnooze">Snooze +5 min</button>
-        <button type="button" class="btn-primary" id="focusAlertStop">Stop alarm</button>
+        <button type="button" class="btn-secondary" id="focusSnooze">Snooze +5 Min</button>
+        <button type="button" class="btn-primary" id="focusAlertStop">Stop Alarm</button>
       </div>
     </div>
   </div>
@@ -7026,7 +7026,7 @@
   <dialog class="lp-dialog lp-picker" id="lpPicker" aria-labelledby="lpPickerTitle">
     <h2 class="lp-dialog-title" id="lpPickerTitle">Who's listening?</h2>
     <div class="lp-tiles" id="lpTiles"></div>
-    <label class="lp-check"><input type="checkbox" id="lpRemember"> Remember me on this device</label>
+    <label class="lp-check"><input type="checkbox" id="lpRemember"> Remember Me on This Device</label>
   </dialog>
 
   <dialog class="lp-dialog" id="lpEditor" aria-labelledby="lpEditorTitle">
@@ -7103,7 +7103,7 @@
         <div class="lp-swatches" id="plColors" role="radiogroup" aria-labelledby="plColorLabel"></div>
       </div>
       <div class="lp-dialog-actions">
-        <button type="button" class="btn-ghost pl-delete" id="plDelete" hidden>Delete playlist</button>
+        <button type="button" class="btn-ghost pl-delete" id="plDelete" hidden>Delete Playlist</button>
         <button type="button" class="btn-secondary" id="plCancel">Cancel</button>
         <button type="submit" class="btn-primary" id="plSave">Create</button>
       </div>
@@ -7114,14 +7114,14 @@
   <dialog class="lp-dialog" id="sdDialog" aria-labelledby="sdTitle">
     <form id="sdForm" method="dialog" novalidate>
       <h2 class="lp-dialog-title" id="sdTitle">Export to SD Card</h2>
-      <p class="sd-intro">For the ESP32 breadboard player. Put the microSD card in this computer, pick the playlists, then choose the card itself (not a folder on it). Songs go into <b>music</b> and playlists into <b>playlists</b>. <a href="https://github.com/SpikemenDan/localify/blob/main/docs/BREADBOARD.md" target="_blank" rel="noopener">How to build the player</a></p>
-      <div class="sd-lists" id="sdLists" role="group" aria-label="Playlists to export"></div>
-      <label class="sd-option"><input type="checkbox" id="sdCopy" checked> <span>Copy the songs too<small>Songs already on the card are skipped. Only MP3 and WAV play on the player.</small></span></label>
+      <p class="sd-intro">For the ESP32 breadboard player. Put the microSD card in this computer, pick the playlists, then choose the card itself (not a folder on it). Songs go into <b>music</b> and playlists into <b>playlists</b>. <a href="https://github.com/SpikemenDan/localify/blob/main/docs/BREADBOARD.md" target="_blank" rel="noopener">How to Build the Player</a></p>
+      <div class="sd-lists" id="sdLists" role="group" aria-label="Playlists to Export"></div>
+      <label class="sd-option"><input type="checkbox" id="sdCopy" checked> <span>Copy the Songs Too<small>Songs already on the card are skipped. Only MP3 and WAV play on the player.</small></span></label>
       <div class="sd-bar" id="sdBar" hidden><i></i></div>
       <p class="sd-status" id="sdStatus" role="status" aria-live="polite"></p>
       <div class="lp-dialog-actions">
         <button type="button" class="btn-secondary" id="sdCancel">Close</button>
-        <button type="submit" class="btn-primary" id="sdGo">Choose SD card</button>
+        <button type="submit" class="btn-primary" id="sdGo">Choose SD Card</button>
       </div>
     </form>
   </dialog>
@@ -7132,8 +7132,8 @@
       <h2 class="lp-dialog-title" id="bkImportTitle">Import Backup</h2>
       <div class="bk-preview" id="bkPreview"></div>
       <fieldset class="bk-modes" id="bkModes">
-        <legend>How to import</legend>
-        <label><input type="radio" name="bkMode" value="new" checked> <span><b>As a new profile</b><small>Nothing you have now changes.</small></span></label>
+        <legend>How to Import</legend>
+        <label><input type="radio" name="bkMode" value="new" checked> <span><b>As a New Profile</b><small>Nothing you have now changes.</small></span></label>
         <label><input type="radio" name="bkMode" value="merge"> <span><b>Merge into <i class="bk-current-name"></i></b><small>Adds the likes and folders. Your current settings win.</small></span></label>
         <label><input type="radio" name="bkMode" value="replace"> <span><b>Replace <i class="bk-current-name"></i></b><small>This profile's likes, settings and history are overwritten.</small></span></label>
       </fieldset>
@@ -7570,7 +7570,7 @@
          Filename fallback metadata ("Title - Artist.mp3")
          ======================================================================== */
       function parseFileMeta(file, customFolderName) {
-        const rawName = file.name || 'Unknown track';
+        const rawName = file.name || 'Unknown Track';
         let base = rawName.replace(/\.[^/.]+$/, '').trim();
         if (!base.includes(' ') && base.includes('_')) base = base.replace(/_/g, ' ');
         // Strip leading track numbers like "01 - ", "01. ", "1) "
@@ -8191,7 +8191,7 @@
               try { if (await writeOne(base, entry)) saved++; }
               catch (e) {
                 if (e && e.name === 'QuotaExceededError') {
-                  if (!fullWarned) showNotice('Not enough space', 'Some songs couldn’t be saved, so they won’t be here after a reload. Free up disk space and add them again.', { kind: 'warn', ms: 8000 });
+                  if (!fullWarned) showNotice('Not Enough Space', 'Some songs couldn’t be saved, so they won’t be here after a reload. Free up disk space and add them again.', { kind: 'warn', ms: 8000 });
                   fullWarned = true;
                   return;
                 }
@@ -8199,7 +8199,7 @@
             }
             if (saved) {
               KeepData.request();
-              showNotice('Songs saved', supportsDirectoryPicker
+              showNotice('Songs Saved', supportsDirectoryPicker
                 ? `${saved} ${saved === 1 ? 'song is' : 'songs are'} saved in Localify, so ${saved === 1 ? 'it stays' : 'they stay'} after a reload.`
                 : `This browser can’t reopen folders, so Localify keeps its own copy. Your ${saved} ${saved === 1 ? 'song stays' : 'songs stay'} after a reload.`,
                 { kind: 'ok' });
@@ -8495,7 +8495,7 @@
       })();
 
       /* ---- [Playlists] your own lists of songs ----
-         Songs are remembered by file name (likeKey), like Liked songs, so a playlist
+         Songs are remembered by file name (likeKey), like Liked Songs, so a playlist
          keeps working after a reload and fills in again when the folder is loaded.
          Kept per profile and in backups. */
       const Playlists = (() => {
@@ -8679,7 +8679,7 @@
           $('plName').value = p ? p.name : '';
           $('plSave').textContent = p ? 'Save' : 'Create';
           $('plDelete').hidden = !p;
-          $('plDelete').textContent = 'Delete playlist';
+          $('plDelete').textContent = 'Delete Playlist';
           paint();
           dlg.showModal();
           $('plName').focus();
@@ -8706,7 +8706,7 @@
             render();
             if (state.activeView === viewOf(editing)) renderHeroHeader();
             dlg.close();
-            showToast('Playlist updated');
+            showToast('Playlist Updated');
             return;
           }
           name = uniqueName(name || `My playlist ${lists.length + 1}`);
@@ -8727,7 +8727,7 @@
           if (!editing) return;
           if (!deleteArmed) {
             deleteArmed = true;
-            $('plDelete').textContent = 'Press again to delete';
+            $('plDelete').textContent = 'Press Again to Delete';
             return;
           }
           const gone = editing;
@@ -8935,7 +8935,7 @@
           } finally {
             busy = false;
             $('sdGo').disabled = false;
-            $('sdGo').textContent = 'Export again';
+            $('sdGo').textContent = 'Export Again';
             $('sdCancel').textContent = 'Close';
           }
         }
@@ -8944,7 +8944,7 @@
         $('sdForm').addEventListener('submit', (e) => { e.preventDefault(); run(); });
         $('sdCancel').addEventListener('click', () => { if (busy) stop = true; else dlg.close(); });
         dlg.addEventListener('cancel', (e) => { if (busy) { e.preventDefault(); stop = true; } });
-        dlg.addEventListener('close', () => { $('sdGo').textContent = 'Choose SD card'; });
+        dlg.addEventListener('close', () => { $('sdGo').textContent = 'Choose SD Card'; });
 
         return { open };
       })();
@@ -9017,7 +9017,7 @@
         saveJSON(STORAGE_KEYS.FOLDERS, []);
         clearFolderHandles();
         renderRecentFolders();
-        showToast('Folder history cleared');
+        showToast('Folder History Cleared');
       }
 
       async function handleRecentFolderClick(folderName) {
@@ -9053,8 +9053,8 @@
               <div class="recent-folder-name" title="${escapeHtml(folderLabel(f.name) === f.name ? f.name : folderLabel(f.name) + ' (' + f.name + ')')}">${escapeHtml(folderLabel(f.name))}</div>
               <div class="recent-folder-meta">${f.trackCount} track${f.trackCount !== 1 ? 's' : ''} &bull; ${formatRelativeTime(f.lastUsed)}</div>
             </div>
-            <button class="recent-folder-remove recent-folder-edit" data-edit-folder="${escapeHtml(f.name)}" title="Rename or restyle" aria-label="Edit ${escapeHtml(folderLabel(f.name))}">${SVG.edit}</button>
-            <button class="recent-folder-remove" data-remove-folder="${escapeHtml(f.name)}" title="Remove from list" aria-label="Remove ${escapeHtml(folderLabel(f.name))} from the list">${SVG.close}</button>
+            <button class="recent-folder-remove recent-folder-edit" data-edit-folder="${escapeHtml(f.name)}" title="Rename or Restyle" aria-label="Edit ${escapeHtml(folderLabel(f.name))}">${SVG.edit}</button>
+            <button class="recent-folder-remove" data-remove-folder="${escapeHtml(f.name)}" title="Remove from List" aria-label="Remove ${escapeHtml(folderLabel(f.name))} from the list">${SVG.close}</button>
           </div>`).join('');
       }
 
@@ -9446,7 +9446,7 @@
         }
         updateControlStatesUI();
         renderUpNextQueue();
-        showToast(state.shuffle ? 'Shuffle on' : 'Shuffle off');
+        showToast(state.shuffle ? 'Shuffle On' : 'Shuffle Off');
       }
 
       function cycleRepeatMode() {
@@ -9454,7 +9454,7 @@
         state.repeatMode = modes[(modes.indexOf(state.repeatMode) + 1) % modes.length];
         saveJSON(STORAGE_KEYS.REPEAT, state.repeatMode);
         updateControlStatesUI();
-        showToast({ off: 'Repeat off', all: 'Repeat all', one: 'Repeat one' }[state.repeatMode]);
+        showToast({ off: 'Repeat Off', all: 'Repeat All', one: 'Repeat One' }[state.repeatMode]);
       }
 
       /* ========================================================================
@@ -9682,7 +9682,7 @@
         updateReconnectUI();
         renderAll();
         updateCurrentTrackUI();
-        showToast('Library cleared');
+        showToast('Library Cleared');
       }
 
       /* ---- Resume last track/position ---- */
@@ -9694,7 +9694,7 @@
         if (!force && now - lastResumeSave < 5000) return;
         lastResumeSave = now;
         const keyOf = (id) => { const t = state.trackMap.get(id); return t ? t.likeKey : null; };
-        // Up next too: the play order (with songs you queued) and the list it came from
+        // Up Next too: the play order (with songs you queued) and the list it came from
         const MAX = 3000;
         const start = Math.max(0, Math.min(state.queueIndex - 200, state.playQueue.length - MAX));
         saveJSON(STORAGE_KEYS.LAST_TRACK, {
@@ -9716,7 +9716,7 @@
         const track = state.tracks.find(t => t.likeKey === r.key);
         if (!track) return;
         state.resume = null;
-        // Rebuild the saved Up next (keys → this session's songs), else start from the open list
+        // Rebuild the saved Up Next (keys → this session's songs), else start from the open list
         const byKey = new Map();
         for (const t of state.tracks) if (!byKey.has(t.likeKey)) byKey.set(t.likeKey, t.id);
         const toIds = (keys) => {
@@ -10084,10 +10084,10 @@
         }
         const isLiked = state.activeView === 'liked';
         dom.heroBanner.classList.toggle('liked-theme', isLiked);
-        dom.heroType.textContent = isLiked ? 'Favorites' : 'Local music library';
+        dom.heroType.textContent = isLiked ? 'Favorites' : 'Local Music Library';
         dom.heroTitle.textContent = isLiked ? 'Liked Songs' : 'All Tracks';
         if (state.activeView === 'unsorted') {   // [AI Tagger]
-          dom.heroType.textContent = 'Waiting for details';
+          dom.heroType.textContent = 'Waiting for Details';
           dom.heroTitle.textContent = 'Unsorted';
         }
         dom.heroCover.innerHTML = isLiked ? SVG.heartFilled64 : SVG.note(64, '#ffffff');
@@ -10202,7 +10202,7 @@
         }
       }
 
-      /** Delete key: take songs out of the playlist (or Liked songs) being viewed. Files are never deleted. */
+      /** Delete key: take songs out of the playlist (or Liked Songs) being viewed. Files are never deleted. */
       function removeTracksHere(list) {
         if (!list.length) return false;
         if (Playlists.isView(state.activeView)) { Playlists.removeMany(list); return true; }
@@ -10255,7 +10255,7 @@
 
           if (!hasLibrary) {
             const reconnect = state.pendingReconnect.length > 0;
-            dom.emptyTitle.textContent = reconnect ? 'Welcome back' : 'Your offline music player is ready';
+            dom.emptyTitle.textContent = reconnect ? 'Welcome Back' : 'Your Offline Music Player Is Ready';
             dom.emptyDesc.textContent = reconnect
               ? (state.pendingReconnect.length === 1
                 ? 'Your folder is still saved. Click anywhere, then Allow, to bring its songs back.'
@@ -10263,21 +10263,21 @@
               : 'Pick a folder or drop audio files. It all stays on your device.';
             dom.emptyActions.style.display = 'flex';
           } else if (state.searchQuery.trim() !== '') {
-            dom.emptyTitle.textContent = 'No matching tracks';
+            dom.emptyTitle.textContent = 'No Matching Tracks';
             dom.emptyDesc.textContent = `Nothing found for "${state.searchQuery.trim()}".`;
             dom.emptyActions.style.display = 'none';
           } else if (state.activeView === 'liked') {
-            dom.emptyTitle.textContent = 'No liked songs yet';
+            dom.emptyTitle.textContent = 'No Liked Songs Yet';
             dom.emptyDesc.textContent = 'Tap the heart on a song to save it.';
             dom.emptyActions.style.display = 'none';
           } else if (Playlists.isView(state.activeView)) {   // [Playlists]
-            dom.emptyTitle.textContent = 'This playlist is empty';
+            dom.emptyTitle.textContent = 'This Playlist Is Empty';
             dom.emptyDesc.textContent = Playlists.fromView(state.activeView).keys.length
               ? 'Load the folder with its songs to play it.'
               : 'Open the ⋯ menu on any song and choose Add to playlist.';
             dom.emptyActions.style.display = 'none';
           } else if (state.activeView === 'unsorted') {   // [AI Tagger]
-            dom.emptyTitle.textContent = 'Nothing unsorted';
+            dom.emptyTitle.textContent = 'Nothing Unsorted';
             dom.emptyDesc.textContent = 'Songs added while you\'re offline wait here until Localify can fill in their details.';
             dom.emptyActions.style.display = 'none';
           }
@@ -10373,16 +10373,16 @@
             </div>
             <div class="track-album" title="${escapeHtml(album)}${track.year ? ' (' + track.year + ')' : ''}">${escapeHtml(album)}</div>
             <div class="row-actions">
-              <button class="row-action row-edit" data-edit-id="${track.id}" tabindex="-1" aria-label="Edit audio" title="Edit audio (E)">${SVG.edit}</button>
+              <button class="row-action row-edit" data-edit-id="${track.id}" tabindex="-1" aria-label="Edit Audio" title="Edit audio (E)">${SVG.edit}</button>
               <button class="row-action row-audacity" data-audacity-id="${track.id}" tabindex="-1" aria-label="Open in Audacity"${Audacity.canOpen(track) ? ' title="Open in Audacity"' : ` aria-disabled="true" title="${escapeHtml(Audacity.UNKNOWN_LOCATION)}"`}>${SVG.audacity}</button>
-              <button class="row-action row-more" data-more-id="${track.id}" tabindex="-1" aria-label="More actions" aria-haspopup="menu" title="More actions">${LOOKS_SVG.more}</button>
-              <button class="row-action row-tidy" data-tidy-id="${track.id}" tabindex="-1" aria-label="Tidy name and tags" title="Tidy name &amp; tags (I)">${SVG.tag}</button>
-              <button class="btn-like${isLiked ? ' liked' : ''}" data-like-id="${track.id}" tabindex="-1" aria-pressed="${isLiked}" aria-label="${isLiked ? 'Remove from' : 'Add to'} Liked songs">${SVG.heart}</button>
+              <button class="row-action row-more" data-more-id="${track.id}" tabindex="-1" aria-label="More Actions" aria-haspopup="menu" title="More Actions">${LOOKS_SVG.more}</button>
+              <button class="row-action row-tidy" data-tidy-id="${track.id}" tabindex="-1" aria-label="Tidy Name and Tags" title="Tidy name &amp; tags (I)">${SVG.tag}</button>
+              <button class="btn-like${isLiked ? ' liked' : ''}" data-like-id="${track.id}" tabindex="-1" aria-pressed="${isLiked}" aria-label="${isLiked ? 'Remove from' : 'Add to'} Liked Songs">${SVG.heart}</button>
             </div>
             <div class="track-dur">${track.duration ? formatTime(track.duration) : '--:--'}</div>`;
       }
 
-      /** In All tracks, which of your folders a song came from (its own name and icon). */
+      /** In All Tracks, which of your folders a song came from (its own name and icon). */
       function trackSourceHTML(track) {
         if (state.activeView !== 'all') return '';
         const name = track.rootName || track.folder;
@@ -10394,7 +10394,7 @@
         return `<span class="track-src" title="From your folder “${escapeHtml(label)}”"${look.accent ? ` data-accent="${escapeHtml(look.accent)}"` : ''}>${icon}<span class="track-src-name">${escapeHtml(label)}</span></span>`;
       }
 
-      /** Re-render one track wherever it currently appears (list row, Up next). */
+      /** Re-render one track wherever it currently appears (list row, Up Next). */
       function patchTrackEverywhere(track) {
         const el = rowEls.get(track.id);
         if (el) fillRow(el, track, +el.dataset.index);
@@ -10482,13 +10482,13 @@
         const track = state.trackMap.get(state.currentTrackId);
         document.title = track
           ? `${state.isPlaying ? '▶ ' : ''}${track.title}${track.artist ? ' · ' + track.artist : ''} — Localify`
-          : 'Localify — offline MP3 player';
+          : 'Localify — Offline MP3 Player';
       }
 
       function updatePlayerBarUI() {
         const track = state.trackMap.get(state.currentTrackId);
         if (!track) {
-          dom.playerTitle.textContent = 'Not playing';
+          dom.playerTitle.textContent = 'Not Playing';
           dom.playerSubtitle.textContent = 'Select a folder to begin';
           looksSetArt(dom.playerArt, SVG.note(24, 'currentColor'));   // [Looks] crossfade; token color
           dom.btnLikeCurrent.style.display = 'none';
@@ -10582,9 +10582,9 @@
         if (typeof updateEditEntryPoints === 'function') try { updateEditEntryPoints(); } catch (err) { /* modules not ready yet */ }
         const track = state.trackMap.get(state.currentTrackId);
         if (!track) {
-          dom.npTitle.textContent = 'No track playing';
+          dom.npTitle.textContent = 'No Track Playing';
           dom.npArtist.textContent = 'Select a track to start listening';
-          dom.npAlbum.textContent = 'Local library';
+          dom.npAlbum.textContent = 'Local Library';
           looksSetArt(dom.npArtwork, buildFallbackArtHTML(['#282828', '#121212'], 64));   // [Looks] keep crossfade key in sync
           return;
         }
@@ -10597,7 +10597,7 @@
 
       function renderUpNextQueue() {
         dom.queueModeBadge.textContent = state.shuffle ? 'Shuffled' : 'Sequential';
-        if (state.activeView !== 'visualizer') return;   // only visible in Now playing
+        if (state.activeView !== 'visualizer') return;   // only visible in Now Playing
         if (state.playQueue.length === 0 || state.queueIndex < 0) {
           dom.upNextList.innerHTML = '<div class="queue-empty">Load and play tracks to view your upcoming queue.</div>';
           return;
@@ -10730,7 +10730,7 @@
       function noteNotKept(count) {
         if (!count || toldNotKept || LibraryCopy.supported) return;   // saved copies keep them
         toldNotKept = true;
-        setTimeout(() => showNotice('Songs won’t stay after a reload',
+        setTimeout(() => showNotice('Songs Won’t Stay After a Reload',
           'This browser can’t keep your music between visits. Add it again next time, or use Chrome, Edge or Firefox.',
           { kind: 'warn', ms: 8000 }), 2500);
       }
@@ -10775,7 +10775,7 @@
         try {
           const handles = handleJobs ? await Promise.all(handleJobs) : [];
           if (handles.length && handles.every(h => h && h.kind === 'directory')) {
-            // Dropped folders: load them like "Load folder" so they're remembered after a reload
+            // Dropped folders: load them like "Load Folder" so they're remembered after a reload
             for (const h of handles) {
               state.pendingReconnect = state.pendingReconnect.filter(p => p.name !== h.name);
               await loadFolderFromHandle(h);
@@ -10868,7 +10868,7 @@
         saveJSON(STORAGE_KEYS.SHUFFLE, true);
         startPlaybackFromList(visible);
         updateControlStatesUI();
-        showToast('Shuffle play started');
+        showToast('Shuffle Play Started');
       });
 
       // Track list: click, double-click and keyboard (listbox)
@@ -10974,7 +10974,7 @@
 
       dom.mainScroll.addEventListener('scroll', onListScroll, { passive: true });
 
-      // Up next
+      // Up Next
       const playQueueItem = (item) => {
         const qIdx = parseInt(item.dataset.qindex, 10);
         if (!Number.isNaN(qIdx)) loadAndPlayQueueIndex(qIdx);
@@ -11551,7 +11551,7 @@
         if (mode === 'track' && xf.active) finishCrossfade(true);
         updateSleepUI();
         syncSettingsUI();
-        if (mode === 'off') showToast('Sleep timer off');
+        if (mode === 'off') showToast('Sleep Timer Off');
         else if (mode === 'track') showToast('Stopping at the end of this track');
         else showToast(`Sleep timer: ${mode} min`);
       }
@@ -11681,7 +11681,7 @@
         Lyrics.resetPrefs();   // [Lyrics]
         setPlaybackSpeed(1);
         syncSettingsUI();
-        showToast('Settings reset');
+        showToast('Settings Reset');
       }
 
       /* ---- Panel UI ---- */
@@ -11888,7 +11888,7 @@
 
       /* ========================================================================
          [Pitch] Speed that changes pitch + adjustable reverb
-         - "Change pitch with speed" = preservesPitch off on both players.
+         - "Change Pitch with Speed" = preservesPitch off on both players.
          - Reverb (0-100 %) is a ConvolverNode wet/dry mix that
            sits after the sleep-fade gain: fx.sleep -> revIn -> dry/wet -> duck.
          - No independent pitch shift: that needs an AudioWorklet phase vocoder /
@@ -11956,7 +11956,7 @@
         const st = pitchSemitones(rate);
         let readout;
         if (!cfg.pitchWithSpeed) readout = 'Off: songs keep their key';
-        else if (Math.abs(st) < 0.05) readout = 'Original pitch';
+        else if (Math.abs(st) < 0.05) readout = 'Original Pitch';
         else readout = `${st > 0 ? '+' : '−'}${Math.abs(st).toFixed(1)} semitones ${st > 0 ? 'higher' : 'lower'}`;
         pitchDom.readout.textContent = readout;
 
@@ -12092,11 +12092,11 @@
          ======================================================================== */
       var DEFAULT_FOCUS = { minutes: 25, sound: 'chime', alarmVolume: 0.8, duck: 15, notify: false, vibrate: true };
       var FOCUS_SOUNDS = {
-        chime:   'Soft chime',
+        chime:   'Soft Chime',
         bell:    'Bell',
         marimba: 'Marimba',
-        beep:    'Digital beep',
-        rise:    'Gentle rise',
+        beep:    'Digital Beep',
+        rise:    'Gentle Rise',
         gong:    'Gong',
         custom:  'My own sound'
       };
@@ -12210,7 +12210,7 @@
         saveFocusRun();
         focusSchedule();
         updateFocusUI();
-        if (!wasRinging) showToast('Focus timer stopped');
+        if (!wasRinging) showToast('Focus Timer Stopped');
       }
 
       function focusSnooze() {
@@ -12268,7 +12268,7 @@
       function focusSendNotification() {
         if (!focusSettings().notify || !('Notification' in window) || Notification.permission !== 'granted') return;
         try {
-          focusNotification = new Notification("Time's up", {
+          focusNotification = new Notification("Time's Up", {
             body: 'Your lock-in session is done. Take a break.',
             tag: 'localify-focus',
             requireInteraction: true,
@@ -12570,11 +12570,11 @@
         const ctx = ensureAlarmCtx();
         let buffer = null;
         try { buffer = await ctx.decodeAudioData(await file.arrayBuffer()); } catch (e) { buffer = null; }
-        if (!buffer) { showToast("Couldn't read that audio file"); return; }
+        if (!buffer) { showToast("Couldn't Read That Audio File"); return; }
         try {
           await focusIdb('readwrite', s => s.put({ id: 'alarm', name: file.name, blob: file }));
         } catch (e) {
-          showToast("Couldn't save the sound on this device");
+          showToast("Couldn't Save the Sound on This Device");
           return;
         }
         alarmCustom = { name: file.name, blob: file, buffer };
@@ -12606,7 +12606,7 @@
         d.btn.classList.toggle('is-running', !!run && !ringing);
         d.btn.classList.toggle('is-paused', paused);
         d.btn.classList.toggle('is-ringing', ringing);
-        const chip = !run ? '' : ringing ? "Time's up" : clock;
+        const chip = !run ? '' : ringing ? "Time's Up" : clock;
         if (d.btnText.textContent !== chip) d.btnText.textContent = chip;
         d.btn.setAttribute('aria-label', !run ? 'Lock-in focus timer'
           : ringing ? "Focus timer: time's up" : `Focus timer: ${clock} left${paused ? ', paused' : ''}`);
@@ -12615,7 +12615,7 @@
         d.running.hidden = !run;
         if (run) {
           d.big.textContent = clock;
-          d.state.textContent = ringing ? "Time's up" : paused ? 'Paused' : 'Locked in';
+          d.state.textContent = ringing ? "Time's Up" : paused ? 'Paused' : 'Locked In';
           d.progress.style.width = `${run.total ? Math.min(100, (1 - left / run.total) * 100) : 100}%`;
           d.pause.textContent = paused ? 'Resume' : 'Pause';
           d.pause.disabled = ringing;
@@ -12697,9 +12697,9 @@
         const cfg = focusSettings();
         const d = focusDom;
         setRadioGroup(d.sound, cfg.sound);
-        d.customName.textContent = alarmCustom ? alarmCustom.name : 'No file chosen';
+        d.customName.textContent = alarmCustom ? alarmCustom.name : 'No File Chosen';
         d.clearFile.hidden = !alarmCustom;
-        d.pickFile.textContent = alarmCustom ? 'Replace file…' : 'Choose sound file…';
+        d.pickFile.textContent = alarmCustom ? 'Replace file…' : 'Choose Sound File…';
         d.alarmVol.value = Math.round(cfg.alarmVolume * 100);
         d.alarmVolValue.textContent = `${Math.round(cfg.alarmVolume * 100)}%`;
         d.duck.value = cfg.duck;
@@ -12881,7 +12881,7 @@
       /* [/Focus] */
 
       /* ========================================================================
-         Audio editor (built-in)
+         Audio Editor (built-in)
          Decode → waveform → edits with undo → preview → 16-bit WAV export.
          Everything happens in this tab; the original file is never changed.
          ======================================================================== */
@@ -12962,7 +12962,7 @@
 
         function setPlayIcon(playing) {
           el.playIcon.innerHTML = playing ? SVG.pauseInner : SVG.playInner;
-          el.play.setAttribute('aria-label', playing ? 'Pause preview' : 'Play preview');
+          el.play.setAttribute('aria-label', playing ? 'Pause Preview' : 'Play Preview');
         }
 
         /* ---------------------------------------------------------------- UI state */
@@ -12998,7 +12998,7 @@
           el.time.innerHTML = `<strong>${fmt(pos / sr())}</strong> / ${fmt(len() / sr())}`;
           el.sel.textContent = ed.sel
             ? `Selection ${fmt(ed.sel.a / sr())} – ${fmt(ed.sel.b / sr())}`
-            : 'No selection';
+            : 'No Selection';
         }
 
         function updateAll() {
@@ -14139,7 +14139,7 @@
          ======================================================================== */
       const Audacity = (() => {
         const PROTOCOL = 'localify-audacity:';
-        const UNKNOWN_LOCATION = 'Location unknown. Load this track with Open folder (or drop its folder) to open it in Audacity.';
+        const UNKNOWN_LOCATION = 'Location unknown. Load this track with Open Folder (or drop its folder) to open it in Audacity.';
 
         const el = {
           roots: $('asRoots'), helper: $('asHelper'), preview: $('asPreview'), copy: $('asCopy'),
@@ -14205,7 +14205,7 @@
           const names = knownRootNames();
           if (pending && !names.includes(pending.rootName)) names.unshift(pending.rootName);
           if (names.length === 0) {
-            el.roots.innerHTML = '<p class="as-empty">Load a music folder with <strong>Open folder</strong> (or drop a folder) and it shows up here.</p>';
+            el.roots.innerHTML = '<p class="as-empty">Load a music folder with <strong>Open Folder</strong> (or drop a folder) and it shows up here.</p>';
           } else {
             el.roots.innerHTML = names.map(name => {
               const id = rootId(name);
@@ -14324,7 +14324,7 @@
         el.copy.addEventListener('click', async () => {
           try {
             await navigator.clipboard.writeText(el.preview.textContent);
-            showToast('Helper line copied');
+            showToast('Helper Line Copied');
           } catch (err) {
             const range = document.createRange();
             range.selectNodeContents(el.preview);
@@ -14363,7 +14363,7 @@
         const DEFAULT_TAGGER_PREFS = { template: '{artist} - {title}', dashOrder: 'artist-title', ai: false,
           autoFill: true, onlineOnly: true, autoApply: false, musicbrainz: true };
         const READ_WORKERS = 4;
-        const UNDO_MAX_BYTES = 256 * 1024 * 1024;   // original tag bytes kept for "Undo last batch"
+        const UNDO_MAX_BYTES = 256 * 1024 * 1024;   // original tag bytes kept for "Undo Last Batch"
         const ZIP_MAX_BYTES = 3.5 * 1024 * 1024 * 1024;
 
         /* ---------------- Prefs ---------------- */
@@ -15314,7 +15314,7 @@
             const cls = kind === 'new' && changed ? (v ? ' tg-changed' : ' tg-removed') : '';
             rows.push(`<span class="tg-k">${FIELD_LABELS[k]}</span><span class="tg-v${cls}">${v ? escapeHtml(v) : '(removed)'}${kind === 'new' && values.__ai && values.__ai[k] ? ' <span class="tg-badge">AI</span>' : ''}</span>`);
           }
-          return rows.length ? `<div class="tg-tags">${rows.join('')}</div>` : '<div class="tg-tags tg-none">No tags</div>';
+          return rows.length ? `<div class="tg-tags">${rows.join('')}</div>` : '<div class="tg-tags tg-none">No Tags</div>';
         }
 
         function rowHTML(item, i) {
@@ -15325,7 +15325,7 @@
           let right;
           if (item.editing) {
             right = `<div class="tg-edit">
-              <label class="tg-edit-name"><span>File name</span><input type="text" data-f="__name" value="${escapeHtml(item.nextName)}" spellcheck="false"></label>
+              <label class="tg-edit-name"><span>File Name</span><input type="text" data-f="__name" value="${escapeHtml(item.nextName)}" spellcheck="false"></label>
               ${FIELDS.map(k => `<label><span>${FIELD_LABELS[k]}</span><input type="text" data-f="${k}" value="${escapeHtml(item.next[k] || '')}"${item.mp3 ? '' : ' disabled'}${k === 'year' || k === 'track' ? ' inputmode="numeric"' : ''} spellcheck="false"></label>`).join('')}
             </div>`;
           } else {
@@ -15346,7 +15346,7 @@
             <div class="tg-actions">
               ${stateLabel ? `<span class="tg-pill" data-kind="${st}">${stateLabel}</span>` : ''}
               ${locked ? '' : `
-              <button type="button" class="tg-act tg-accept" data-act="accept" aria-pressed="${st === 'accepted'}" title="Accept this change"${st === 'same' && !item.editing ? ' hidden' : ''}>${st === 'accepted' ? 'Accepted' : 'Accept'}</button>
+              <button type="button" class="tg-act tg-accept" data-act="accept" aria-pressed="${st === 'accepted'}" title="Accept This Change"${st === 'same' && !item.editing ? ' hidden' : ''}>${st === 'accepted' ? 'Accepted' : 'Accept'}</button>
               <button type="button" class="tg-act" data-act="edit" aria-pressed="${item.editing}">${item.editing ? 'Done' : 'Edit'}</button>
               <button type="button" class="tg-act tg-skip" data-act="skip" aria-pressed="${st === 'skipped'}"${st === 'same' ? ' hidden' : ''}>${st === 'skipped' ? 'Skipped' : 'Skip'}</button>
               ${hooks.canIdentify && hooks.canIdentify() ? `<button type="button" class="tg-act tg-sound" data-act="sound" title="Identify this song by its sound (AcoustID)"${item.identifying ? ' disabled' : ''}>${item.identifying ? 'Listening…' : 'By Sound'}</button>` : ''}`}
@@ -15363,7 +15363,7 @@
           el.list.innerHTML = rows.map(([it, i]) => rowHTML(it, i)).join('');
           el.empty.hidden = rows.length > 0 || ui.busy;
           if (!rows.length && !ui.busy) {
-            el.empty.textContent = ui.items.length ? 'Every song here is already tidy. Turn on “Show tidy songs” to edit one anyway.' : 'No songs to tidy.';
+            el.empty.textContent = ui.items.length ? 'Every song here is already tidy. Turn on “Show Tidy Songs” to edit one anyway.' : 'No songs to tidy.';
           }
           updateFooter();
         }
@@ -15423,7 +15423,7 @@
           const where = new Set(ui.items.map(it => it.where));
           if (where.has('folder') && where.size === 1) return 'Changes are saved into your music folder (the browser will ask for permission to edit it).';
           if (where.has('folder')) return 'Songs from a folder you opened are saved in place; the others are downloaded as retagged copies.';
-          return 'These songs were added without folder access, so retagged copies are downloaded. Open the folder with “Load folder” to save in place.';
+          return 'These songs were added without folder access, so retagged copies are downloaded. Open the folder with “Load Folder” to save in place.';
         }
 
         function scopeTracks(value) {
@@ -15437,7 +15437,7 @@
 
         function fillScope() {
           if (ui.single) {
-            el.scope.innerHTML = '<option value="shown">This song</option>';
+            el.scope.innerHTML = '<option value="shown">This Song</option>';
             el.scope.disabled = true;
             return;
           }
@@ -15952,9 +15952,9 @@
         }
 
         /**
-         * "Auto-apply to files": write details into one song without the dialog.
+         * "Auto-Apply to Files": write details into one song without the dialog.
          * Only for MP3s in a folder the user already allowed editing (never asks for permission).
-         * Joins "Undo last batch" in the Tidy dialog.
+         * Joins "Undo Last Batch" in the Tidy dialog.
          */
         async function autoApply(track, fields) {
           if (!isMp3(track) || ui.busy) return false;
@@ -16319,7 +16319,7 @@ self.onmessage = async (e) => {
           else if (!key()) s = 'No key yet. Songs won’t be identified by sound.';
           else if (!hasKey()) s = 'That doesn’t look like an AcoustID key.';
           else if (keyBad) s = 'AcoustID didn’t accept this key. Check it and try again.';
-          else if (!lookupsOn()) s = 'Saved. Turn on Look up songs online to use it.';
+          else if (!lookupsOn()) s = 'Saved. Turn on Look Up Songs Online to use it.';
           else s = 'Saved in this profile. Songs can be identified by sound.';
           set.status.textContent = s;
           set.status.dataset.kind = keyBad || (key() && !hasKey()) ? 'error' : '';
@@ -16371,8 +16371,8 @@ self.onmessage = async (e) => {
       /* ==========================================================================
          [AI Tagger] auto-fill: fill in song details in the background.
          - Details live in STORAGE_KEYS.SONG_DETAILS (per song key), shown in the
-           library only. Files change only through Apply, or "Auto-apply to files".
-         - With "Only run when online" on, songs found while offline are marked
+           library only. Files change only through Apply, or "Auto-Apply to Files".
+         - With "Only Run When Online" on, songs found while offline are marked
            Unsorted and processed when the connection comes back.
          - When sources disagree or a value is missing, it asks instead of guessing.
          ========================================================================== */
@@ -16564,7 +16564,7 @@ self.onmessage = async (e) => {
           summary.tracks = []; summary.saved = [];
           if (s.applied) {
             notify(`Saved details into ${s.applied} ${s.applied === 1 ? 'file' : 'files'}`, 'Undo', async () => {
-              if (!(await Tagger.undoAuto())) { showToast('Nothing to undo'); return; }
+              if (!(await Tagger.undoAuto())) { showToast('Nothing to Undo'); return; }
               // Put the details back as a suggestion so the song isn't saved again on its own
               for (const { track, entry } of s.saved) if (state.trackMap.has(track.id)) details[keyOf(track)] = entry;
               saveDetails(true);
@@ -16613,7 +16613,7 @@ self.onmessage = async (e) => {
           return leave;
         }
 
-        /** opts.sound: identify by sound even if the names look fine ([AcoustID], from "Identify by sound").
+        /** opts.sound: identify by sound even if the names look fine ([AcoustID], from "Identify by Sound").
          *  opts.manual: don't auto-apply. Resolves to { state, sound } (sound: what the sound lookup found). */
         async function processTrack(track, opts = {}) {
           if (!state.trackMap.has(track.id)) return null;
@@ -16865,12 +16865,12 @@ self.onmessage = async (e) => {
         }
 
         const soundBusy = new Set();
-        /** "Identify by sound" from the row menu or Tidy. quiet: return the message instead of showing it. */
+        /** "Identify by Sound" from the row menu or Tidy. quiet: return the message instead of showing it. */
         async function identifyBySound(track, { quiet } = {}) {
           const say = (msg, label, fn) => { if (!quiet) notify(msg, label, fn); return msg; };
           if (!track || !state.trackMap.has(track.id)) return '';
           if (!AcoustID.hasKey()) return say('Add an AcoustID key in Settings → Tidy Names & Tags first.');
-          if (!pref().musicbrainz) return say('Turn on Look up songs online in Settings first.');
+          if (!pref().musicbrainz) return say('Turn on Look Up Songs Online in Settings first.');
           if (AcoustID.keyRejected()) return say('AcoustID didn’t accept your key. Check it in Settings.');
           if (!(await canRun())) return say('You’re offline. Try again when you’re back online.');
           if (soundBusy.has(track.id)) return '';
@@ -17264,7 +17264,7 @@ self.onmessage = async (e) => {
         }
 
         function openQuestions(firstTrack) {
-          if (!questionCount()) { showToast('No questions right now'); return; }
+          if (!questionCount()) { showToast('No Questions Right Now'); return; }
           session.list = buildSessionList(firstTrack ? keyOf(firstTrack) : '');
           session.answered = 0;
           session.opener = document.activeElement;
@@ -17291,7 +17291,7 @@ self.onmessage = async (e) => {
           if (session.preview) { session.preview.pause(); session.preview.removeAttribute('src'); session.preview.load(); }
           if (session.previewUrl) URL.revokeObjectURL(session.previewUrl);
           session.preview = null; session.previewUrl = '';
-          qa.play.textContent = 'Play preview';
+          qa.play.textContent = 'Play Preview';
           qa.play.setAttribute('aria-pressed', 'false');
         }
 
@@ -17312,7 +17312,7 @@ self.onmessage = async (e) => {
           qa.ask.hidden = !cur;
           qa.skip.disabled = qa.leave.disabled = !cur;
           if (!cur) { stopPreview(); qa.status.textContent = ''; qa.close.textContent = 'Done'; qa.close.focus(); return; }
-          qa.close.textContent = 'Stop for now';
+          qa.close.textContent = 'Stop for Now';
           const track = trackForKey(cur.key);
           if (cur.key !== prevKey) stopPreview();
           qa.cover.innerHTML = artHTML(track, 28);
@@ -17374,17 +17374,17 @@ self.onmessage = async (e) => {
         qa.play.addEventListener('click', () => {
           const track = session.cur && trackForKey(session.cur.key);
           if (!track) return;
-          if (session.preview && !session.preview.paused) { session.preview.pause(); qa.play.textContent = 'Play preview'; qa.play.setAttribute('aria-pressed', 'false'); return; }
+          if (session.preview && !session.preview.paused) { session.preview.pause(); qa.play.textContent = 'Play Preview'; qa.play.setAttribute('aria-pressed', 'false'); return; }
           if (!session.preview) {
             session.previewUrl = URL.createObjectURL(track.file);
             session.preview = new Audio(session.previewUrl);
             session.preview.volume = audio.volume;
             if (track.duration > 60) session.preview.currentTime = Math.min(30, track.duration / 3);
-            session.preview.addEventListener('ended', () => { qa.play.textContent = 'Play preview'; qa.play.setAttribute('aria-pressed', 'false'); });
+            session.preview.addEventListener('ended', () => { qa.play.textContent = 'Play Preview'; qa.play.setAttribute('aria-pressed', 'false'); });
           }
           if (!audio.paused) audio.pause();
           session.preview.play().catch(() => {});
-          qa.play.textContent = 'Pause preview';
+          qa.play.textContent = 'Pause Preview';
           qa.play.setAttribute('aria-pressed', 'true');
         });
 
@@ -17427,7 +17427,7 @@ self.onmessage = async (e) => {
         function badgeHTML(track) {
           if (!track.afState || !pref().autoFill) return '';
           if (track.afState === 'unsorted') return '<span class="af-dot af-dot-unsorted" title="Unsorted: details will be filled in when you\'re online"></span>';
-          if (track.afState === 'question') return `<span class="af-dot af-dot-q" role="button" data-af-q="${track.id}" aria-label="Answer Localify's question" title="Localify has a question about this song. Click to answer."></span>`;
+          if (track.afState === 'question') return `<span class="af-dot af-dot-q" role="button" data-af-q="${track.id}" aria-label="Answer Localify's Question" title="Localify has a question about this song. Click to answer."></span>`;
           return '';
         }
 
@@ -17484,7 +17484,7 @@ self.onmessage = async (e) => {
           updateChip();
         };
         Tagger.hooks.knownArtist = (name) => knownArtists().has(norm(name));
-        // [AcoustID] "Identify by sound" in Tidy
+        // [AcoustID] "Identify by Sound" in Tidy
         Tagger.hooks.canIdentify = () => AcoustID.ready();
         // [AcoustID] { msg, ok }: ok when the song was matched (the messages identifyBySound gives for a match)
         Tagger.hooks.identify = async (track) => {
@@ -17521,7 +17521,7 @@ self.onmessage = async (e) => {
       /* [/AI Tagger] auto-fill */
 
       /* ========================================================================
-         Editor / Audacity entry points (track rows, Now playing, player bar)
+         Editor / Audacity entry points (track rows, Now Playing, player bar)
          ======================================================================== */
       function updateEditEntryPoints() {
         const track = state.trackMap.get(state.currentTrackId);
@@ -17678,8 +17678,8 @@ self.onmessage = async (e) => {
         const lower = (v) => String(v || '').trim().toLowerCase();
         const mode = () => (state.activeView === 'albums' || state.activeView === 'artists') ? state.activeView : null;
         const isBrowseView = (v) => v === 'albums' || v === 'artists';
-        const albumName = (t) => t.album || t.folder || 'Unknown album';
-        const artistName = (t) => t.artist || 'Unknown artist';
+        const albumName = (t) => t.album || t.folder || 'Unknown Album';
+        const artistName = (t) => t.artist || 'Unknown Artist';
         const albumKey = (t) => lower(albumName(t)) + '\u0001' + lower(t.albumArtist);
         const artistKey = (t) => lower(artistName(t));
         const keyFor = (m) => (m === 'albums' ? albumKey : artistKey);
@@ -17725,7 +17725,7 @@ self.onmessage = async (e) => {
           return g[0] || null;
         }
 
-        const groupArtist = (g) => g.artists.size === 1 ? [...g.artists][0] : 'Various artists';
+        const groupArtist = (g) => g.artists.size === 1 ? [...g.artists][0] : 'Various Artists';
         const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
 
         function loadCover(track) {
@@ -17993,16 +17993,16 @@ self.onmessage = async (e) => {
         looksEmptyAction = null;
         if (kind === 'liked') {
           if (Playlists.isView(state.activeView)) dom.emptyState.dataset.kind = 'playlist';
-          label = 'Browse all tracks';
+          label = 'Browse All Tracks';
           looksEmptyAction = () => switchView('all');
         } else if (kind === 'search') {
-          label = 'Clear search';
+          label = 'Clear Search';
           looksEmptyAction = () => { clearSearch(); dom.searchInput.focus(); };
         } else if (kind === 'albums' || kind === 'artists') {
-          dom.emptyTitle.textContent = kind === 'albums' ? 'This album is empty' : 'No songs by this artist';
+          dom.emptyTitle.textContent = kind === 'albums' ? 'This Album Is Empty' : 'No Songs by This Artist';
           dom.emptyDesc.textContent = 'Reload the folder to bring its songs back.';
           dom.emptyActions.style.display = 'none';
-          label = kind === 'albums' ? 'Back to albums' : 'Back to artists';
+          label = kind === 'albums' ? 'Back to Albums' : 'Back to Artists';
           looksEmptyAction = () => Browse.back();
         }
         $('looksEmptyCtaWrap').hidden = !label;
@@ -18026,7 +18026,7 @@ self.onmessage = async (e) => {
       })();
 
       /* ---- [Looks] track actions menu: "⋯" button, right-click, long-press, Shift+F10 ---- */
-      // [AcoustID] a sound wave, for "Identify by sound"
+      // [AcoustID] a sound wave, for "Identify by Sound"
       const SOUND_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 12h1M7 8v8M11 4v16M15 7v10M19 10v4M22 12h-1"/></svg>';
       const LooksMenu = (() => {
         const menu = $('looksMenu'), backdrop = $('looksMenuBackdrop');
@@ -18046,9 +18046,9 @@ self.onmessage = async (e) => {
         // What Localify did for this song (the list only hints at it while you point at a row)
         function statusItems(t) {
           const st = AutoFill.statusOf(t);
-          if (st === 'question') return [null, { act: 'af-ask', label: 'Answer Localify’s question', icon: MI.ask }];
+          if (st === 'question') return [null, { act: 'af-ask', label: 'Answer Localify’s Question', icon: MI.ask }];
           if (st === 'unsorted') return [null, { act: 'af-wait', label: 'Unsorted: fills in when you’re online', icon: MI.info, disabled: true, title: 'Localify fills in this song’s details when you’re back online.' }];
-          if (st) return [null, { act: 'af-review', label: 'See what Localify filled in', icon: MI.info, kbd: 'I' }];
+          if (st) return [null, { act: 'af-review', label: 'See What Localify Filled In', icon: MI.info, kbd: 'I' }];
           return [];
         }
 
@@ -18057,15 +18057,15 @@ self.onmessage = async (e) => {
           const liked = list.every(t => state.likedKeys.has(t.likeKey));
           return [
             { act: 'm-play', label: `Play ${n} songs`, icon: MI.play, kbd: 'Enter' },
-            { act: 'm-next', label: 'Play next', icon: MI.next, kbd: '⇧Q' },
-            { act: 'm-queue', label: 'Add to queue', icon: MI.queue, kbd: 'Q' },
+            { act: 'm-next', label: 'Play Next', icon: MI.next, kbd: '⇧Q' },
+            { act: 'm-queue', label: 'Add to Queue', icon: MI.queue, kbd: 'Q' },
             null,
             { act: 'm-like', label: liked ? 'Remove from Liked Songs' : 'Add to Liked Songs', icon: SVG.heart, kbd: 'L', on: liked },
-            { act: 'pl', label: 'Add to playlist', icon: SVG.playlist, chev: true },
+            { act: 'pl', label: 'Add to Playlist', icon: SVG.playlist, chev: true },
             ...(Playlists.isView(state.activeView) ? [{ act: 'm-remove', label: `Remove ${n} from this playlist`, icon: SVG.close, kbd: 'Del' }] : []),
             null,
-            { act: 'm-all', label: 'Select all', icon: MI.all, kbd: 'Ctrl A' },
-            { act: 'm-clear', label: 'Clear selection', icon: SVG.close, kbd: 'Esc' }
+            { act: 'm-all', label: 'Select All', icon: MI.all, kbd: 'Ctrl A' },
+            { act: 'm-clear', label: 'Clear Selection', icon: SVG.close, kbd: 'Esc' }
           ];
         }
 
@@ -18074,19 +18074,19 @@ self.onmessage = async (e) => {
           const liked = state.likedKeys.has(t.likeKey);
           const canAud = Audacity.canOpen(t);
           return [
-            { act: 'next', label: 'Play next', icon: MI.next, kbd: '⇧Q' },
-            { act: 'queue', label: 'Add to queue', icon: MI.queue, kbd: 'Q' },
+            { act: 'next', label: 'Play Next', icon: MI.next, kbd: '⇧Q' },
+            { act: 'queue', label: 'Add to Queue', icon: MI.queue, kbd: 'Q' },
             null,
-            { act: 'edit', label: 'Edit audio', icon: SVG.edit, kbd: 'E' },
+            { act: 'edit', label: 'Edit Audio', icon: SVG.edit, kbd: 'E' },
             { act: 'audacity', label: 'Open in Audacity', icon: SVG.audacity, disabled: !canAud, title: canAud ? '' : Audacity.UNKNOWN_LOCATION },
             { act: 'like', label: liked ? 'Remove from Liked Songs' : 'Add to Liked Songs', icon: SVG.heart, kbd: 'L', on: liked },
-            { act: 'pl', label: 'Add to playlist', icon: SVG.playlist, chev: true },   // [Playlists]
-            ...(Playlists.isView(state.activeView) ? [{ act: 'pl-remove', label: 'Remove from this playlist', icon: SVG.close }] : []),
+            { act: 'pl', label: 'Add to Playlist', icon: SVG.playlist, chev: true },   // [Playlists]
+            ...(Playlists.isView(state.activeView) ? [{ act: 'pl-remove', label: 'Remove from This Playlist', icon: SVG.close }] : []),
             null,
-            { act: 'album', label: 'Go to album', icon: LOOKS_SVG.disc(16) },
-            { act: 'artist', label: 'Go to artist', icon: LOOKS_SVG.person(16) },
+            { act: 'album', label: 'Go to Album', icon: LOOKS_SVG.disc(16) },
+            { act: 'artist', label: 'Go to Artist', icon: LOOKS_SVG.person(16) },
             // [AcoustID]
-            ...(AutoFill.canIdentify() ? [null, { act: 'sound', label: 'Identify by sound', icon: SOUND_ICON }] : []),
+            ...(AutoFill.canIdentify() ? [null, { act: 'sound', label: 'Identify by Sound', icon: SOUND_ICON }] : []),
             ...statusItems(t)
           ];
         }
@@ -18103,7 +18103,7 @@ self.onmessage = async (e) => {
           ).join('');
         }
 
-        // [Playlists] the "Add to playlist" list replaces the menu's items
+        // [Playlists] the "Add to Playlist" list replaces the menu's items
         function renderPicker(t) {
           const rows = Playlists.all().map(p => {
             const on = multi ? Playlists.hasAll(p, multi) : Playlists.has(p, t);
@@ -18112,7 +18112,7 @@ self.onmessage = async (e) => {
           return `<button type="button" role="menuitem" class="looks-menu-item" data-act="pl-back" tabindex="-1"><span class="pl-chev" aria-hidden="true">‹</span><span>Back</span></button>`
             + '<div class="looks-menu-sep" role="separator"></div>'
             + rows
-            + `<button type="button" role="menuitem" class="looks-menu-item" data-act="pl-new" tabindex="-1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg><span>New playlist</span></button>`;
+            + `<button type="button" role="menuitem" class="looks-menu-item" data-act="pl-new" tabindex="-1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg><span>New Playlist</span></button>`;
         }
 
         function swapItems(html) {
@@ -18275,13 +18275,13 @@ self.onmessage = async (e) => {
           openFor(t.id, rowEls.get(t.id) || dom.tracklistBody);
         });
 
-        /** Straight to the "Add to playlist" list (the selection bar's button). */
+        /** Straight to the "Add to Playlist" list (the selection bar's button). */
         function openPicker(id, from) { openFor(id, from); if (isOpen) run('pl'); }
 
         return { openFor, openPicker, close, isOpen: () => isOpen };
       })();
 
-      /* ---- [Looks] mobile full-screen Now playing ---- */
+      /* ---- [Looks] mobile full-screen Now Playing ---- */
       const FsPlayer = (() => {
         const el = $('fsPlayer'), sheet = $('fsSheet'), art = $('fsArt'), artWrap = $('fsArtWrap'), seek = $('fsSeek');
         const ui = { title: $('fsTitle'), artist: $('fsArtist'), like: $('fsLike'), play: $('fsPlay'), shuffle: $('fsShuffle'), repeat: $('fsRepeat'), cur: $('fsCur'), dur: $('fsDur'), context: $('fsContext') };
@@ -18304,7 +18304,7 @@ self.onmessage = async (e) => {
           const pl = Playlists.fromView(state.activeView);   // [Playlists]
           if (pl) return pl.name;
           if (m && sel) return dom.heroTitle.textContent;
-          return 'Your library';
+          return 'Your Library';
         }
 
         function artChanged() {
@@ -18823,10 +18823,10 @@ self.onmessage = async (e) => {
         }
 
         /* ---------------- Rendering ---------------- */
-        const SOURCE = { lrclib: 'LRCLIB', file: '.lrc File', tags: 'Song tags' };
+        const SOURCE = { lrclib: 'LRCLIB', file: '.lrc File', tags: 'Song Tags' };
         function header() {
           const t = current();
-          ui.song.textContent = t ? t.title : 'Not playing';
+          ui.song.textContent = t ? t.title : 'Not Playing';
           ui.artist.textContent = t ? (t.artist || '') : '';
         }
         function stateHTML(title, text, actions) {
@@ -18868,7 +18868,7 @@ self.onmessage = async (e) => {
               p.className = 'ly-plain';
               p.textContent = v.text;
               ui.body.replaceChildren(p);
-              chip = `Not synced · ${SOURCE[v.source] || ''}`;
+              chip = `Not Synced · ${SOURCE[v.source] || ''}`;
               foot = "These lyrics aren't timed to the song.";
               break;
             }
@@ -18876,14 +18876,14 @@ self.onmessage = async (e) => {
               ui.body.setAttribute('aria-live', 'polite');
               const t = current();
               const html = {
-                idle: () => stateHTML('Nothing playing', 'Play a song to see its lyrics.'),
+                idle: () => stateHTML('Nothing Playing', 'Play a song to see its lyrics.'),
                 loading: () => `<div class="ly-state"><div class="ly-spin" aria-hidden="true"></div><span>${v.online ? 'Looking up lyrics…' : 'Finding lyrics…'}</span></div>`,
                 instrumental: () => stateHTML('Instrumental', 'This song has no words.'),
-                none: () => stateHTML('No lyrics found', t ? `Nothing for “${(v.q && v.q.title) || t.title}”${v.q && v.q.artist ? ' by ' + v.q.artist : ''}. Add a .lrc file with the same name next to the song to use your own.` : '', btn('retry', 'Search again')),
-                offline: () => stateHTML("You're offline", 'Lyrics you opened before still work. These will load when you\'re back online.', btn('retry', 'Try again')),
-                off: () => stateHTML('Online lyrics are off', 'Turn on Find lyrics online in Settings to look them up.', btn('settings', 'Open settings', true)),
-                lookupsOff: () => stateHTML('Online lookups are off', 'Turn on Look up songs online in Settings → Tidy Names & Tags to find lyrics.', btn('settings', 'Open settings', true)),
-                error: () => stateHTML("Couldn't reach LRCLIB", 'The lyrics service may be busy. Try again in a moment.', btn('retry', 'Try again'))
+                none: () => stateHTML('No Lyrics Found', t ? `Nothing for “${(v.q && v.q.title) || t.title}”${v.q && v.q.artist ? ' by ' + v.q.artist : ''}. Add a .lrc file with the same name next to the song to use your own.` : '', btn('retry', 'Search Again')),
+                offline: () => stateHTML("You're Offline", 'Lyrics you opened before still work. These will load when you\'re back online.', btn('retry', 'Try Again')),
+                off: () => stateHTML('Online Lyrics Are Off', 'Turn on Find Lyrics Online in Settings to look them up.', btn('settings', 'Open Settings', true)),
+                lookupsOff: () => stateHTML('Online Lookups Are Off', 'Turn on Look Up Songs Online in Settings → Tidy Names & Tags to find lyrics.', btn('settings', 'Open Settings', true)),
+                error: () => stateHTML("Couldn't Reach LRCLIB", 'The lyrics service may be busy. Try again in a moment.', btn('retry', 'Try Again'))
               }[v.kind];
               ui.body.innerHTML = html ? html() : '';
             }
@@ -19052,7 +19052,7 @@ self.onmessage = async (e) => {
           if (prefs.online && isOpen && view && ['off', 'none', 'error'].includes(view.kind)) scheduleLoad(true);
         });
         ui.setClear.addEventListener('click', async () => {
-          try { await cacheClear(); showToast('Saved lyrics cleared'); } catch (e) { showToast("Couldn't clear saved lyrics"); }
+          try { await cacheClear(); showToast('Saved Lyrics Cleared'); } catch (e) { showToast("Couldn't Clear Saved Lyrics"); }
           stale = true;
           syncSettings();
         });
@@ -19251,20 +19251,20 @@ self.onmessage = async (e) => {
         menu.textContent = '';
         var lbl = document.createElement('div');
         lbl.className = 'lp-menu-label';
-        lbl.textContent = 'Switch profile';
+        lbl.textContent = 'Switch Profile';
         menu.appendChild(lbl);
         list.forEach(function (p) {
           menu.appendChild(menuItem(p.name, avatarEl(p), function () { switchTo(p.id); }, { radio: true, checked: p.id === active.id }));
         });
-        menu.appendChild(menuItem('Add profile', ICONS.add, function () { openEditor(null); }));
+        menu.appendChild(menuItem('Add Profile', ICONS.add, function () { openEditor(null); }));
         var sep = document.createElement('div');
         sep.className = 'lp-menu-sep';
         sep.setAttribute('role', 'separator');
         menu.appendChild(sep);
         menu.appendChild(menuItem('Edit “' + active.name + '”', ICONS.edit, function () { openEditor(active); }));
         if (list.length > 1) menu.appendChild(menuItem('Delete “' + active.name + '”…', ICONS.trash, function () { deleteProfile(active); }, { danger: true }));
-        menu.appendChild(menuItem('Back up & restore…', ICONS.data, function () { openSettingsAt('setDataTitle'); }));
-        if (PWA.canInstall()) menu.appendChild(menuItem('Install app', ICONS.install, PWA.install));
+        menu.appendChild(menuItem('Back Up & Restore…', ICONS.data, function () { openSettingsAt('setDataTitle'); }));
+        if (PWA.canInstall()) menu.appendChild(menuItem('Install App', ICONS.install, PWA.install));
       }
 
       function positionMenu() {
@@ -19347,7 +19347,7 @@ self.onmessage = async (e) => {
         var add = document.createElement('button');
         add.type = 'button';
         add.className = 'lp-tile lp-tile-add';
-        add.innerHTML = '<span class="lp-avatar lp-avatar-lg" aria-hidden="true">+</span><span>Add profile</span>';
+        add.innerHTML = '<span class="lp-avatar lp-avatar-lg" aria-hidden="true">+</span><span>Add Profile</span>';
         add.addEventListener('click', function () { openEditor(null, function (p) { pick(p.id); }); });
         tiles.appendChild(add);
         $('lpRemember').checked = !atStartup && LP.rememberedId() === active.id;
@@ -19452,7 +19452,7 @@ self.onmessage = async (e) => {
         var p = LP.create(fields);
         if (editorDone) { editorDone(p); return; }
         renderChip();
-        toast('Created ' + p.name, { label: 'Switch now', run: function () { switchTo(p.id); } });
+        toast('Created ' + p.name, { label: 'Switch Now', run: function () { switchTo(p.id); } });
       });
 
       $('bkSwitchProfile').addEventListener('click', function () { openPicker(false); });
@@ -19635,7 +19635,7 @@ self.onmessage = async (e) => {
           var label = document.createElement('label');
           label.className = 'visually-hidden-input';
           label.htmlFor = 'bkWhich';
-          label.textContent = 'Profile to import';
+          label.textContent = 'Profile to Import';
           var sel = document.createElement('select');
           sel.id = 'bkWhich';
           parsed.profiles.forEach(function (x, i) {
@@ -19707,7 +19707,7 @@ self.onmessage = async (e) => {
             return p;
           });
           renderChip();
-          if (created.length === 1) toast('Imported as ' + created[0].name, { label: 'Switch now', run: function () { switchTo(created[0].id); } });
+          if (created.length === 1) toast('Imported as ' + created[0].name, { label: 'Switch Now', run: function () { switchTo(created[0].id); } });
           else toast('Imported ' + created.length + ' profiles');
           return;
         }

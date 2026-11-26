@@ -45,19 +45,19 @@ and show **"A new version of Localify is ready — Reload"**.
 
 ### Android (Chrome)
 1. Open the address in Chrome.
-2. Tap **Install app** in Localify's profile menu or under **Settings → App**, or use
+2. Tap **Install App** in Localify's profile menu or under **Settings → App**, or use
    Chrome's **⋮ → Install app / Add to Home screen**.
-3. Open Localify from the home screen. Use **Add folder / Add files** to pick music.
+3. Open Localify from the home screen. Use **Select Music Folder / Add Audio Files** to pick music.
 
 ### iPhone / iPad (Safari)
 1. Open the address in **Safari** (other iOS browsers can't install apps).
 2. Tap **Share** (the square with an arrow) → **Add to Home Screen** → **Add**.
-3. Open Localify from the home screen. Pick songs with **Add files**; iOS doesn't
+3. Open Localify from the home screen. Pick songs with **Add Audio Files**; iOS doesn't
    let web apps keep access to folders, so you pick them again after a restart.
 
 ### Windows (Edge or Chrome)
 1. Open the address in Edge or Chrome.
-2. Click **Install app** in Localify (profile menu or **Settings → App**), or the
+2. Click **Install App** in Localify (profile menu or **Settings → App**), or the
    install icon at the right end of the address bar.
 3. Localify gets its own window, Start menu entry and taskbar icon. Uninstall it
    from **Settings → Apps** like any other app.
